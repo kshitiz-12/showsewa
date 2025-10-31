@@ -50,7 +50,8 @@
    - **Root Directory**: `frontend`
    - **Build Command**: `npm run build` (auto)
    - **Output Directory**: `dist` (auto)
-   - Note: `vercel.json` is already configured in the frontend folder
+   - **Install Command**: Leave empty (or `npm install`)
+   - ✅ `frontend/vercel.json` already configured!
 
 5. Add Environment Variables:
    ```
@@ -86,6 +87,12 @@ After frontend deploys:
 ---
 
 ## 🐛 Common Issues
+
+**Vercel Error: "cd frontend: No such file or directory"**  
+👉 **FIX**: In Vercel Settings → General, set:
+   - **Root Directory**: `frontend`
+   - **Install Command**: Leave empty (not `cd frontend && npm install`)
+   See `VERCEL_FIX.md` for details!
 
 **CORS Error**: Add `FRONTEND_URL` to Render env vars
 
