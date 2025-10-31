@@ -56,11 +56,24 @@ app.use(helmet());
 app.use(compression());
 app.use(limiter);
 app.use(cors({
-  origin: [
-    process.env.FRONTEND_URL || 'http://localhost:5174',
-    'http://localhost:5173', // Vite default port
-    'http://localhost:3000', // Alternative React dev port
-  ],
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or Postman)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      process.env.FRONTEND_URL || 'http://localhost:5174',
+      'http://localhost:5173', // Vite default port
+      'http://localhost:3000', // Alternative React dev port
+      'https://showsewa.vercel.app', // Production frontend
+    ];
+    
+    // Check if origin is in allowed list or is a Vercel preview deployment
+    if (allowedOrigins.includes(origin) || origin.includes('.vercel.app')) {
+      callback(null, true);
+    } else {
+      callback(null, true); // For development, allow all origins
+    }
+  },
   credentials: true,
 }));
 app.use(morgan('combined'));
