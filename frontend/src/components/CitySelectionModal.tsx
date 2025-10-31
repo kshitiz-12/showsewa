@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Search, MapPin, X, Landmark } from 'lucide-react';
-import { popularCities, nepalCities, getProvinces, getCitiesByProvince, City } from '../data/nepalCities';
+import { popularCities, nepalCities, getProvinces } from '../data/nepalCities';
 
 interface CitySelectionModalProps {
   isOpen: boolean;
@@ -23,7 +23,7 @@ export function CitySelectionModal({ isOpen, onClose, onSelectCity, currentCity 
   const handleDetectLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        () => {
           // In a real implementation, you would reverse geocode the coordinates
           // For now, we'll just use Kathmandu as default
           onSelectCity('Kathmandu');

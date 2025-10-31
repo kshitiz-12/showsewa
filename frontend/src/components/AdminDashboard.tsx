@@ -41,8 +41,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentView, setCurrentView] = useState<'dashboard' | 'theaters' | 'movies' | 'events' | 'bookings' | 'cleanup'>('dashboard');
-  const [theaters, setTheaters] = useState<any[]>([]);
-  const [theatersLoading, setTheatersLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
   // Modal states
@@ -108,35 +106,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     }
   };
 
-  const fetchTheaters = async () => {
-    try {
-      setTheatersLoading(true);
-      setError(null);
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/admin/theaters?limit=100', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          setTheaters(data.data.theaters || []);
-          console.log('Theaters loaded:', data.data.theaters?.length || 0);
-        } else {
-          setError('Failed to load theaters');
-        }
-      } else {
-        setError(`Failed to fetch theaters: ${response.status}`);
-      }
-    } catch (error) {
-      console.error('Error fetching theaters:', error);
-      setError('Network error while loading theaters');
-    } finally {
-      setTheatersLoading(false);
-    }
-  };
 
   if (loading) {
     return (

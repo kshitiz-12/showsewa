@@ -450,7 +450,7 @@ export function Movies({ onNavigate }: MoviesProps) {
                   {language === 'en' ? movie.title : movie.titleNe}
                 </h3>
                 <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                  {movie.genre.join(', ')} • {movie.language.join(', ')}
+                  {Array.isArray(movie.genre) ? movie.genre.join(', ') : movie.genre} • {Array.isArray(movie.language) ? movie.language.join(', ') : movie.language}
                 </p>
               </div>
             ))}

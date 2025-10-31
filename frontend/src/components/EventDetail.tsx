@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Calendar, MapPin, Clock, Users, ArrowLeft } from 'lucide-react';
+import { Calendar, MapPin, Users, ArrowLeft } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface Event {
@@ -53,8 +53,8 @@ export function EventDetail({ eventId, onNavigate }: EventDetailProps) {
     <div className="min-h-screen bg-white dark:bg-gray-900">
       <div className="relative h-96 bg-gray-900">
         <img
-          src={event.image_url}
-          alt={language === 'en' ? event.title : event.title_ne}
+          src={event.imageUrl}
+          alt={language === 'en' ? event.title : event.titleNe}
           className="w-full h-full object-cover opacity-60"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>

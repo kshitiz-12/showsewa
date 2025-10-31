@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, MapPin, Phone, Mail, Building2, Star, RefreshCw, AlertCircle, Download } from 'lucide-react';
+import { Plus, Edit, Trash2, MapPin, Phone, Mail, Building2, RefreshCw, AlertCircle, Download } from 'lucide-react';
 import { theaterService, CreateTheaterRequest, UpdateTheaterRequest } from '../services/theaterService';
 import { Theater } from '../data/nepalTheaters';
 
@@ -19,7 +19,7 @@ export const TheaterManagement: React.FC<TheaterManagementProps> = ({ onAddTheat
     loadTheaters();
   }, []);
 
-  const loadTheaters = async (forceRefresh = false) => {
+  const loadTheaters = async () => {
     try {
       setLoading(true);
       setError(null);
@@ -301,7 +301,7 @@ const TheaterForm: React.FC<TheaterFormProps> = ({ theater, onSubmit, onCancel, 
     address: theater?.address || '',
     phone: theater?.phone || '',
     email: theater?.email || '',
-    description: theater?.description || '',
+    description: '',
     amenities: theater?.amenities || [],
     screenCount: theater?.screens || 3,
     seatsPerScreen: 200,

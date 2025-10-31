@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Clock, Film, Calendar, ArrowLeft, Play, Image as ImageIcon, Star, Heart } from 'lucide-react';
+import { Clock, Film, Calendar, ArrowLeft, Play, Image as ImageIcon, Star, Heart, MapPin, Ticket } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useCity } from '../contexts/CityContext';
 import { useFavorites } from '../contexts/FavoritesContext';
@@ -395,7 +395,7 @@ export function MovieDetail({ movieId, onNavigate }: Readonly<MovieDetailProps>)
                               {/* Showtimes Grid - BookMyShow Style */}
                               <div className="p-4">
                                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                                  {showtimes.map((showtime, timeIndex) => (
+                                  {showtimes.map((showtime) => (
                                     <button
                                       key={showtime.id}
                                       onClick={() => onNavigate('booking-page', showtime.id)}

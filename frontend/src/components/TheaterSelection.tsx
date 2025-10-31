@@ -5,19 +5,6 @@ import { useFavorites } from '../contexts/FavoritesContext';
 import { theaterService } from '../services/theaterService';
 import { Theater } from '../data/nepalTheaters';
 
-interface Theater {
-  id: string;
-  name: string;
-  city: string;
-  area: string;
-  address: string;
-  phone?: string;
-  email?: string;
-  screens: number;
-  amenities: string[];
-  isActive: boolean;
-}
-
 interface TheaterSelectionProps {
   onSelectTheater: (theater: Theater) => void;
   selectedTheater?: Theater;

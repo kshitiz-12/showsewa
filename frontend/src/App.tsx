@@ -182,7 +182,7 @@ function App() {
       case 'loyalty':
         return <LoyaltyPoints />;
       case 'profile':
-        return <UserProfile />;
+        return <UserProfile onNavigate={handleNavigate} />;
       case 'bookings':
         return <UserBookings onNavigate={handleNavigate} />;
       default:

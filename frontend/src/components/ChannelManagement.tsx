@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Monitor, 
-  Smartphone, 
   CreditCard, 
   Building2, 
-  Handshake, 
   RefreshCw, 
   Settings, 
   AlertCircle,
   CheckCircle,
   Clock,
-  TrendingUp,
-  Users
+  TrendingUp
 } from 'lucide-react';
 import { inventoryService, TheaterChannel, ChannelBooking } from '../services/inventoryService';
 
