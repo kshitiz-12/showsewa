@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import prisma from '../lib/prisma';
 import { AuthRequest } from '../middleware/auth';
 import { triggerMovieCleanup, getCleanupStats } from '../services/movieCleanupService';
-import { SeatStatus } from '@prisma/client';
+import { SeatStatus, Prisma } from '@prisma/client';
 
 /**
  * Get dashboard statistics
@@ -417,7 +417,7 @@ export const createTheater = async (req: AuthRequest, res: Response) => {
 
     // Create screens and seat categories in smaller transactions
     console.log(`Creating ${screenCount} screens with ${seatsPerScreen} seats each...`);
-    const screens = [];
+    const screens: any[] = [];
     
     for (let i = 1; i <= screenCount; i++) {
       console.log(`Creating screen ${i}/${screenCount}...`);
@@ -485,7 +485,7 @@ export const createTheater = async (req: AuthRequest, res: Response) => {
 
       // Create seats in batches to avoid transaction timeout
       console.log(`Creating seats for screen ${i}...`);
-      const seats = [];
+      const seats: Prisma.SeatCreateManyInput[] = [];
       const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
       
       for (let rowIndex = 0; rowIndex < rows.length && rowIndex < Math.ceil(seatsPerScreen / 15); rowIndex++) {

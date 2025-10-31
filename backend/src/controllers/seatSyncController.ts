@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import prisma from '../lib/prisma';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
+import { Prisma } from '@prisma/client';
 
 /**
  * This controller handles seat synchronization across multiple booking channels
@@ -44,7 +45,7 @@ export const bulkUpdateSeats = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    const updateResults = [];
+    const updateResults: any[] = [];
     
     // Process each seat update
     for (const update of seatUpdates) {

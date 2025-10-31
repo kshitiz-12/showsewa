@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import prisma from '../lib/prisma';
+import { Prisma } from '@prisma/client';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
@@ -165,7 +166,7 @@ export const getSeatsForShowtime = async (req: Request, res: Response) => {
 
       // Generate seats based on categories and capacity
       try {
-        const generatedSeats = [];
+        const generatedSeats: any[] = [];
         let seatNumber = 1;
         const rows = Math.ceil(Math.sqrt(capacity)); // Approximate square layout
         const seatsPerRow = Math.ceil(capacity / rows);
