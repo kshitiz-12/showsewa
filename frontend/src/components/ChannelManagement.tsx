@@ -20,7 +20,7 @@ interface ChannelManagementProps {
 const channelConfig = {
   showsewa: { name: 'ShowSewa', icon: Monitor, color: 'red', description: 'Our platform' },
   walkIn: { name: 'Walk-In', icon: Building2, color: 'gray', description: 'Physical tickets' },
-  otherPlatform: { name: 'Other Platforms', icon: Handshake, color: 'purple', description: 'Partner sites' },
+  otherPlatform: { name: 'Other Platforms', icon: Building2, color: 'purple', description: 'Partner sites' },
   posSystem: { name: 'POS System', icon: CreditCard, color: 'green', description: 'Point of sale' },
 };
 

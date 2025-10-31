@@ -40,7 +40,7 @@ export const TheaterManagement: React.FC<TheaterManagementProps> = ({ onAddTheat
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await loadTheaters(true);
+    await loadTheaters();
     setRefreshing(false);
   };
 
@@ -103,7 +103,7 @@ export const TheaterManagement: React.FC<TheaterManagementProps> = ({ onAddTheat
       alert(`Sync completed: ${results.success} successful, ${results.failed} failed`);
       
       if (results.success > 0) {
-        await loadTheaters(true); // Refresh the list
+        await loadTheaters(); // Refresh the list
       }
     } catch (error) {
       console.error('❌ Failed to sync theaters:', error);
@@ -315,7 +315,7 @@ const TheaterForm: React.FC<TheaterFormProps> = ({ theater, onSubmit, onCancel, 
     setLoading(true);
     
     try {
-      await onSubmit(formData);
+      await onSubmit(formData as CreateTheaterRequest | UpdateTheaterRequest);
     } catch (error) {
       console.error('Form submission error:', error);
     } finally {
