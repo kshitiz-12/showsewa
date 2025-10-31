@@ -50,6 +50,7 @@
    - **Root Directory**: `frontend`
    - **Build Command**: `npm run build` (auto)
    - **Output Directory**: `dist` (auto)
+   - Note: `vercel.json` is already configured in the frontend folder
 
 5. Add Environment Variables:
    ```
