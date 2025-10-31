@@ -32,6 +32,12 @@ import qrRoutes from './routes/qr';
 // Load environment variables
 dotenv.config();
 
+// Debug: Log DATABASE_URL (masked for security)
+console.log('🔍 DATABASE_URL configured:', process.env.DATABASE_URL ? 'YES' : 'NO');
+console.log('🔍 DIRECT_URL configured:', process.env.DIRECT_URL ? 'YES' : 'NO');
+console.log('🔍 DATABASE_URL host:', process.env.DATABASE_URL?.match(/@([^:]+):/)?.[1] || 'NOT FOUND');
+console.log('🔍 DIRECT_URL host:', process.env.DIRECT_URL?.match(/@([^:]+):/)?.[1] || 'NOT FOUND');
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
