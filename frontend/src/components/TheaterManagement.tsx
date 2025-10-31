@@ -44,9 +44,9 @@ export const TheaterManagement: React.FC<TheaterManagementProps> = ({ onAddTheat
     setRefreshing(false);
   };
 
-  const handleCreateTheater = async (theaterData: CreateTheaterRequest) => {
+  const handleCreateTheater = async (theaterData: CreateTheaterRequest | UpdateTheaterRequest) => {
     try {
-      const newTheater = await theaterService.createTheater(theaterData);
+      const newTheater = await theaterService.createTheater(theaterData as CreateTheaterRequest);
       setTheaters(prev => [newTheater, ...prev]);
       setShowCreateForm(false);
       
