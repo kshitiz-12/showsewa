@@ -1,6 +1,6 @@
-# Database Configuration - Using Direct Connection for Render
-DATABASE_URL="postgresql://postgres:Showsewa12xyz@db.sekplvmoorurpxwpxuuv.supabase.co:5432/postgres"
-DIRECT_URL="postgresql://postgres:Showsewa12xyz@db.sekplvmoorurpxwpxuuv.supabase.co:5432/postgres"
+# Database Configuration - Using Transaction Pooler for Render
+DATABASE_URL="postgresql://postgres.sekplvmoorurpxwpxuuv:Showsewa12xyz@aws-1-us-east-2.pooler.supabase.com:5432/postgres"
+DIRECT_URL="postgresql://postgres.sekplvmoorurpxwpxuuv:Showsewa12xyz@aws-1-us-east-2.pooler.supabase.com:5432/postgres"
 
 # Supabase Configuration
 SUPABASE_URL="https://sekplvmoorurpxwpxuuv.supabase.co"
