@@ -176,17 +176,19 @@ server.on('error', (err: NodeJS.ErrnoException) => {
 });
 
 // Graceful shutdown
-process.on('SIGTERM', () => {
+process.on('SIGTERM', async () => {
   console.log('SIGTERM received, shutting down gracefully');
-  server.close(() => {
+  server.close(async () => {
+    await prisma.$disconnect();
     console.log('Process terminated');
     process.exit(0);
   });
 });
 
-process.on('SIGINT', () => {
+process.on('SIGINT', async () => {
   console.log('SIGINT received, shutting down gracefully');
-  server.close(() => {
+  server.close(async () => {
+    await prisma.$disconnect();
     console.log('Process terminated');
     process.exit(0);
   });
