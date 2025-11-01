@@ -33,7 +33,10 @@ class EmailService {
       auth: {
         user: process.env.SMTP_USER || 'your-email@gmail.com',
         pass: process.env.SMTP_PASS || 'your-app-password'
-      }
+      },
+      connectionTimeout: 10000, // 10 seconds
+      greetingTimeout: 5000, // 5 seconds
+      socketTimeout: 10000 // 10 seconds
     });
   }
 
@@ -47,10 +50,17 @@ class EmailService {
         console.log('From:', process.env.SMTP_USER);
       }
 
-      const info = await this.transporter.sendMail({
+      // Add timeout to prevent hanging
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('Email sending timeout')), 15000); // 15 seconds timeout
+      });
+
+      const sendPromise = this.transporter.sendMail({
         from: `"ShowSewa" <${process.env.SMTP_USER}>`,
         ...options
       });
+
+      const info = await Promise.race([sendPromise, timeoutPromise]);
 
       console.log('✅ Email sent successfully:', info.messageId);
       console.log('📧 Email delivered to:', options.to);

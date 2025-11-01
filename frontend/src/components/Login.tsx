@@ -14,6 +14,7 @@ export function Login({ onNavigate }: Readonly<LoginProps>) {
   const [showPassword, setShowPassword] = useState(false);
   const [showOTP, setShowOTP] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   
   // Form states
   const [email, setEmail] = useState('');
@@ -21,6 +22,7 @@ export function Login({ onNavigate }: Readonly<LoginProps>) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -48,9 +50,36 @@ export function Login({ onNavigate }: Readonly<LoginProps>) {
       }
 
       if (isLogin) {
-        // For login, go directly to OTP verification
-        setShowOTP(true);
-        setSuccess(`OTP sent to ${email}. Please check your email and enter the verification code.`);
+        // Validate password for login
+        if (!password) {
+          setError('Please enter your password');
+          setLoading(false);
+          return;
+        }
+
+        // For login, use password (no OTP)
+        const response = await fetch('http://localhost:5000/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            login({ user: data.data.user, token: data.data.token });
+            onNavigate('home');
+          } else {
+            setError(data.message || 'Login failed');
+            setLoading(false);
+          }
+        } else {
+          const errorData = await response.json();
+          console.error('Login error:', errorData);
+          setError(errorData.message || 'Login failed');
+          setLoading(false);
+        }
+        return;
       } else {
         // For registration, create user and send OTP
         const response = await fetch('http://localhost:5000/api/auth/register', {
@@ -122,41 +151,91 @@ export function Login({ onNavigate }: Readonly<LoginProps>) {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    setLoading(true);
 
-  const handleEmailPasswordLogin = async (e: React.FormEvent) => {
+    try {
+      // Validate email
+      if (!email || !/\S+@\S+\.\S+/.test(email)) {
+        setError('Please enter a valid email address');
+        setLoading(false);
+        return;
+      }
+
+      // Request password reset OTP
+      const response = await fetch('http://localhost:5000/api/auth/request-password-reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      if (response.ok) {
+        setSuccess(`Password reset OTP sent to ${email}. Please check your email and enter the verification code.`);
+        setShowOTP(true);
+        setShowForgotPassword(true);
+      } else {
+        const errorData = await response.json();
+        console.error('Password reset error:', errorData);
+        setError(errorData.message || 'Failed to send password reset OTP');
+      }
+    } catch (err) {
+      console.error('Password reset request error:', err);
+      setError('Connection error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-      if (!email || !password) {
-        setError('Please enter email and password');
+      if (!otp || otp.length !== 6) {
+        setError('Please enter a valid 6-digit OTP');
         setLoading(false);
         return;
       }
 
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      if (!newPassword || newPassword.length < 6) {
+        setError('Password must be at least 6 characters long');
+        setLoading(false);
+        return;
+      }
+
+      // Reset password with OTP
+      const response = await fetch('http://localhost:5000/api/auth/reset-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, otp, newPassword }),
       });
 
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
-          // Store token and user data
-          login({ user: data.data.user, token: data.data.token });
-          onNavigate('home');
+          setSuccess('Password reset successfully! You can now login with your new password.');
+          setTimeout(() => {
+            setShowForgotPassword(false);
+            setShowOTP(false);
+            setIsLogin(true);
+            setOtp('');
+            setNewPassword('');
+            setSuccess('');
+          }, 2000);
         } else {
-          setError(data.message || 'Login failed');
+          setError(data.message || 'Password reset failed');
         }
       } else {
         const data = await response.json();
-        setError(data.message || 'Login failed. Please check your credentials.');
+        setError(data.message || 'Password reset failed');
       }
     } catch (err) {
-      console.error('Login error:', err);
-      setError('Connection error. Please try again.');
+      console.error('Password reset error:', err);
+      setError('Verification failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -237,7 +316,7 @@ export function Login({ onNavigate }: Readonly<LoginProps>) {
 
           {/* OTP Form */}
           {showOTP ? (
-            <form onSubmit={handleVerifyOTP} className="space-y-6">
+            <form onSubmit={showForgotPassword ? handleResetPassword : handleVerifyOTP} className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Enter OTP
@@ -256,6 +335,26 @@ export function Login({ onNavigate }: Readonly<LoginProps>) {
                 </p>
               </div>
 
+              {showForgotPassword && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    New Password
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-600"
+                      required
+                      minLength={6}
+                    />
+                  </div>
+                </div>
+              )}
+
               <button
                 type="submit"
                 disabled={loading}
@@ -264,10 +363,10 @@ export function Login({ onNavigate }: Readonly<LoginProps>) {
                 {loading ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    Verifying...
+                    {showForgotPassword ? 'Resetting...' : 'Verifying...'}
                   </>
                 ) : (
-                  'Verify OTP'
+                  showForgotPassword ? 'Reset Password' : 'Verify OTP'
                 )}
               </button>
 
@@ -276,7 +375,9 @@ export function Login({ onNavigate }: Readonly<LoginProps>) {
                 onClick={() => {
                   setShowOTP(false);
                   setOtp('');
+                  setNewPassword('');
                   setSuccess('');
+                  setShowForgotPassword(false);
                 }}
                 className="w-full text-red-600 hover:text-red-700 font-medium"
               >
@@ -285,7 +386,7 @@ export function Login({ onNavigate }: Readonly<LoginProps>) {
             </form>
           ) : (
             /* Main Login/Signup Form */
-            <form onSubmit={isLogin ? handleEmailPasswordLogin : handleSendOTP} className="space-y-4">
+            <form onSubmit={handleSendOTP} className="space-y-4">
               {!isLogin && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -359,18 +460,6 @@ export function Login({ onNavigate }: Readonly<LoginProps>) {
                 </div>
               )}
 
-              {isLogin && (
-                <div className="flex items-center justify-between text-sm">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" className="rounded" />
-                    <span className="text-gray-600 dark:text-gray-400">Remember me</span>
-                  </label>
-                  <button type="button" className="text-red-600 hover:text-red-700 font-medium">
-                    Forgot password?
-                  </button>
-                </div>
-              )}
-
               <button
                 type="submit"
                 disabled={loading}
@@ -386,15 +475,12 @@ export function Login({ onNavigate }: Readonly<LoginProps>) {
                 )}
               </button>
 
-              {!isLogin && (
-                <button
-                  type="button"
-                  onClick={handleEmailPasswordLogin}
-                  disabled={loading}
-                  className="w-full border-2 border-red-600 text-red-600 py-3 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors font-semibold disabled:opacity-50"
-                >
-                  Sign Up without OTP
-                </button>
+              {isLogin && (
+                <div className="flex justify-end">
+                  <button type="button" onClick={handleForgotPassword} className="text-sm text-red-600 hover:text-red-700 font-medium">
+                    Forgot password?
+                  </button>
+                </div>
               )}
             </form>
           )}

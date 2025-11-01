@@ -112,9 +112,13 @@ export const register = async (req: Request, res: Response) => {
       }
     });
 
-    // Store OTP and send via email
+    // Store OTP and send via email (fire and forget - don't block the response)
     storeOTP(email, otp, 'registration');
-    await sendEmailOTP(email, otp, 'registration');
+    sendEmailOTP(email, otp, 'registration').catch(error => {
+      console.error('Background OTP email sending failed:', error);
+      // Log OTP in console for development/testing
+      console.log(`📧 OTP for ${email}: ${otp}`);
+    });
 
     return res.status(201).json({
       success: true,
@@ -213,6 +217,63 @@ export const verifyOTP = async (req: Request, res: Response) => {
 
   } catch (error) {
     console.error('OTP verification error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+};
+
+/**
+ * Request login OTP
+ */
+export const requestLoginOTP = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is required'
+      });
+    }
+
+    // Find user
+    const user = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    if (!user) {
+      // Don't reveal if user exists
+      return res.json({
+        success: true,
+        message: 'If user exists, login OTP has been sent'
+      });
+    }
+
+    if (!user.isVerified) {
+      return res.status(401).json({
+        success: false,
+        message: 'Please verify your email first'
+      });
+    }
+
+    const otp = generateOTP();
+    storeOTP(email, otp, 'registration'); // Reuse registration OTP type
+    sendEmailOTP(email, otp, 'registration').catch(error => {
+      console.error('Background OTP email sending failed:', error);
+      // Log OTP in console for development/testing
+      console.log(`📧 Login OTP for ${email}: ${otp}`);
+    });
+
+    return res.json({
+      success: true,
+      message: 'Login OTP sent'
+    });
+
+  } catch (error) {
+    console.error('Login OTP request error:', error);
     return res.status(500).json({
       success: false,
       message: 'Internal server error',
@@ -420,7 +481,11 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
 
     const otp = generateOTP();
     storeOTP(email, otp, 'password_reset');
-    await sendEmailOTP(email, otp, 'password_reset');
+    sendEmailOTP(email, otp, 'password_reset').catch(error => {
+      console.error('Background OTP email sending failed:', error);
+      // Log OTP in console for development/testing
+      console.log(`📧 Password Reset OTP for ${email}: ${otp}`);
+    });
 
     return res.json({
       success: true,
@@ -429,6 +494,92 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
 
   } catch (error) {
     console.error('Password reset request error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+};
+
+/**
+ * Reset password with OTP
+ */
+export const resetPassword = async (req: Request, res: Response) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+
+    if (!email || !otp || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email, OTP, and new password are required'
+      });
+    }
+
+    // Find user
+    const user = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Validate OTP format
+    if (otp.length !== 6 || !/^\d+$/.test(otp)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid OTP format'
+      });
+    }
+
+    // Verify OTP
+    const storedData = otpStore.get(email);
+    
+    if (!storedData || storedData.type !== 'password_reset') {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid OTP'
+      });
+    }
+
+    if (Date.now() > storedData.expiresAt) {
+      otpStore.delete(email);
+      return res.status(400).json({
+        success: false,
+        message: 'OTP has expired. Please request a new one.'
+      });
+    }
+
+    if (storedData.otp !== otp) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid OTP'
+      });
+    }
+
+    // OTP is valid, remove it and update password
+    otpStore.delete(email);
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
+
+    // Update user password
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { password: hashedPassword }
+    });
+
+    return res.json({
+      success: true,
+      message: 'Password reset successfully'
+    });
+
+  } catch (error) {
+    console.error('Password reset error:', error);
     return res.status(500).json({
       success: false,
       message: 'Internal server error',
