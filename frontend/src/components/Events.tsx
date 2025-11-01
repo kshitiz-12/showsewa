@@ -116,14 +116,14 @@ export function Events({ onNavigate }: EventsProps) {
             {/* Incoming Events Toggle */}
             <button
               onClick={() => setShowIncomingOnly(!showIncomingOnly)}
-              className={`btn-secondary ${showIncomingOnly ? 'bg-blue-50 border-blue-300 text-blue-700' : ''}`}
+              className={`btn-secondary whitespace-nowrap ${showIncomingOnly ? 'bg-blue-50 border-blue-300 text-blue-700' : ''}`}
             >
               <Clock className={`w-5 h-5 ${showIncomingOnly ? 'text-blue-600' : 'text-gray-400'}`} />
               <span className="font-medium">Incoming Events</span>
             </button>
           </div>
 
-          <div className="flex gap-3 overflow-x-auto pb-2">
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
             {categories.map(category => (
               <button
                 key={category.id}
