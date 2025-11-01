@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Search, MapPin, X, Landmark } from 'lucide-react';
 import { popularCities, nepalCities, getProvinces } from '../data/nepalCities';
 
@@ -56,7 +57,7 @@ export function CitySelectionModal({ isOpen, onClose, onSelectCity, currentCity 
     );
   }
 
-  return (
+  const modalContent = (
     <div className="fixed inset-0 z-[9999] flex items-start justify-center p-4 bg-black bg-opacity-50 backdrop-blur-sm overflow-y-auto">
       <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] my-8 overflow-hidden">
         {/* Header */}
@@ -156,4 +157,6 @@ export function CitySelectionModal({ isOpen, onClose, onSelectCity, currentCity 
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }

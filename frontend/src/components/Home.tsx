@@ -166,7 +166,7 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors overflow-x-hidden">
       {/* Hero Section */}
       <section className="relative py-20 lg:py-32 bg-gradient-to-br from-red-900 via-red-800 to-red-700 overflow-hidden shadow-xl">
         <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/20"></div>
