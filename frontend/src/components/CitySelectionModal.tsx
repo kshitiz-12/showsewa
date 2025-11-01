@@ -57,7 +57,7 @@ export function CitySelectionModal({ isOpen, onClose, onSelectCity, currentCity 
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center p-4 bg-black bg-opacity-50 backdrop-blur-sm overflow-y-auto">
+    <div className="fixed inset-0 z-[9999] flex items-start justify-center p-4 bg-black bg-opacity-50 backdrop-blur-sm overflow-y-auto">
       <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] my-8 overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
