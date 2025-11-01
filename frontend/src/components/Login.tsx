@@ -96,7 +96,7 @@ export function Login({ onNavigate }: Readonly<LoginProps>) {
         if (response.ok) {
           const data = await response.json();
           setShowOTP(true);
-          setSuccess(`Registration successful! OTP sent to ${email}. Please check your email and enter the verification code.`);
+          setSuccess(data.message || `OTP sent to ${email}. Please check your email and enter the verification code.`);
         } else {
           const errorData = await response.json();
           console.error('Registration error:', errorData);

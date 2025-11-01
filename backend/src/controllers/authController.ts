@@ -13,6 +13,12 @@ interface OTPData {
   otp: string;
   expiresAt: number;
   type: 'registration' | 'password_reset';
+  registrationData?: {
+    name: string;
+    email: string;
+    password: string;
+    phone?: string;
+  };
 }
 
 const otpStore = new Map<string, OTPData>();
@@ -23,9 +29,9 @@ const generateOTP = () => {
 };
 
 // Store OTP with expiration (10 minutes)
-const storeOTP = (email: string, otp: string, type: 'registration' | 'password_reset' = 'registration') => {
+const storeOTP = (email: string, otp: string, type: 'registration' | 'password_reset' = 'registration', registrationData?: any) => {
   const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
-  otpStore.set(email, { otp, expiresAt, type });
+  otpStore.set(email, { otp, expiresAt, type, ...(registrationData && { registrationData }) });
 };
 
 // Verify and consume OTP
@@ -92,39 +98,26 @@ export const register = async (req: Request, res: Response) => {
     // Generate OTP
     const otp = generateOTP();
 
-    // Create user (not verified initially)
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-        ...(phone && { phone }), // Only include phone if provided
-        role: 'USER',
-        isVerified: false
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        phone: true,
-        role: true,
-        isVerified: true
-      }
+    // Store OTP with registration data (don't create user yet)
+    storeOTP(email, otp, 'registration', {
+      name,
+      email,
+      password: hashedPassword,
+      phone: phone || undefined
     });
-
-    // Store OTP and send via email (fire and forget - don't block the response)
-    storeOTP(email, otp, 'registration');
+    
+    // Send OTP via email (fire and forget - don't block the response)
     sendEmailOTP(email, otp, 'registration').catch(error => {
       console.error('Background OTP email sending failed:', error);
       // Log OTP in console for development/testing
       console.log(`📧 OTP for ${email}: ${otp}`);
     });
 
-    return res.status(201).json({
+    return res.status(200).json({
       success: true,
-      message: 'User registered successfully. Please verify your email with the OTP sent.',
+      message: 'OTP sent to your email. Please verify to complete registration.',
       data: {
-        user
+        email
       }
     });
 
@@ -152,25 +145,6 @@ export const verifyOTP = async (req: Request, res: Response) => {
       });
     }
 
-    // Find user
-    const user = await prisma.user.findUnique({
-      where: { email }
-    });
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
-    }
-
-    if (user.isVerified) {
-      return res.status(400).json({
-        success: false,
-        message: 'User already verified'
-      });
-    }
-
     // Validate OTP format
     if (otp.length !== 6 || !/^\d+$/.test(otp)) {
       return res.status(400).json({
@@ -179,19 +153,83 @@ export const verifyOTP = async (req: Request, res: Response) => {
       });
     }
 
-    // Verify OTP
-    if (!verifyAndConsumeOTP(email, otp)) {
+    // Get OTP data
+    const storedData = otpStore.get(email);
+    
+    if (!storedData) {
       return res.status(400).json({
         success: false,
         message: 'Invalid or expired OTP. Please request a new one.'
       });
     }
 
-    // Verify user
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { isVerified: true }
-    });
+    if (Date.now() > storedData.expiresAt) {
+      otpStore.delete(email);
+      return res.status(400).json({
+        success: false,
+        message: 'OTP has expired. Please request a new one.'
+      });
+    }
+
+    if (storedData.otp !== otp) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid OTP'
+      });
+    }
+
+    // If it's a registration, create the user now
+    let user;
+    if (storedData.type === 'registration' && storedData.registrationData) {
+      user = await prisma.user.create({
+        data: {
+          name: storedData.registrationData.name,
+          email: storedData.registrationData.email,
+          password: storedData.registrationData.password,
+          ...(storedData.registrationData.phone && { phone: storedData.registrationData.phone }),
+          role: 'USER',
+          isVerified: true
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          role: true,
+          isVerified: true
+        }
+      });
+    } else {
+      // For existing users, just verify them
+      user = await prisma.user.findUnique({
+        where: { email }
+      });
+
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'User not found'
+        });
+      }
+
+      if (user.isVerified) {
+        otpStore.delete(email);
+        return res.status(400).json({
+          success: false,
+          message: 'User already verified'
+        });
+      }
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { isVerified: true }
+      });
+
+      user.isVerified = true;
+    }
+
+    // OTP is valid, remove it
+    otpStore.delete(email);
 
     // Generate JWT token
     const token = jwt.sign(
@@ -210,7 +248,7 @@ export const verifyOTP = async (req: Request, res: Response) => {
           name: user.name,
           email: user.email,
           role: user.role,
-          isVerified: true
+          isVerified: user.isVerified
         }
       }
     });
