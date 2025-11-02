@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Search, Calendar, MapPin, Filter, Clock } from 'lucide-react';
+import { Search, Calendar, MapPin, Filter, Clock, Music } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useCity } from '../contexts/CityContext';
 // Removed unused supabase import
@@ -31,6 +31,7 @@ export function Events({ onNavigate }: EventsProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showIncomingOnly, setShowIncomingOnly] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const categories = [
     { id: 'all', label: t('events.filter_all') },
@@ -49,6 +50,7 @@ export function Events({ onNavigate }: EventsProps) {
   }, [events, searchQuery, selectedCategory, showIncomingOnly]);
 
   async function loadEvents() {
+    setLoading(true);
     try {
       // Use backend API instead of Supabase for better filtering
       const response = await fetch(`http://localhost:5000/api/events?city=${selectedCity}&incoming=${showIncomingOnly}`);
@@ -64,6 +66,8 @@ export function Events({ onNavigate }: EventsProps) {
       // Fallback to empty array
       setEvents([]);
       setFilteredEvents([]);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -103,13 +107,13 @@ export function Events({ onNavigate }: EventsProps) {
 
           <div className="flex flex-col md:flex-row gap-4 mb-6">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 z-10" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t('events.search_placeholder')}
-                className="input"
+                className="input pl-10"
               />
             </div>
             
@@ -140,12 +144,48 @@ export function Events({ onNavigate }: EventsProps) {
           </div>
         </div>
 
-        {filteredEvents.length === 0 ? (
+{loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg animate-pulse">
+                <div className="h-64 bg-gray-300 dark:bg-gray-700"></div>
+                <div className="p-6 space-y-4">
+                  <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-3/4"></div>
+                  <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-full"></div>
+                  <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-2/3"></div>
+                  <div className="space-y-2">
+                    <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-1/2"></div>
+                    <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-1/2"></div>
+                  </div>
+                  <div className="h-10 bg-gray-300 dark:bg-gray-700 rounded w-full"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : filteredEvents.length === 0 ? (
           <div className="text-center py-16">
-            <Filter className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-xl text-gray-600 dark:text-gray-400">
-              {t('events.no_events')}
+            <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900/30 dark:to-red-800/30 rounded-full flex items-center justify-center">
+              <Filter className="w-12 h-12 text-red-600 dark:text-red-400" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              No Events Found
+            </h3>
+            <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
+              {searchQuery || selectedCategory !== 'all' 
+                ? 'Try adjusting your filters to see more results'
+                : 'Check back soon for upcoming events!'}
             </p>
+            {(searchQuery || selectedCategory !== 'all') && (
+              <button
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedCategory('all');
+                }}
+                className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors font-semibold"
+              >
+                Clear Filters
+              </button>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -156,21 +196,30 @@ export function Events({ onNavigate }: EventsProps) {
                 className="group cursor-pointer bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2 w-full text-left"
                 onClick={() => onNavigate('event-detail', event.id)}
               >
-                <div className="relative h-64 overflow-hidden">
-                  <img
-                    src={event.imageUrl}
-                    alt={language === 'en' ? event.title : event.titleNe}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                  />
-                  <div className="absolute top-4 left-4 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-3 py-1 rounded-full text-xs font-semibold uppercase">
+                <div className="relative h-64 overflow-hidden bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800">
+                  {event.imageUrl ? (
+                    <img
+                      src={event.imageUrl}
+                      alt={language === 'en' ? event.title : event.titleNe}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                      }}
+                    />
+                  ) : null}
+                  <div className="hidden absolute inset-0 flex items-center justify-center">
+                    <Music className="w-16 h-16 text-gray-400" />
+                  </div>
+                  <div className="absolute top-4 left-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm text-gray-900 dark:text-white px-3 py-1 rounded-full text-xs font-semibold uppercase shadow-lg">
                     {event.category}
                   </div>
-                  <div className="absolute top-4 right-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                  <div className="absolute top-4 right-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
                     NPR {event.priceMin?.toLocaleString() || '0'}+
                   </div>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
                     {language === 'en' ? event.title : event.titleNe}
                   </h3>
                   <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
@@ -178,20 +227,20 @@ export function Events({ onNavigate }: EventsProps) {
                   </p>
                   <div className="space-y-2 mb-4">
                     <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                      <MapPin className="w-4 h-4 text-red-600" />
-                      <span className="text-sm">
+                      <MapPin className="w-4 h-4 text-red-600 flex-shrink-0" />
+                      <span className="text-sm truncate">
                         {language === 'en' ? event.venue : event.venueNe}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                      <Calendar className="w-4 h-4 text-red-600" />
+                      <Calendar className="w-4 h-4 text-red-600 flex-shrink-0" />
                       <span className="text-sm">
                         {event.eventDate ? new Date(event.eventDate).toLocaleDateString() : 'TBA'}
                       </span>
                     </div>
                   </div>
                   <div
-                    className="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition-colors font-semibold text-center"
+                    className="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition-colors font-semibold text-center shadow-lg"
                     onClick={(e) => { e.stopPropagation(); onNavigate('event-checkout', event.id); }}
                   >
                     {t('home.book_now')}

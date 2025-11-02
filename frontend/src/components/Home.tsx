@@ -8,28 +8,28 @@ import { CurvyCarousel } from './CurvyCarousel';
 interface Event {
   id: string;
   title: string;
-  title_ne: string;
-  image_url: string;
+  titleNe: string;
+  imageUrl: string;
   venue: string;
-  venue_ne: string;
-  event_date: string;
-  price_min: number;
-  price_max: number;
+  venueNe: string;
+  eventDate: string;
+  priceMin: number;
+  priceMax: number;
   category: string;
 }
 
 interface Movie {
   id: string;
   title: string;
-  title_ne: string;
-  poster_url: string;
+  titleNe: string;
+  posterUrl: string;
   genre: string[] | string;
   duration: number;
   language: string[] | string;
   rating: string;
-  release_date: string;
-  trailer_url: string;
-  imdb_rating: number;
+  releaseDate: string;
+  trailerUrl: string;
+  imdbRating: number;
 }
 
 interface HomeProps {
@@ -248,9 +248,9 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
                       trendingMovies.slice(0, 3).map((movie) => (
                         <div key={movie.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors cursor-pointer">
                           <div className="w-12 h-16 rounded-lg flex-shrink-0 overflow-hidden">
-                            {movie.poster_url ? (
+                            {movie.posterUrl ? (
                               <img 
-                                src={movie.poster_url} 
+                                src={movie.posterUrl} 
                                 alt={movie.title}
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
@@ -259,7 +259,7 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
                                 }}
                               />
                             ) : null}
-                            <div className="w-full h-full bg-gray-600 flex items-center justify-center" style={{ display: movie.poster_url ? 'none' : 'flex' }}>
+                            <div className="w-full h-full bg-gray-600 flex items-center justify-center" style={{ display: movie.posterUrl ? 'none' : 'flex' }}>
                               <Film className="w-6 h-6 text-gray-400" />
                             </div>
                           </div>
@@ -324,8 +324,8 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
                     id: movie.id,
                     title: movie.title,
                     subtitle: Array.isArray(movie.genre) ? movie.genre.join(', ') : movie.genre,
-                    image: movie.poster_url,
-                    trailerUrl: movie.trailer_url,
+                    image: movie.posterUrl,
+                    trailerUrl: movie.trailerUrl,
                     type: 'movie' as const
                   }))}
                   onItemClick={(item) => onNavigate('movie-detail', item.id)}
@@ -380,7 +380,7 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
                     id: event.id,
                     title: event.title,
                     subtitle: event.venue,
-                    image: event.image_url,
+                    image: event.imageUrl,
                     type: 'event' as const
                   }))}
                   onItemClick={(item) => onNavigate('event-detail', item.id)}
@@ -437,31 +437,40 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
                     onClick={() => onNavigate('event-detail', event.id)}
                     className="card hover:lift cursor-pointer group overflow-hidden"
                   >
-                    <div className="relative h-48 overflow-hidden">
-                      <img
-                        src={event.image_url || '/api/placeholder/300/200'}
-                        alt={language === 'en' ? event.title : event.title_ne}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
+                    <div className="relative h-48 overflow-hidden bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800">
+                      {event.imageUrl ? (
+                        <img
+                          src={event.imageUrl}
+                          alt={language === 'en' ? event.title : event.titleNe}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                          }}
+                        />
+                      ) : null}
+                      <div className={`hidden w-full h-full flex items-center justify-center`}>
+                        <Music className="w-12 h-12 text-gray-400" />
+                      </div>
                       <div className="badge-blue absolute top-3 left-3">
                         Coming Soon
                       </div>
                     </div>
                     <div className="p-4">
                       <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
-                        {language === 'en' ? event.title : event.title_ne}
+                        {language === 'en' ? event.title : event.titleNe}
                       </h4>
                       <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2">
                         <Calendar className="w-4 h-4" />
-                        <span>{new Date(event.event_date).toLocaleDateString()}</span>
+                        <span>{new Date(event.eventDate).toLocaleDateString()}</span>
                       </div>
                       <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-3">
                         <MapPin className="w-4 h-4" />
-                        <span>{language === 'en' ? event.venue : event.venue_ne}</span>
+                        <span>{language === 'en' ? event.venue : event.venueNe}</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
-                          ₹{event.price_min} - ₹{event.price_max}
+                          ₹{event.priceMin} - ₹{event.priceMax}
                         </span>
                         <span className="text-sm text-gray-500 dark:text-gray-400 capitalize">
                           {event.category}
