@@ -47,8 +47,10 @@ scheduleMovieCleanup();
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 1000, // limit each IP to 1000 requests per windowMs (increased for production)
   message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 
 // Middleware
@@ -64,7 +66,9 @@ app.use(cors({
       process.env.FRONTEND_URL || 'http://localhost:5174',
       'http://localhost:5173', // Vite default port
       'http://localhost:3000', // Alternative React dev port
-      'https://showsewa.vercel.app', // Production frontend
+      'https://showsewa.vercel.app', // Production frontend (old)
+      'https://www.showsewa.com', // Production frontend
+      'https://showsewa.com', // Production frontend (without www)
     ];
     
     // Check if origin is in allowed list or is a Vercel preview deployment
