@@ -98,49 +98,57 @@ export function Events({ onNavigate }: EventsProps) {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-6">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-6">
             {t('events.title')}
           </h1>
 
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 z-10" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={t('events.search_placeholder')}
-                className="input pl-10"
-              />
-            </div>
-            
-            {/* Incoming Events Toggle */}
-            <button
-              onClick={() => setShowIncomingOnly(!showIncomingOnly)}
-              className={`btn-secondary whitespace-nowrap ${showIncomingOnly ? 'bg-blue-50 border-blue-300 text-blue-700' : ''}`}
-            >
-              <Clock className={`w-5 h-5 ${showIncomingOnly ? 'text-blue-600' : 'text-gray-400'}`} />
-              <span className="font-medium">Incoming Events</span>
-            </button>
-          </div>
-
-          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-            {categories.map(category => (
+          {/* Search and Filters - BookMyShow Style */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-6">
+            <div className="flex flex-col md:flex-row gap-4 mb-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 z-10" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={t('events.search_placeholder')}
+                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                />
+              </div>
+              
+              {/* Incoming Events Toggle */}
               <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors ${
-                  selectedCategory === category.id
-                    ? 'bg-red-600 text-white'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                onClick={() => setShowIncomingOnly(!showIncomingOnly)}
+                className={`px-4 py-2.5 rounded-lg font-medium whitespace-nowrap transition-colors border ${
+                  showIncomingOnly 
+                    ? 'bg-red-50 border-red-300 text-red-700 dark:bg-red-900/30 dark:border-red-700 dark:text-red-400' 
+                    : 'bg-white border-gray-300 text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
               >
-                {category.label}
+                <Clock className={`w-4 h-4 inline mr-2 ${showIncomingOnly ? 'text-red-600 dark:text-red-400' : 'text-gray-400'}`} />
+                Incoming Events
               </button>
-            ))}
+            </div>
+
+            {/* Category Filters */}
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+              {categories.map(category => (
+                <button
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.id)}
+                  className={`px-4 py-2 rounded-full font-medium whitespace-nowrap transition-all ${
+                    selectedCategory === category.id
+                      ? 'bg-red-600 text-white shadow-md'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  {category.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -188,15 +196,14 @@ export function Events({ onNavigate }: EventsProps) {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredEvents.map(event => (
-              <button
-                type="button"
+              <div
                 key={event.id}
-                className="group cursor-pointer bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2 w-full text-left"
+                className="group cursor-pointer bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
                 onClick={() => onNavigate('event-detail', event.id)}
               >
-                <div className="relative h-64 overflow-hidden bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800">
+                <div className="relative h-56 overflow-hidden bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800">
                   {event.imageUrl ? (
                     <img
                       src={event.imageUrl}
@@ -204,49 +211,52 @@ export function Events({ onNavigate }: EventsProps) {
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none';
-                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                        const fallback = e.currentTarget.nextElementSibling;
+                        if (fallback) fallback.classList.remove('hidden');
                       }}
                     />
                   ) : null}
                   <div className="hidden absolute inset-0 flex items-center justify-center">
                     <Music className="w-16 h-16 text-gray-400" />
                   </div>
-                  <div className="absolute top-4 left-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm text-gray-900 dark:text-white px-3 py-1 rounded-full text-xs font-semibold uppercase shadow-lg">
-                    {event.category}
+                  {/* Category Badge */}
+                  <div className="absolute top-3 left-3">
+                    <span className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm text-gray-900 dark:text-white px-3 py-1 rounded-full text-xs font-semibold uppercase shadow-md">
+                      {event.category}
+                    </span>
                   </div>
-                  <div className="absolute top-4 right-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
-                    NPR {event.priceMin?.toLocaleString() || '0'}+
+                  {/* Price Badge */}
+                  <div className="absolute top-3 right-3">
+                    <span className="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+                      NPR {event.priceMin?.toLocaleString() || '0'}
+                    </span>
                   </div>
                 </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+                <div className="p-4">
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
                     {language === 'en' ? event.title : event.titleNe}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
-                    {language === 'en' ? event.description : event.descriptionNe}
-                  </p>
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                      <MapPin className="w-4 h-4 text-red-600 flex-shrink-0" />
-                      <span className="text-sm truncate">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                      <Calendar className="w-4 h-4 flex-shrink-0" />
+                      <span className="truncate">
+                        {event.eventDate ? new Date(event.eventDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'TBA'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                      <MapPin className="w-4 h-4 flex-shrink-0" />
+                      <span className="truncate">
                         {language === 'en' ? event.venue : event.venueNe}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                      <Calendar className="w-4 h-4 text-red-600 flex-shrink-0" />
-                      <span className="text-sm">
-                        {event.eventDate ? new Date(event.eventDate).toLocaleDateString() : 'TBA'}
-                      </span>
-                    </div>
-                  </div>
-                  <div
-                    className="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition-colors font-semibold text-center shadow-lg"
-                    onClick={(e) => { e.stopPropagation(); onNavigate('event-checkout', event.id); }}
-                  >
-                    {t('home.book_now')}
+                    {event.priceMax && event.priceMax > (event.priceMin || 0) && (
+                      <div className="text-xs text-gray-500 dark:text-gray-500 pt-1">
+                        Up to NPR {event.priceMax.toLocaleString()}
+                      </div>
+                    )}
                   </div>
                 </div>
-              </button>
+              </div>
             ))}
           </div>
         )}

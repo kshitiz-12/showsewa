@@ -25,6 +25,7 @@ model User {
   seatHolds     SeatHold[]
   theaters      Theater[]
   achievements  UserAchievement[]
+  eventInterests EventInterest[]
 
   @@index([email])
   @@map("users")
@@ -123,6 +124,8 @@ model Event {
   tags           String[]
   organizer      String?
   ageRestriction String?       @map("age_restriction")
+  termsAndConditions String?   @map("terms_and_conditions")
+  termsAndConditionsNe String? @map("terms_and_conditions_ne")
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
   createdBy      String        @map("created_by")
@@ -131,11 +134,27 @@ model Event {
   reviews        Review[]
   sessions       EventSession[]
   ticketTypes    TicketType[]
+  interests      EventInterest[]
 
   @@index([category, status, isActive])
   @@index([eventDate, endDate])
   @@index([isFeatured])
   @@map("events")
+}
+
+// Track user interests in events
+model EventInterest {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  eventId   String   @map("event_id")
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId])
+  @@index([eventId])
+  @@index([userId])
+  @@map("event_interests")
 }
 
 // Event sessions support single or multi-slot events

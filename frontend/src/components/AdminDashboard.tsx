@@ -360,16 +360,16 @@ const RevenueCard: React.FC<RevenueCardProps> = ({ title, amount, bookings, icon
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-3 sm:p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
-        <div className={`p-3 rounded-full ${colorClasses[color as keyof typeof colorClasses]}`}>
-          <Icon className="w-6 h-6" />
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-4 sm:p-6">
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
+        <div className={`p-2 sm:p-3 rounded-full ${colorClasses[color as keyof typeof colorClasses]}`}>
+          <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
         </div>
       </div>
       <div className="space-y-2">
-        <p className="text-3xl font-bold text-gray-900 dark:text-white">₹{amount.toLocaleString()}</p>
-        <p className="text-sm text-gray-600 dark:text-gray-400">{bookings} bookings</p>
+        <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">₹{amount.toLocaleString()}</p>
+        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{bookings} bookings</p>
       </div>
     </div>
   );
@@ -617,7 +617,7 @@ const TheaterModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
                 max="20"
                 value={formData.screenCount}
                 onChange={(e) => setFormData({...formData, screenCount: Number.parseInt(e.target.value) || 1})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 placeholder="3"
               />
             </div>
@@ -630,7 +630,7 @@ const TheaterModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
                 max="500"
                 value={formData.seatsPerScreen}
                 onChange={(e) => setFormData({...formData, seatsPerScreen: Number.parseInt(e.target.value) || 200})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 placeholder="200"
               />
             </div>
@@ -951,7 +951,9 @@ const EventModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
     isFeatured: false,
     tags: [] as string[],
     organizer: '',
-    ageRestriction: ''
+    ageRestriction: '',
+    termsAndConditions: '',
+    termsAndConditionsNe: ''
   });
 
   // Fetch theaters when city changes
@@ -1025,11 +1027,11 @@ const EventModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">Add New Event</h3>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Add New Event</h3>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -1042,27 +1044,27 @@ const EventModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="event-title" className="block text-sm font-medium text-gray-700 mb-1">Event Title *</label>
+            <label htmlFor="event-title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Event Title *</label>
             <input
               id="event-title"
               type="text"
               required
               value={formData.title}
               onChange={(e) => setFormData({...formData, title: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               placeholder="e.g., Summer Music Festival 2025"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="event-category" className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+              <label htmlFor="event-category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category *</label>
               <select
                 id="event-category"
                 required
                 value={formData.category}
                 onChange={(e) => setFormData({...formData, category: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
                 <option value="CONCERT">🎵 Concert</option>
                 <option value="FESTIVAL">🎪 Festival</option>
@@ -1075,13 +1077,13 @@ const EventModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
               </select>
             </div>
             <div>
-              <label htmlFor="event-organizer" className="block text-sm font-medium text-gray-700 mb-1">Organizer</label>
+              <label htmlFor="event-organizer" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Organizer</label>
               <input
                 id="event-organizer"
                 type="text"
                 value={formData.organizer}
                 onChange={(e) => setFormData({...formData, organizer: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 placeholder="Organizer name"
               />
             </div>
@@ -1089,7 +1091,7 @@ const EventModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
 
           {/* City Selection */}
           <div>
-            <label htmlFor="event-city" className="block text-sm font-medium text-gray-700 mb-1">City *</label>
+            <label htmlFor="event-city" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">City *</label>
             <select
               id="event-city"
               required
@@ -1103,7 +1105,7 @@ const EventModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
                   setFormData({...formData, location: e.target.value, theaterId: ''});
                 }
               }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
               <option value="">Select a city</option>
               {[...nepalCities]
@@ -1122,7 +1124,7 @@ const EventModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
 
           {/* Theater/Venue Selection */}
           <div>
-            <label htmlFor="event-venue" className="block text-sm font-medium text-gray-700 mb-1">Venue / Theater</label>
+            <label htmlFor="event-venue" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Venue / Theater</label>
             {selectedCity && (
               <div className="relative mb-2">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -1131,7 +1133,7 @@ const EventModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
                   placeholder="Search venues..."
                   value={theaterSearchQuery}
                   onChange={(e) => setTheaterSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
             )}
@@ -1148,7 +1150,7 @@ const EventModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
                     location: theater ? `${theater.area}, ${theater.city}` : selectedCity
                   });
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
                 <option value="">Or select a theater/venue</option>
                 {filteredTheaters.map((theater) => (
@@ -1164,7 +1166,7 @@ const EventModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
                 value={formData.venue}
                 onChange={(e) => setFormData({...formData, venue: e.target.value})}
                 placeholder="Enter venue name manually"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             )}
             <p className="text-xs text-gray-500 mt-1">
@@ -1173,7 +1175,7 @@ const EventModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
           </div>
 
           <div>
-            <label htmlFor="event-location" className="block text-sm font-medium text-gray-700 mb-1">Location *</label>
+            <label htmlFor="event-location" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Location *</label>
             <input
               id="event-location"
               type="text"
@@ -1185,16 +1187,16 @@ const EventModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="event-date" className="block text-sm font-medium text-gray-700 mb-1">Event Start *</label>
+              <label htmlFor="event-date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Event Start *</label>
               <input
                 id="event-date"
                 type="datetime-local"
                 required
                 value={formData.eventDate}
                 onChange={(e) => setFormData({...formData, eventDate: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
               <div className="mt-2 flex flex-wrap gap-2">
                 {[1, 7, 14, 30].map(days => {
@@ -1220,21 +1222,21 @@ const EventModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
               </div>
             </div>
             <div>
-              <label htmlFor="event-end-date" className="block text-sm font-medium text-gray-700 mb-1">Event End *</label>
+              <label htmlFor="event-end-date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Event End *</label>
               <input
                 id="event-end-date"
                 type="datetime-local"
                 required
                 value={formData.endDate}
                 onChange={(e) => setFormData({...formData, endDate: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label htmlFor="event-price-min" className="block text-sm font-medium text-gray-700 mb-1">Min Price</label>
+              <label htmlFor="event-price-min" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Min Price</label>
               <input
                 id="event-price-min"
                 type="number"
@@ -1242,11 +1244,11 @@ const EventModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
                 min="0"
                 value={formData.priceMin}
                 onChange={(e) => setFormData({...formData, priceMin: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
             <div>
-              <label htmlFor="event-price-max" className="block text-sm font-medium text-gray-700 mb-1">Max Price</label>
+              <label htmlFor="event-price-max" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Max Price</label>
               <input
                 id="event-price-max"
                 type="number"
@@ -1254,11 +1256,11 @@ const EventModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
                 min="0"
                 value={formData.priceMax}
                 onChange={(e) => setFormData({...formData, priceMax: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
             <div>
-              <label htmlFor="event-seats" className="block text-sm font-medium text-gray-700 mb-1">Total Seats *</label>
+              <label htmlFor="event-seats" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Total Seats *</label>
               <input
                 id="event-seats"
                 type="number"
@@ -1266,7 +1268,7 @@ const EventModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
                 min="1"
                 value={formData.totalSeats}
                 onChange={(e) => setFormData({...formData, totalSeats: e.target.value, availableSeats: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
           </div>
@@ -1280,30 +1282,30 @@ const EventModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
               onChange={(e) => setFormData({...formData, isFeatured: e.target.checked})}
               className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
             />
-            <label htmlFor="event-featured" className="text-sm font-medium text-gray-700">Featured Event</label>
+            <label htmlFor="event-featured" className="text-sm font-medium text-gray-700 dark:text-gray-300">Featured Event</label>
           </div>
 
           <div>
-            <label htmlFor="event-description" className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <label htmlFor="event-description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
             <textarea
               id="event-description"
               value={formData.description}
               onChange={(e) => setFormData({...formData, description: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               rows={3}
               placeholder="Describe your event, artists, highlights..."
             />
           </div>
 
           <div>
-            <label htmlFor="event-image" className="block text-sm font-medium text-gray-700 mb-1">Event Image URL *</label>
+            <label htmlFor="event-image" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Event Image URL *</label>
             <input
               id="event-image"
               type="url"
               required
               value={formData.imageUrl}
               onChange={(e) => setFormData({...formData, imageUrl: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               placeholder="https://..."
             />
             <p className="text-xs text-gray-500 mt-1">
@@ -1313,8 +1315,8 @@ const EventModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
 
           {/* Quick Price Presets */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Quick Price Presets</label>
-            <div className="grid grid-cols-4 gap-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quick Price Presets</label>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {[
                 { min: 500, max: 1500, seats: 300 },
                 { min: 800, max: 2000, seats: 500 },
@@ -1339,6 +1341,39 @@ const EventModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
                   <span className="text-gray-600">{preset.seats} seats</span>
                 </button>
               ))}
+            </div>
+          </div>
+
+          {/* Terms & Conditions */}
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="event-terms-conditions" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Terms & Conditions (English) <span className="text-gray-500 text-xs">(Optional)</span>
+              </label>
+              <textarea
+                id="event-terms-conditions"
+                value={formData.termsAndConditions}
+                onChange={(e) => setFormData({...formData, termsAndConditions: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                rows={4}
+                placeholder="Enter event-specific terms and conditions (e.g., refund policy, age restrictions, entry rules)..."
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                If left empty, default terms will be shown to users
+              </p>
+            </div>
+            <div>
+              <label htmlFor="event-terms-conditions-ne" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Terms & Conditions (नेपाली) <span className="text-gray-500 text-xs">(Optional)</span>
+              </label>
+              <textarea
+                id="event-terms-conditions-ne"
+                value={formData.termsAndConditionsNe}
+                onChange={(e) => setFormData({...formData, termsAndConditionsNe: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                rows={4}
+                placeholder="घटना-विशिष्ट नियमहरू र शर्तहरू प्रविष्ट गर्नुहोस्..."
+              />
             </div>
           </div>
 
@@ -1560,10 +1595,10 @@ const ShowtimeModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">Add New Showtime</h3>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Add New Showtime</h3>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -1576,13 +1611,13 @@ const ShowtimeModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="showtime-movie" className="block text-sm font-medium text-gray-700 mb-1">Movie *</label>
+            <label htmlFor="showtime-movie" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Movie *</label>
             <select
               id="showtime-movie"
               required
               value={formData.movieId}
               onChange={(e) => setFormData({...formData, movieId: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
               <option value="">Select a movie</option>
               {movies.map((movie) => (
@@ -1595,7 +1630,7 @@ const ShowtimeModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
 
           {/* City Selection - Using nepalCities dropdown */}
           <div>
-            <label htmlFor="showtime-city" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="showtime-city" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               City *
             </label>
             <select
@@ -1603,7 +1638,7 @@ const ShowtimeModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
               required
               value={selectedCity}
               onChange={(e) => handleCityChange(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
               <option value="">Select a city</option>
               {[...nepalCities]
@@ -1626,7 +1661,7 @@ const ShowtimeModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
 
           {/* Theater Selection */}
           <div>
-            <label htmlFor="showtime-theater" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="showtime-theater" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Theater *
             </label>
             
@@ -1639,15 +1674,15 @@ const ShowtimeModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
                   placeholder="Search theaters..."
                   value={theaterSearchQuery}
                   onChange={(e) => setTheaterSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
             )}
             
             {dataLoading ? (
-              <div className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 flex items-center">
-                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                <span className="text-gray-500">Loading theaters...</span>
+              <div className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900 flex items-center">
+                <Loader2 className="w-4 h-4 animate-spin mr-2 text-gray-500 dark:text-gray-400" />
+                <span className="text-gray-500 dark:text-gray-400">Loading theaters...</span>
               </div>
             ) : (
               <select
@@ -1658,7 +1693,7 @@ const ShowtimeModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
                   handleTheaterChange(e.target.value);
                   setFormData(prev => ({...prev, screenId: ''}));
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 disabled={!selectedCity}
               >
                 <option value="">
@@ -1682,13 +1717,13 @@ const ShowtimeModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
           </div>
 
           <div>
-            <label htmlFor="showtime-screen" className="block text-sm font-medium text-gray-700 mb-1">Screen *</label>
+            <label htmlFor="showtime-screen" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Screen *</label>
             <select
               id="showtime-screen"
               required
               value={formData.screenId}
               onChange={(e) => setFormData({...formData, screenId: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               disabled={!selectedTheaterId}
             >
               <option value="">Select a screen</option>
@@ -1700,9 +1735,9 @@ const ShowtimeModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
             </select>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="showtime-date" className="block text-sm font-medium text-gray-700 mb-1">Show Date *</label>
+              <label htmlFor="showtime-date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Show Date *</label>
               <div className="flex gap-2">
                 <input
                   id="showtime-date"
@@ -1710,7 +1745,7 @@ const ShowtimeModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
                   required
                   value={formData.showDate}
                   onChange={(e) => setFormData({...formData, showDate: e.target.value})}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
                 <button
                   type="button"
@@ -1718,21 +1753,21 @@ const ShowtimeModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
                     const today = new Date().toISOString().split('T')[0];
                     setFormData({...formData, showDate: today});
                   }}
-                  className="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                  className="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                 >
                   Today
                 </button>
               </div>
             </div>
             <div>
-              <label htmlFor="showtime-time" className="block text-sm font-medium text-gray-700 mb-1">Show Time *</label>
+              <label htmlFor="showtime-time" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Show Time *</label>
               <input
                 id="showtime-time"
                 type="time"
                 required
                 value={formData.showTime}
                 onChange={(e) => setFormData({...formData, showTime: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
               <div className="mt-2 flex flex-wrap gap-2">
                 {['09:00', '12:00', '15:00', '18:00', '21:00'].map((time) => (
@@ -1753,9 +1788,9 @@ const ShowtimeModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="showtime-price" className="block text-sm font-medium text-gray-700 mb-1">Base Price (NPR) *</label>
+              <label htmlFor="showtime-price" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Base Price (NPR) *</label>
               <input
                 id="showtime-price"
                 type="number"
@@ -1764,7 +1799,7 @@ const ShowtimeModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
                 step="0.01"
                 value={formData.price}
                 onChange={(e) => setFormData({...formData, price: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 placeholder="600"
               />
               <div className="mt-1 text-xs text-gray-500 mb-2">
@@ -1788,12 +1823,12 @@ const ShowtimeModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
               </div>
             </div>
             <div>
-              <label htmlFor="showtime-language" className="block text-sm font-medium text-gray-700 mb-1">Language</label>
+              <label htmlFor="showtime-language" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Language</label>
               <select
                 id="showtime-language"
                 value={formData.language}
                 onChange={(e) => setFormData({...formData, language: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
                 <option value="Hindi">Hindi</option>
                 <option value="English">English</option>

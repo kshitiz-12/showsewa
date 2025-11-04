@@ -1074,7 +1074,9 @@ export const createEvent = async (req: AuthRequest, res: Response) => {
       isFeatured,
       tags,
       organizer,
-      ageRestriction
+      ageRestriction,
+      termsAndConditions,
+      termsAndConditionsNe
     } = req.body;
 
     if (!title || !description || !category || !venue || !location || !eventDate || !endDate || !totalSeats) {
@@ -1108,6 +1110,8 @@ export const createEvent = async (req: AuthRequest, res: Response) => {
         tags: tags || [],
         organizer,
         ageRestriction,
+        termsAndConditions: termsAndConditions || null,
+        termsAndConditionsNe: termsAndConditionsNe || null,
         createdBy: req.user!.id,
         isActive: true
       }
