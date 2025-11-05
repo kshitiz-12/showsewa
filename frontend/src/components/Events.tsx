@@ -98,48 +98,48 @@ export function Events({ onNavigate }: EventsProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-4 sm:py-6 lg:py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-6">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">
             {t('events.title')}
           </h1>
 
           {/* Search and Filters - BookMyShow Style */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-6">
-            <div className="flex flex-col md:flex-row gap-4 mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 sm:p-4 mb-4 sm:mb-6">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-3 sm:mb-4">
               <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 z-10" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5 z-10" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={t('events.search_placeholder')}
-                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  className="w-full pl-9 sm:pl-10 pr-4 py-2 sm:py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm sm:text-base"
                 />
               </div>
               
               {/* Incoming Events Toggle */}
               <button
                 onClick={() => setShowIncomingOnly(!showIncomingOnly)}
-                className={`px-4 py-2.5 rounded-lg font-medium whitespace-nowrap transition-colors border ${
+                className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg font-medium whitespace-nowrap transition-colors border text-sm sm:text-base ${
                   showIncomingOnly 
                     ? 'bg-red-50 border-red-300 text-red-700 dark:bg-red-900/30 dark:border-red-700 dark:text-red-400' 
                     : 'bg-white border-gray-300 text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
               >
-                <Clock className={`w-4 h-4 inline mr-2 ${showIncomingOnly ? 'text-red-600 dark:text-red-400' : 'text-gray-400'}`} />
+                <Clock className={`w-3 h-3 sm:w-4 sm:h-4 inline mr-1.5 sm:mr-2 ${showIncomingOnly ? 'text-red-600 dark:text-red-400' : 'text-gray-400'}`} />
                 Incoming Events
               </button>
             </div>
 
             {/* Category Filters */}
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
               {categories.map(category => (
                 <button
                   key={category.id}
                   onClick={() => setSelectedCategory(category.id)}
-                  className={`px-4 py-2 rounded-full font-medium whitespace-nowrap transition-all ${
+                  className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-medium whitespace-nowrap transition-all text-xs sm:text-sm ${
                     selectedCategory === category.id
                       ? 'bg-red-600 text-white shadow-md'
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -153,32 +153,28 @@ export function Events({ onNavigate }: EventsProps) {
         </div>
 
 {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg animate-pulse">
-                <div className="h-64 bg-gray-300 dark:bg-gray-700"></div>
-                <div className="p-6 space-y-4">
-                  <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-3/4"></div>
-                  <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-full"></div>
-                  <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-2/3"></div>
-                  <div className="space-y-2">
-                    <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-1/2"></div>
-                    <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-1/2"></div>
-                  </div>
-                  <div className="h-10 bg-gray-300 dark:bg-gray-700 rounded w-full"></div>
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl overflow-hidden shadow-sm sm:shadow-lg animate-pulse">
+                <div className="h-40 sm:h-48 lg:h-56 bg-gray-300 dark:bg-gray-700"></div>
+                <div className="p-3 sm:p-4 space-y-2 sm:space-y-3">
+                  <div className="h-4 sm:h-5 bg-gray-300 dark:bg-gray-700 rounded w-3/4"></div>
+                  <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-full"></div>
+                  <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-2/3"></div>
+                  <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-1/2"></div>
                 </div>
               </div>
             ))}
           </div>
         ) : filteredEvents.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900/30 dark:to-red-800/30 rounded-full flex items-center justify-center">
-              <Filter className="w-12 h-12 text-red-600 dark:text-red-400" />
+          <div className="text-center py-12 sm:py-16">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 mx-auto mb-4 sm:mb-6 bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900/30 dark:to-red-800/30 rounded-full flex items-center justify-center">
+              <Filter className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-red-600 dark:text-red-400" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">
               No Events Found
             </h3>
-            <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-sm sm:text-base lg:text-lg text-gray-600 dark:text-gray-400 mb-4 sm:mb-6">
               {searchQuery || selectedCategory !== 'all' 
                 ? 'Try adjusting your filters to see more results'
                 : 'Check back soon for upcoming events!'}
@@ -189,21 +185,21 @@ export function Events({ onNavigate }: EventsProps) {
                   setSearchQuery('');
                   setSelectedCategory('all');
                 }}
-                className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors font-semibold"
+                className="bg-red-600 text-white px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg hover:bg-red-700 transition-colors font-semibold text-sm sm:text-base"
               >
                 Clear Filters
               </button>
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
             {filteredEvents.map(event => (
               <div
                 key={event.id}
                 className="group cursor-pointer bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
                 onClick={() => onNavigate('event-detail', event.id)}
               >
-                <div className="relative h-56 overflow-hidden bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800">
+                <div className="relative h-40 sm:h-48 lg:h-56 overflow-hidden bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800">
                   {event.imageUrl ? (
                     <img
                       src={event.imageUrl}
@@ -217,40 +213,40 @@ export function Events({ onNavigate }: EventsProps) {
                     />
                   ) : null}
                   <div className="hidden absolute inset-0 flex items-center justify-center">
-                    <Music className="w-16 h-16 text-gray-400" />
+                    <Music className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400" />
                   </div>
                   {/* Category Badge */}
-                  <div className="absolute top-3 left-3">
-                    <span className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm text-gray-900 dark:text-white px-3 py-1 rounded-full text-xs font-semibold uppercase shadow-md">
+                  <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
+                    <span className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm text-gray-900 dark:text-white px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold uppercase shadow-md">
                       {event.category}
                     </span>
                   </div>
                   {/* Price Badge */}
-                  <div className="absolute top-3 right-3">
-                    <span className="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+                  <div className="absolute top-2 right-2 sm:top-3 sm:right-3">
+                    <span className="bg-red-600 text-white px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-xs sm:text-sm font-bold shadow-lg">
                       NPR {event.priceMin?.toLocaleString() || '0'}
                     </span>
                   </div>
                 </div>
-                <div className="p-4">
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+                <div className="p-3 sm:p-4">
+                  <h3 className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 dark:text-white mb-1.5 sm:mb-2 line-clamp-2 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
                     {language === 'en' ? event.title : event.titleNe}
                   </h3>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                      <Calendar className="w-4 h-4 flex-shrink-0" />
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                      <Calendar className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                       <span className="truncate">
                         {event.eventDate ? new Date(event.eventDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'TBA'}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                      <MapPin className="w-4 h-4 flex-shrink-0" />
+                    <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                      <MapPin className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                       <span className="truncate">
                         {language === 'en' ? event.venue : event.venueNe}
                       </span>
                     </div>
                     {event.priceMax && event.priceMax > (event.priceMin || 0) && (
-                      <div className="text-xs text-gray-500 dark:text-gray-500 pt-1">
+                      <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-500 pt-0.5 sm:pt-1">
                         Up to NPR {event.priceMax.toLocaleString()}
                       </div>
                     )}

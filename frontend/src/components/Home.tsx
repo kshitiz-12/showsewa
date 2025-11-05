@@ -168,71 +168,71 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors overflow-x-hidden">
       {/* Hero Section */}
-      <section className="relative py-20 lg:py-32 bg-gradient-to-br from-red-900 via-red-800 to-red-700 overflow-hidden shadow-xl">
+      <section className="relative py-12 sm:py-16 lg:py-24 bg-gradient-to-br from-red-900 via-red-800 to-red-700 overflow-hidden shadow-xl">
         <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/20"></div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center w-full">
             {/* Left Content */}
-            <div className="text-white space-y-6 animate-soft-fade-up">
-              <div className="space-y-4">
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
+            <div className="text-white space-y-4 sm:space-y-6 animate-soft-fade-up">
+              <div className="space-y-3 sm:space-y-4">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
                   <span className="bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent">
                     Book Your Entertainment
                   </span>
                   <br />
                   <span className="text-white">Experience</span>
                 </h1>
-                <p className="text-xl text-gray-200 max-w-2xl">
+                <p className="text-base sm:text-lg lg:text-xl text-gray-200 max-w-2xl">
                   Discover and book tickets for concerts, movies, sports, and events across Nepal
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <button
                   onClick={() => onNavigate('movies')}
-                  className="btn-primary px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:lift"
+                  className="btn-primary px-6 py-3 sm:px-8 sm:py-4 text-base sm:text-lg font-semibold rounded-lg sm:rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:lift"
                 >
-                  <Film className="w-5 h-5" />
+                  <Film className="w-4 h-4 sm:w-5 sm:h-5" />
                   Explore Movies
-                  <ArrowRight className="w-5 h-5" />
+                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
                 <button
                   onClick={() => onNavigate('events')}
-                  className="border-2 border-white text-white hover:bg-white hover:text-red-600 px-8 py-4 text-lg font-semibold rounded-xl transition-all duration-300 hover:lift flex items-center justify-center gap-2"
+                  className="border-2 border-white text-white hover:bg-white hover:text-red-600 px-6 py-3 sm:px-8 sm:py-4 text-base sm:text-lg font-semibold rounded-lg sm:rounded-xl transition-all duration-300 hover:lift flex items-center justify-center gap-2"
                 >
-                  <Music className="w-5 h-5" />
+                  <Music className="w-4 h-4 sm:w-5 sm:h-5" />
                   Discover Events
-                  <Play className="w-5 h-5" />
+                  <Play className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </div>
 
-              <div className="flex items-center gap-6 text-sm text-gray-300">
+              <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-xs sm:text-sm text-gray-300">
                 <div className="flex items-center gap-2">
-                  <Star className="w-4 h-4 text-yellow-400" />
+                  <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400" />
                   <span>4.9/5 Rating</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-gray-400" />
+                  <Users className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />
                   <span>50K+ Users</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Award className="w-4 h-4 text-green-400" />
+                  <Award className="w-3 h-3 sm:w-4 sm:h-4 text-green-400" />
                   <span>Trusted Platform</span>
                 </div>
               </div>
             </div>
 
             {/* Right Content - Trending Card */}
-            <div className="relative">
-              <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 shadow-2xl">
+            <div className="relative hidden lg:block">
+              <div className="bg-white/10 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20 shadow-2xl">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-red-600 rounded-xl flex items-center justify-center">
                     <TrendingUp className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-white font-semibold">Trending Now</h3>
-                    <p className="text-gray-300 text-sm">Most popular this week</p>
+                    <h3 className="text-white font-semibold text-sm sm:text-base">Trending Now</h3>
+                    <p className="text-gray-300 text-xs sm:text-sm">Most popular this week</p>
                   </div>
                 </div>
                 
@@ -408,29 +408,29 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
       </section>
 
       {/* Incoming Events Section */}
-      <section className="py-20 bg-white dark:bg-gray-900">
+      <section className="py-12 sm:py-16 lg:py-20 bg-white dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div>
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0 mb-6 sm:mb-8">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-red-600 rounded-xl flex items-center justify-center">
                   <Clock className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Incoming Events</h3>
-                  <p className="text-gray-600 dark:text-gray-400">Events starting soon</p>
+                  <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Incoming Events</h3>
+                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Events starting soon</p>
                 </div>
               </div>
               <button
                 onClick={() => onNavigate('events')}
-                className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-2 rounded-lg font-semibold hover:from-red-600 hover:to-red-700 transition-all duration-300"
+                className="bg-gradient-to-r from-red-500 to-red-600 text-white px-5 py-2 sm:px-6 sm:py-2 rounded-lg font-semibold text-sm sm:text-base hover:from-red-600 hover:to-red-700 transition-all duration-300 whitespace-nowrap self-start sm:self-auto"
               >
                 View All Events
               </button>
             </div>
 
             {incomingEvents.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
                 {incomingEvents.map((event) => (
                   <div
                     key={event.id}
@@ -456,23 +456,23 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
                         Coming Soon
                       </div>
                     </div>
-                    <div className="p-4">
-                      <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
+                    <div className="p-3 sm:p-4">
+                      <h4 className="text-sm sm:text-base lg:text-lg font-semibold text-gray-900 dark:text-white mb-1.5 sm:mb-2 line-clamp-2">
                         {language === 'en' ? event.title : event.titleNe}
                       </h4>
-                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2">
-                        <Calendar className="w-4 h-4" />
-                        <span>{new Date(event.eventDate).toLocaleDateString()}</span>
+                      <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1.5 sm:mb-2">
+                        <Calendar className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                        <span className="truncate">{new Date(event.eventDate).toLocaleDateString()}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-3">
-                        <MapPin className="w-4 h-4" />
-                        <span>{language === 'en' ? event.venue : event.venueNe}</span>
+                      <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-2 sm:mb-3">
+                        <MapPin className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                        <span className="truncate">{language === 'en' ? event.venue : event.venueNe}</span>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-lg font-bold text-red-600 dark:text-red-400">
-                          NPR {event.priceMin} - NPR {event.priceMax}
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0">
+                        <span className="text-base sm:text-lg font-bold text-red-600 dark:text-red-400">
+                          NPR {event.priceMin}
                         </span>
-                        <span className="text-sm text-gray-500 dark:text-gray-400 capitalize">
+                        <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 capitalize truncate">
                           {event.category}
                         </span>
                       </div>

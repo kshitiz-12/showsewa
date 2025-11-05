@@ -84,10 +84,10 @@ export const CurvyCarousel: React.FC<CurvyCarouselProps> = ({
     setTimeout(() => setIsTransitioning(false), 300);
   };
 
-  const height = variant === 'hero' ? 'h-[600px]' : 'h-[500px]';
+  const height = variant === 'hero' ? 'h-[600px] sm:h-[600px]' : 'h-[400px] sm:h-[450px] md:h-[500px]';
   const containerClasses = variant === 'hero' 
     ? 'relative h-[600px] w-full overflow-hidden bg-gradient-to-br from-red-600 via-red-700 to-gray-900'
-    : 'relative h-[500px] w-full overflow-hidden rounded-3xl bg-gradient-to-br from-red-600 via-red-700 to-gray-900 shadow-2xl';
+    : 'relative h-[400px] sm:h-[450px] md:h-[500px] w-full overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-red-600 via-red-700 to-gray-900 shadow-2xl';
 
   if (!items.length) {
     return (
@@ -180,33 +180,33 @@ export const CurvyCarousel: React.FC<CurvyCarouselProps> = ({
       {/* Content */}
       <div className="relative z-10 h-full flex items-center">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
             
             {/* Left Side - Content */}
-            <div className="text-white space-y-8">
-              <div className="space-y-6">
+            <div className="text-white space-y-4 sm:space-y-6 lg:space-y-8">
+              <div className="space-y-3 sm:space-y-4 lg:space-y-6">
                 {/* Badge */}
-                <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
-                  <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                  <span className="text-sm font-medium">
+                <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1.5 sm:px-4 sm:py-2 rounded-full">
+                  <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 fill-current" />
+                  <span className="text-xs sm:text-sm font-medium">
                     {currentItem.type === 'movie' ? 'Featured Movie' : 'Featured Event'}
                   </span>
                 </div>
 
                 {/* Title */}
-                <h1 className="text-4xl md:text-6xl font-bold leading-tight">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight">
                   {language === 'en' ? currentItem.title : (currentItem.titleNe || currentItem.title)}
                 </h1>
 
                 {/* Description */}
                 {(currentItem.description || currentItem.descriptionNe) && (
-                  <p className="text-xl text-gray-200 leading-relaxed">
+                  <p className="text-sm sm:text-base lg:text-lg xl:text-xl text-gray-200 leading-relaxed line-clamp-2 sm:line-clamp-3">
                     {language === 'en' ? currentItem.description : (currentItem.descriptionNe || currentItem.description)}
                   </p>
                 )}
 
                 {/* Meta Information */}
-                <div className="flex flex-wrap gap-6 text-gray-200">
+                <div className="flex flex-wrap gap-3 sm:gap-4 lg:gap-6 text-gray-200 text-xs sm:text-sm">
                   {currentItem.genre && (
                     <div className="flex items-center gap-2">
                       <Play className="w-4 h-4 text-red-400" />
@@ -239,7 +239,7 @@ export const CurvyCarousel: React.FC<CurvyCarouselProps> = ({
 
                 {/* Price */}
                 {currentItem.price && (
-                  <div className="text-2xl font-bold text-yellow-400">
+                  <div className="text-lg sm:text-xl lg:text-2xl font-bold text-yellow-400">
                     {currentItem.price}
                   </div>
                 )}
@@ -248,19 +248,19 @@ export const CurvyCarousel: React.FC<CurvyCarouselProps> = ({
               {/* CTA Button */}
               <button
                 onClick={() => onItemClick(currentItem)}
-                className="group bg-white text-red-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 flex items-center gap-3 shadow-xl"
+                className="group bg-white text-red-600 px-5 py-2.5 sm:px-6 sm:py-3 lg:px-8 lg:py-4 rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base lg:text-lg hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 flex items-center gap-2 sm:gap-3 shadow-xl w-fit"
               >
                 <span>Book Now</span>
-                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
 
             {/* Right Side - Curvy Image Container */}
-            <div className="relative">
+            <div className="relative hidden lg:block">
               <div className={`relative w-full ${variant === 'hero' ? 'h-[400px] lg:h-[500px]' : 'h-[350px] lg:h-[400px]'}`}>
                 {/* Curvy Background */}
-                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-sm rounded-[40px] p-8">
-                  <div className="relative h-full w-full rounded-3xl overflow-hidden shadow-2xl">
+                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-sm rounded-[30px] sm:rounded-[40px] p-4 sm:p-6 lg:p-8">
+                  <div className="relative h-full w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl">
                     {/* Show Trailer if available, otherwise show poster */}
                     {currentItem.trailerUrl ? (
                       <>
@@ -335,29 +335,29 @@ export const CurvyCarousel: React.FC<CurvyCarouselProps> = ({
           <button
             onClick={prevSlide}
             disabled={isTransitioning}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
           
           <button
             onClick={nextSlide}
             disabled={isTransitioning}
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <ChevronRight className="w-6 h-6" />
+            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         </>
       )}
 
       {/* Indicators */}
       {items.length > 1 && (
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-3">
+        <div className="absolute bottom-4 sm:bottom-6 lg:bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-2 sm:gap-3">
           {items.map((item, index) => (
             <button
               key={`indicator-${item.id}-${index}`}
               onClick={() => goToSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
+              className={`w-2 h-2 sm:w-2.5 sm:h-2.5 lg:w-3 lg:h-3 rounded-full transition-all duration-300 ${
                 index === currentIndex
                   ? 'bg-white scale-125 shadow-lg'
                   : 'bg-white/50 hover:bg-white/75'

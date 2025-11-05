@@ -186,24 +186,24 @@ export function Movies({ onNavigate }: MoviesProps) {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 py-8 animate-page-fade-in">
+    <div className="min-h-screen bg-white dark:bg-gray-900 py-4 sm:py-6 lg:py-8 animate-page-fade-in">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8 animate-page-fade-in" style={{ animationDelay: '0.2s' }}>
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-6">
+        <div className="mb-6 sm:mb-8 animate-page-fade-in" style={{ animationDelay: '0.2s' }}>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">
             {t('movies.title')}
           </h1>
 
           {/* Search and Filter Bar */}
-          <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row gap-4">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5 z-10" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search movies by title..."
-                  className="input pl-10"
+                  className="input pl-9 sm:pl-10 text-sm sm:text-base"
                 />
                 {searchQuery && (
                   <button
@@ -215,12 +215,12 @@ export function Movies({ onNavigate }: MoviesProps) {
                 )}
               </div>
               
-              <div className="flex gap-2">
+              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1 sm:overflow-visible sm:mx-0 sm:px-0">
                 {/* Sort Dropdown */}
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as any)}
-                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                  className="px-3 py-2 sm:px-4 sm:py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500 text-sm sm:text-base whitespace-nowrap"
                 >
                   <option value="trending">Trending</option>
                   <option value="release">Newest Release</option>
@@ -231,16 +231,16 @@ export function Movies({ onNavigate }: MoviesProps) {
                 {/* Filter Toggle */}
                 <button
                   onClick={() => setShowFilters(!showFilters)}
-                  className={`flex items-center gap-2 px-4 py-2 border rounded-lg transition-colors ${
+                  className={`flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2 border rounded-lg transition-colors text-sm sm:text-base whitespace-nowrap ${
                     showFilters || selectedGenres.length > 0 || selectedLanguages.length > 0
                       ? 'bg-red-50 border-red-300 text-red-700 dark:bg-red-900/20 dark:border-red-500 dark:text-red-400'
                       : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-red-300'
                   }`}
                 >
-                  <SlidersHorizontal className="w-5 h-5" />
+                  <SlidersHorizontal className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span className="font-medium">Filters</span>
                   {(selectedGenres.length > 0 || selectedLanguages.length > 0) && (
-                    <span className="bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">
+                    <span className="bg-red-600 text-white text-xs px-1.5 py-0.5 sm:px-2 sm:py-0.5 rounded-full">
                       {selectedGenres.length + selectedLanguages.length}
                     </span>
                   )}
@@ -250,15 +250,15 @@ export function Movies({ onNavigate }: MoviesProps) {
                 {favoriteTheaterIds.size > 0 && (
                   <button
                     onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
-                    className={`flex items-center gap-2 px-4 py-2 border rounded-lg transition-colors ${
+                    className={`flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2 border rounded-lg transition-colors text-sm sm:text-base whitespace-nowrap ${
                       showFavoritesOnly 
                         ? 'bg-red-50 border-red-300 text-red-700 dark:bg-red-900/20 dark:border-red-500 dark:text-red-400' 
                         : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-red-300'
                     }`}
                   >
-                    <Heart className={`w-5 h-5 ${showFavoritesOnly ? 'fill-red-600 text-red-600' : 'text-gray-400'}`} />
+                    <Heart className={`w-4 h-4 sm:w-5 sm:h-5 ${showFavoritesOnly ? 'fill-red-600 text-red-600' : 'text-gray-400'}`} />
                     <span className="font-medium">Favorites</span>
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${
+                    <span className={`text-xs px-1.5 py-0.5 sm:px-2 sm:py-0.5 rounded-full ${
                       showFavoritesOnly ? 'bg-red-200 text-red-800' : 'bg-gray-200 text-gray-600'
                     }`}>
                       {favoriteTheaterIds.size}
@@ -270,13 +270,13 @@ export function Movies({ onNavigate }: MoviesProps) {
 
             {/* Filters Panel */}
             {showFilters && (
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 animate-page-fade-in shadow-lg">
+              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 sm:p-4 animate-page-fade-in shadow-lg">
                 {/* Genres */}
-                <div className="mb-4">
-                  <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                <div className="mb-3 sm:mb-4">
+                  <label className="block text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mb-2">
                     Genres
                   </label>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
                     {['Action', 'Comedy', 'Drama', 'Thriller', 'Romance', 'Horror', 'Sci-Fi', 'Adventure', 'Fantasy', 'Animation'].map((genre) => (
                       <button
                         key={genre}
@@ -287,7 +287,7 @@ export function Movies({ onNavigate }: MoviesProps) {
                               : [...prev, genre]
                           );
                         }}
-                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                        className={`px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors ${
                           selectedGenres.includes(genre)
                             ? 'bg-red-600 text-white'
                             : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -301,10 +301,10 @@ export function Movies({ onNavigate }: MoviesProps) {
 
                 {/* Languages */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                  <label className="block text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mb-2">
                     Languages
                   </label>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
                     {['English', 'Hindi', 'Nepali', 'Tamil', 'Telugu', 'Marathi', 'Bengali', 'Gujarati', 'Punjabi'].map((lang) => (
                       <button
                         key={lang}
@@ -315,7 +315,7 @@ export function Movies({ onNavigate }: MoviesProps) {
                               : [...prev, lang]
                           );
                         }}
-                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                        className={`px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors ${
                           selectedLanguages.includes(lang)
                             ? 'bg-red-600 text-white'
                             : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -346,32 +346,32 @@ export function Movies({ onNavigate }: MoviesProps) {
         </div>
 
         {loading ? (
-          <div className="flex justify-center items-center py-20">
-            <div className="flex flex-col items-center space-y-4">
-              <div className="w-12 h-12 border-4 border-red-200 border-t-red-600 rounded-full animate-spin"></div>
-              <div className="text-gray-600 dark:text-gray-400">Loading movies...</div>
+          <div className="flex justify-center items-center py-12 sm:py-16 lg:py-20">
+            <div className="flex flex-col items-center space-y-3 sm:space-y-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 border-4 border-red-200 border-t-red-600 rounded-full animate-spin"></div>
+              <div className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Loading movies...</div>
             </div>
           </div>
         ) : error ? (
-          <div className="text-center py-20 animate-page-fade-in">
-            <div className="text-red-600 text-xl mb-4">⚠️ {error}</div>
+          <div className="text-center py-12 sm:py-16 lg:py-20 animate-page-fade-in">
+            <div className="text-red-600 text-lg sm:text-xl mb-3 sm:mb-4">⚠️ {error}</div>
             <button
               onClick={loadMovies}
-              className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              className="px-5 py-2 sm:px-6 sm:py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm sm:text-base"
             >
               Retry
             </button>
           </div>
         ) : filteredMovies.length === 0 ? (
-          <div className="text-center py-16 animate-page-fade-in">
-            <Filter className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-xl text-gray-600 dark:text-gray-400 mb-4">
+          <div className="text-center py-12 sm:py-16 animate-page-fade-in">
+            <Filter className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-3 sm:mb-4" />
+            <p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">
               {searchQuery ? 'No movies found matching your search' : 'No movies available'}
             </p>
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm sm:text-base"
               >
                 Clear Search
               </button>
@@ -380,7 +380,7 @@ export function Movies({ onNavigate }: MoviesProps) {
         ) : (
           <>
             {/* Results Summary */}
-            <div className="mb-6 flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+            <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
               <span>
                 Showing <strong className="text-gray-900 dark:text-white">{filteredMovies.length}</strong> of <strong className="text-gray-900 dark:text-white">{movies.length}</strong> movies
               </span>
@@ -392,14 +392,14 @@ export function Movies({ onNavigate }: MoviesProps) {
                     setShowFavoritesOnly(false);
                     setSearchQuery('');
                   }}
-                  className="text-red-600 hover:text-red-700 font-medium flex items-center gap-1"
+                  className="text-red-600 hover:text-red-700 font-medium flex items-center gap-1 self-start sm:self-auto"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-3 h-3 sm:w-4 sm:h-4" />
                   Clear all
                 </button>
               )}
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
             {filteredMovies.map((movie, index) => (
               <div
                 key={movie.id}
@@ -407,17 +407,17 @@ export function Movies({ onNavigate }: MoviesProps) {
                 style={{ animationDelay: `${index * 0.1}s` }}
                 onClick={() => onNavigate('movie-detail', movie.id)}
               >
-                <div className="relative rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-2">
+                <div className="relative rounded-lg sm:rounded-xl overflow-hidden shadow-md sm:shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-2">
                   <img
                     src={movie.posterUrl}
                     alt={language === 'en' ? movie.title : movie.titleNe}
                     className="w-full aspect-[2/3] object-cover"
                   />
-                  <div className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 rounded text-xs font-bold">
+                  <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 bg-red-600 text-white px-1.5 py-0.5 sm:px-2 sm:py-1 rounded text-[10px] sm:text-xs font-bold">
                     {movie.rating}
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="absolute bottom-0 left-0 right-0 p-4">
+                    <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-4">
                       <button 
                         onClick={async (e) => {
                           e.stopPropagation();
@@ -439,17 +439,17 @@ export function Movies({ onNavigate }: MoviesProps) {
                             onNavigate('movie-detail', movie.id);
                           }
                         }}
-                        className="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition-colors font-semibold text-sm"
+                        className="w-full bg-red-600 text-white py-1.5 sm:py-2 rounded-lg hover:bg-red-700 transition-colors font-semibold text-xs sm:text-sm"
                       >
                         {t('home.book_now')}
                       </button>
                     </div>
                   </div>
                 </div>
-                <h3 className="mt-3 text-sm font-semibold text-gray-900 dark:text-white line-clamp-2">
+                <h3 className="mt-2 sm:mt-3 text-xs sm:text-sm font-semibold text-gray-900 dark:text-white line-clamp-2">
                   {language === 'en' ? movie.title : movie.titleNe}
                 </h3>
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 mt-0.5 sm:mt-1 line-clamp-2">
                   {Array.isArray(movie.genre) ? movie.genre.join(', ') : movie.genre} • {Array.isArray(movie.language) ? movie.language.join(', ') : movie.language}
                 </p>
               </div>
