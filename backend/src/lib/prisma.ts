@@ -9,6 +9,11 @@ export const prisma =
       ? ['query', 'error', 'warn'] 
       : ['error'],
     errorFormat: 'pretty',
+    datasources: {
+      db: {
+        url: process.env.DATABASE_URL,
+      },
+    },
   });
 
 // Handle database connection errors gracefully

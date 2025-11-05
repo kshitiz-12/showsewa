@@ -51,7 +51,7 @@ export function Footer({ onNavigate }: FooterProps) {
                 <Facebook className="w-4 h-4 sm:w-5 sm:h-5" />
               </a>
               <a
-                href="#"
+                href="https://www.instagram.com/showsewa?igsh=bGZ6ZjRxZXUycncx"
                 className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-red-600 to-red-700 rounded-lg flex items-center justify-center hover:from-red-700 hover:to-red-800 transition-all duration-300 transform hover:scale-110"
                 aria-label="Instagram"
               >

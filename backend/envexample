@@ -1,5 +1,13 @@
 # Database Configuration - Using Transaction Pooler port 6543 for Render
+# IMPORTANT: If you get "Can't reach database server" errors, try the version WITHOUT connection_limit/pool_timeout first
+
+# Option 1: Simple version (try this first if having connection issues)
 DATABASE_URL="postgresql://postgres.sekplvmoorurpxwpxuuv:Showsewa12xyz@aws-1-us-east-2.pooler.supabase.com:6543/postgres?pgbouncer=true&sslmode=require"
+
+# Option 2: With connection pool parameters (may not work with all PostgreSQL versions)
+# DATABASE_URL="postgresql://postgres.sekplvmoorurpxwpxuuv:Showsewa12xyz@aws-1-us-east-2.pooler.supabase.com:6543/postgres?pgbouncer=true&sslmode=require&connection_limit=5&pool_timeout=20"
+
+# Direct connection for migrations (port 5432)
 DIRECT_URL="postgresql://postgres.sekplvmoorurpxwpxuuv:Showsewa12xyz@aws-1-us-east-2.pooler.supabase.com:5432/postgres?sslmode=require"
 
 # Supabase Configuration
