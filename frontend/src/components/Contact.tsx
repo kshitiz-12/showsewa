@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Mail, Phone, MapPin, Send, Facebook, Instagram, Twitter, MessageCircle, Clock } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, Facebook, Instagram, Twitter, MessageCircle } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
 export function Contact() {
@@ -43,15 +43,29 @@ export function Contact() {
             {t('contact.subtitle')}
           </p>
           <div className="flex flex-wrap justify-center gap-4 animate-page-fade-in" style={{ animationDelay: '0.2s' }}>
-            <div className="bg-white/20 backdrop-blur-sm rounded-full px-6 py-3 text-white">
-              <span className="font-semibold">📧 Email Us</span>
-            </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-full px-6 py-3 text-white">
-              <span className="font-semibold">📞 Call Us</span>
-            </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-full px-6 py-3 text-white">
-              <span className="font-semibold">📍 Visit Us</span>
-            </div>
+            <a
+              href="mailto:info@showsewa.com"
+              className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 transform hover:scale-110 shadow-lg"
+              aria-label="Email Us"
+            >
+              <Mail className="w-6 h-6" />
+            </a>
+            <a
+              href="tel:+9779800000000"
+              className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 transform hover:scale-110 shadow-lg"
+              aria-label="Call Us"
+            >
+              <Phone className="w-6 h-6" />
+            </a>
+            <a
+              href="https://www.google.com/maps/search/?api=1&query=Kathmandu,Nepal"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 transform hover:scale-110 shadow-lg"
+              aria-label="Visit Us"
+            >
+              <MapPin className="w-6 h-6" />
+            </a>
           </div>
         </div>
       </section>
@@ -220,32 +234,6 @@ export function Contact() {
                 >
                   <Twitter className="w-7 h-7 text-white" />
                 </a>
-              </div>
-            </div>
-
-            {/* Business Hours */}
-            <div className="bg-gradient-to-br from-yellow-50 to-white dark:from-gray-800 dark:to-gray-700 rounded-3xl shadow-2xl p-10 border border-yellow-200 dark:border-gray-600">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-white" />
-                </div>
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-                  Business Hours
-                </h2>
-              </div>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-xl">
-                  <span className="font-semibold text-gray-700 dark:text-gray-300">Monday - Friday</span>
-                  <span className="text-gray-600 dark:text-gray-400">9:00 AM - 6:00 PM</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-xl">
-                  <span className="font-semibold text-gray-700 dark:text-gray-300">Saturday</span>
-                  <span className="text-gray-600 dark:text-gray-400">10:00 AM - 4:00 PM</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-xl">
-                  <span className="font-semibold text-gray-700 dark:text-gray-300">Sunday</span>
-                  <span className="text-gray-600 dark:text-gray-400">Closed</span>
-                </div>
               </div>
             </div>
           </div>

@@ -250,11 +250,12 @@ export function EventDetail({ eventId, onNavigate }: EventDetailProps) {
       </div>
 
       {/* Banner Section - Mobile Optimized */}
-      <div className="relative h-[60vh] sm:h-[500px] bg-gradient-to-br from-gray-900 via-gray-800 to-black overflow-hidden">
+      <div className="relative h-[50vh] sm:h-[500px] bg-gradient-to-br from-gray-900 via-gray-800 to-black overflow-hidden">
         <img
           src={event.imageUrl}
           alt={eventTitle}
-          className="w-full h-full object-cover opacity-60"
+          className="w-full h-full object-contain sm:object-cover opacity-60"
+          style={{ objectPosition: 'center' }}
           onError={(e) => {
             (e.target as HTMLImageElement).style.display = 'none';
           }}
@@ -396,7 +397,7 @@ export function EventDetail({ eventId, onNavigate }: EventDetailProps) {
                 </div>
                 <button 
                   onClick={handleGetDirections}
-                  className="mt-1 text-blue-600 dark:text-blue-400 hover:underline text-xs sm:text-sm flex items-center gap-1"
+                  className="mt-1 text-red-600 dark:text-red-400 hover:underline text-xs sm:text-sm flex items-center gap-1"
                 >
                   Get Directions
                   <ChevronRight className="w-3 h-3" />

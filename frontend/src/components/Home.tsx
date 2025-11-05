@@ -213,7 +213,7 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
                   <span>4.9/5 Rating</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-blue-400" />
+                  <Users className="w-4 h-4 text-gray-400" />
                   <span>50K+ Users</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -372,7 +372,7 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
 
               {dataLoading ? (
                 <div className="flex justify-center items-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
                 </div>
               ) : featuredEvents.length > 0 ? (
                 <CurvyCarousel
@@ -413,7 +413,7 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
           <div>
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-red-600 rounded-xl flex items-center justify-center">
                   <Clock className="w-5 h-5 text-white" />
                 </div>
                 <div>
@@ -423,7 +423,7 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
               </div>
               <button
                 onClick={() => onNavigate('events')}
-                className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300"
+                className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-2 rounded-lg font-semibold hover:from-red-600 hover:to-red-700 transition-all duration-300"
               >
                 View All Events
               </button>
@@ -452,7 +452,7 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
                       <div className={`hidden w-full h-full flex items-center justify-center`}>
                         <Music className="w-12 h-12 text-gray-400" />
                       </div>
-                      <div className="badge-blue absolute top-3 left-3">
+                      <div className="badge-red absolute top-3 left-3">
                         Coming Soon
                       </div>
                     </div>
@@ -469,8 +469,8 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
                         <span>{language === 'en' ? event.venue : event.venueNe}</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
-                          ₹{event.priceMin} - ₹{event.priceMax}
+                        <span className="text-lg font-bold text-red-600 dark:text-red-400">
+                          NPR {event.priceMin} - NPR {event.priceMax}
                         </span>
                         <span className="text-sm text-gray-500 dark:text-gray-400 capitalize">
                           {event.category}
@@ -487,7 +487,7 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
                 <p className="text-gray-600 dark:text-gray-400 mb-6">Check back later for upcoming events</p>
                 <button
                   onClick={() => onNavigate('events')}
-                  className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:from-blue-600 hover:to-blue-700 transition-all duration-300"
+                  className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-2 rounded-lg font-semibold hover:from-red-600 hover:to-red-700 transition-all duration-300"
                 >
                   Browse All Events
                 </button>
@@ -592,7 +592,7 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
                 <div className="text-gray-400">User Rating</div>
               </div>
               <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-green-400 to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-gradient-to-r from-green-400 to-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Users className="w-8 h-8 text-white" />
                 </div>
                 <div className="text-2xl font-bold text-white mb-2">50K+</div>

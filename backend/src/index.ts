@@ -71,14 +71,23 @@ app.use(cors({
       'https://showsewa.com', // Production frontend (without www)
     ];
     
+    // Normalize origin for comparison (remove trailing slash)
+    const normalizedOrigin = origin.replace(/\/$/, '');
+    const normalizedAllowed = allowedOrigins.map(o => o.replace(/\/$/, ''));
+    
     // Check if origin is in allowed list or is a Vercel preview deployment
-    if (allowedOrigins.includes(origin) || origin.includes('.vercel.app')) {
+    if (normalizedAllowed.includes(normalizedOrigin) || normalizedOrigin.includes('.vercel.app')) {
       callback(null, true);
-    } else {
+    } else if (process.env.NODE_ENV === 'development') {
       callback(null, true); // For development, allow all origins
+    } else {
+      console.warn(`CORS blocked origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 app.use(morgan('combined'));
 app.use(express.json({ limit: '10mb' }));
