@@ -55,11 +55,14 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
     try {
       console.log('🔄 Loading carousel data...');
       
+      // Build URLs - only include city parameter if a city is selected
+      const cityParam = selectedCity && selectedCity.trim() ? `&city=${encodeURIComponent(selectedCity)}` : '';
+      
       // Load carousel data (more events and movies for carousel)
       const [eventsResponse, incomingEventsResponse, moviesResponse] = await Promise.all([
-        fetch(`http://localhost:5000/api/events?featured=true&limit=6&city=${selectedCity}`),
-        fetch(`http://localhost:5000/api/events?incoming=true&limit=4&city=${selectedCity}`),
-        fetch(`http://localhost:5000/api/movies/trending?limit=6&city=${selectedCity}`)
+        fetch(`http://localhost:5000/api/events?featured=true&limit=6${cityParam}`),
+        fetch(`http://localhost:5000/api/events?incoming=true&limit=4${cityParam}`),
+        fetch(`http://localhost:5000/api/movies/trending?limit=6${cityParam}`)
       ]);
 
       console.log('📡 API Responses:', {
@@ -81,7 +84,8 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
           // Backfill to 6 if needed with general events of same city
           if (unique.length < 6) {
             console.log('ℹ️ Backfilling featured with general events...');
-            const fallback = await fetch(`http://localhost:5000/api/events?limit=6&city=${selectedCity}`);
+            const fallbackCityParam = selectedCity && selectedCity.trim() ? `&city=${encodeURIComponent(selectedCity)}` : '';
+            const fallback = await fetch(`http://localhost:5000/api/events?limit=6${fallbackCityParam}`);
             if (fallback.ok) {
               const fb = await fallback.json();
               if (fb.success) {

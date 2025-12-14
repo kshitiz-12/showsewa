@@ -674,6 +674,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
               <SeatMap 
                 showtimeId={showtimeId}
                 onSeatSelection={handleSeatSelection}
+                showtimeInfo={showtimeInfo}
               />
             )}
             

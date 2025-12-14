@@ -119,6 +119,25 @@ export function CitySelectionModal({ isOpen, onClose, onSelectCity, currentCity 
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {/* "All Cities" option - show first */}
+              <button
+                onClick={() => {
+                  onSelectCity(''); // Empty string means show all cities
+                  onClose();
+                }}
+                className={`p-4 rounded-xl border-2 transition-all duration-200 hover:scale-105 ${
+                  !currentCity || currentCity === ''
+                    ? 'border-red-500 bg-red-50'
+                    : 'border-gray-200 hover:border-red-300 hover:bg-gray-50'
+                }`}
+              >
+                <div className="text-4xl mb-2">🌍</div>
+                <div className={`font-semibold text-sm mb-1 ${!currentCity || currentCity === '' ? 'text-red-600' : 'text-gray-900'}`}>
+                  All Cities
+                </div>
+                <div className="text-xs text-gray-500">Show all</div>
+              </button>
+              
               {displayCities.map((city) => (
                 <button
                   key={city.name}

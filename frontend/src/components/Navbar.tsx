@@ -78,7 +78,9 @@ export function Navbar({ onNavigate, currentPage }: Readonly<NavbarProps>) {
               className="btn-secondary"
             >
               <MapPin className="w-4 h-4 text-red-600" />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{selectedCity}</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                {selectedCity && selectedCity.trim() ? selectedCity : 'All Cities'}
+              </span>
               <ChevronDown className="w-4 h-4 text-gray-500" />
             </button>
 
@@ -249,7 +251,9 @@ export function Navbar({ onNavigate, currentPage }: Readonly<NavbarProps>) {
             >
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-red-600" />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{selectedCity}</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {selectedCity && selectedCity.trim() ? selectedCity : 'All Cities'}
+                </span>
               </div>
               <ChevronDown className="w-4 h-4 text-gray-500" />
             </button>

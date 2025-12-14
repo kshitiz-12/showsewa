@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Ticket } from 'lucide-react';
+import { Ticket, ArrowLeft, Pencil } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface Seat {
@@ -26,9 +26,10 @@ interface SeatCategory {
 interface SeatMapProps {
   showtimeId: string;
   onSeatSelection: (seats: Seat[], totalPrice: number) => void;
+  showtimeInfo?: any;
 }
 
-const SeatMap: React.FC<SeatMapProps> = ({ showtimeId, onSeatSelection }) => {
+const SeatMap: React.FC<SeatMapProps> = ({ showtimeId, onSeatSelection, showtimeInfo }) => {
   const { user } = useAuth();
   const [seats, setSeats] = useState<Seat[]>([]);
   const [categories, setCategories] = useState<SeatCategory[]>([]);
@@ -274,47 +275,22 @@ const SeatMap: React.FC<SeatMapProps> = ({ showtimeId, onSeatSelection }) => {
   };
 
   const getSeatColor = (seat: Seat) => {
-    if (seat.isBooked) return 'bg-red-600 shadow-red-200';
-    if (seat.isSelected) return 'bg-blue-600 shadow-blue-200';
-    
-    // Use actual category colors
-    const category = categories.find(c => c.id === seat.categoryId);
-    if (category) {
-      // Check if category ID contains the category name (for dynamic IDs like premium_${screenId})
-      if (category.id.includes('premium') || category.name.toLowerCase().includes('premium')) {
-        return 'bg-gradient-to-br from-yellow-400 to-yellow-600 shadow-yellow-200';
-      } else if (category.id.includes('standard') || category.name.toLowerCase().includes('standard')) {
-        return 'bg-gradient-to-br from-green-400 to-green-600 shadow-green-200';
-      } else if (category.id.includes('economy') || category.name.toLowerCase().includes('economy')) {
-        return 'bg-gradient-to-br from-blue-400 to-blue-600 shadow-blue-200';
-      }
-      
-      // Fallback to exact match for backward compatibility
-      switch (category.id) {
-        case 'premium':
-          return 'bg-gradient-to-br from-yellow-400 to-yellow-600 shadow-yellow-200';
-        case 'standard':
-          return 'bg-gradient-to-br from-green-400 to-green-600 shadow-green-200';
-        case 'economy':
-          return 'bg-gradient-to-br from-blue-400 to-blue-600 shadow-blue-200';
-        default:
-          return 'bg-gradient-to-br from-gray-300 to-gray-500 shadow-gray-200';
-      }
-    }
-    return 'bg-gradient-to-br from-gray-300 to-gray-500 shadow-gray-200';
+    // BookMyShow style: green for selected, white for available, light gray for sold
+    if (seat.isBooked) return 'bg-gray-300 dark:bg-gray-600';
+    if (seat.isSelected) return 'bg-green-500';
+    return 'bg-white border border-gray-300';
   };
 
   const getSeatTextColor = (seat: Seat) => {
-    if (seat.isBooked || seat.isSelected) return 'text-white font-semibold';
-    if (hoveredSeat === seat.id) return 'text-white font-semibold';
-    return 'text-gray-800 font-medium';
+    if (seat.isBooked) return 'text-gray-500 font-medium';
+    if (seat.isSelected) return 'text-white font-bold';
+    return 'text-gray-900 font-medium';
   };
 
   const getSeatHoverEffects = (seat: Seat) => {
-    if (seat.isBooked) return '';
-    if (seat.isSelected) return 'hover:bg-blue-700 hover:scale-105';
-    if (hoveredSeat === seat.id) return 'scale-110 shadow-lg';
-    return 'hover:scale-105 hover:shadow-md transition-all duration-200';
+    if (seat.isBooked) return 'cursor-not-allowed';
+    if (seat.isSelected) return 'hover:bg-green-600';
+    return 'hover:bg-gray-100 hover:border-gray-400 cursor-pointer';
   };
 
   if (loading) {
@@ -343,75 +319,146 @@ const SeatMap: React.FC<SeatMapProps> = ({ showtimeId, onSeatSelection }) => {
   const seatsByRow = getSeatsByRow();
   const rowKeys = Object.keys(seatsByRow).sort((a, b) => a.localeCompare(b));
 
+  // Group seats by row and category for pricing display
+  const getRowCategory = (rowKey: string) => {
+    // Get the first seat in the row to determine its category and price
+    const rowSeats = seatsByRow[rowKey];
+    if (!rowSeats || rowSeats.length === 0) {
+      return { name: '', price: 0 };
+    }
+    
+    const firstSeat = rowSeats[0];
+    const category = categories.find(c => c.id === firstSeat.categoryId);
+    
+    // Map category names to row labels
+    const categoryName = category?.name?.toUpperCase() || '';
+    let rowLabel = '';
+    if (categoryName.includes('PREMIUM') || categoryName.includes('PRIME')) {
+      rowLabel = 'PRIME ROWS';
+    } else if (categoryName.includes('PLUS') || categoryName.includes('CLASSIC PLUS')) {
+      rowLabel = 'CLASSIC PLUS ROWS';
+    } else if (categoryName.includes('CLASSIC') || categoryName.includes('STANDARD')) {
+      rowLabel = 'CLASSIC ROWS';
+    } else {
+      // Fallback: use actual category name or default
+      rowLabel = categoryName || 'ROWS';
+    }
+    
+    return { 
+      name: rowLabel, 
+      price: firstSeat.price || category?.price || 200 
+    };
+  };
+  
+  // Format date like "Sun, 14 December, 2025"
+  const formatDate = (dateString?: string) => {
+    if (!dateString || !showtimeInfo?.showDate) return '';
+    const date = new Date(showtimeInfo.showDate);
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                    'July', 'August', 'September', 'October', 'November', 'December'];
+    return `${days[date.getDay()]}, ${date.getDate()} ${months[date.getMonth()]}, ${date.getFullYear()}`;
+  };
+
   return (
-    <div className="max-w-7xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-xl shadow-lg">
-      {/* Enhanced Screen */}
-      <div className="text-center mb-12">
-        <div className="relative">
-          <div className="bg-gradient-to-r from-gray-800 to-gray-900 text-white py-6 px-16 rounded-xl shadow-lg transform -skew-x-3">
-            <div className="transform skew-x-3">
-              <h3 className="text-2xl font-bold tracking-wider">SCREEN</h3>
-              <div className="flex items-center justify-center mt-2">
-                <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse mr-2"></div>
-                <span className="text-sm opacity-75">This way for best viewing</span>
-              </div>
+    <div className="max-w-7xl mx-auto bg-white dark:bg-gray-900">
+      {/* Header - Movie Info */}
+      <div className="mb-6 px-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => window.history.back()}
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+            </button>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+                {showtimeInfo?.movie?.title || 'Movie Title'} {showtimeInfo?.movie?.language && `- (${showtimeInfo.movie.language[0] || 'Hindi'})`}
+              </h1>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                {showtimeInfo?.screen?.theater?.name || 'Theater'} {showtimeInfo?.screen?.theater?.city && `| ${showtimeInfo.screen.theater.city}`} | {formatDate()} | {showtimeInfo?.showTime || '09:45 PM'}
+              </p>
             </div>
           </div>
+          <button className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors">
+            <Pencil className="w-4 h-4" />
+            <span>{selectedSeats.length} Ticket{selectedSeats.length !== 1 ? 's' : ''}</span>
+          </button>
+        </div>
+
+        {/* Showtime Selection Bar */}
+        <div className="flex gap-3 mt-4">
+          {['05:50 PM', '09:45 PM', '10:00 PM'].map((time) => (
+            <button
+              key={time}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                time === (showtimeInfo?.showTime || '09:45 PM')
+                  ? 'bg-orange-500 text-white'
+                  : 'bg-white border-2 border-orange-500 text-orange-500 hover:bg-orange-50'
+              }`}
+            >
+              {time}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Enhanced Seat Map */}
-      <div className="mb-8 overflow-x-auto">
-        <div className="space-y-3 min-w-max">
-          {rowKeys.map((rowKey) => {
+      {/* Seating Layout */}
+      <div className="px-4 mb-8 overflow-x-auto">
+        <div className="space-y-4 min-w-max">
+          {rowKeys.map((rowKey, rowIndex) => {
             const rowSeats = seatsByRow[rowKey];
+            const rowCategory = getRowCategory(rowKey);
+            const prevRowCategory = rowIndex > 0 ? getRowCategory(rowKeys[rowIndex - 1]) : null;
+            const showCategoryLabel = !prevRowCategory || prevRowCategory.name !== rowCategory.name;
+
             return (
-              <div key={rowKey} className="flex items-center gap-4">
-                {/* Row Label */}
-                <div className="w-8 text-center">
-                  <span className="text-sm font-bold text-gray-600 dark:text-gray-400">{rowKey}</span>
-                </div>
+              <div key={rowKey}>
+                {/* Category Label */}
+                {showCategoryLabel && (
+                  <div className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    ₹{rowCategory.price} {rowCategory.name}
+                  </div>
+                )}
                 
-                {/* Seats in Row */}
-                <div className="flex gap-1">
-                  {rowSeats.map((seat, index) => (
-                    <button
-                      key={seat.id}
-                      onClick={() => handleSeatClick(seat)}
-                      onMouseEnter={() => setHoveredSeat(seat.id)}
-                      onMouseLeave={() => setHoveredSeat(null)}
-                      disabled={seat.isBooked}
-                      className={`
-                        relative w-10 h-10 text-xs font-medium rounded-lg border-2
-                        ${getSeatColor(seat)}
-                        ${getSeatTextColor(seat)}
-                        ${getSeatHoverEffects(seat)}
-                        ${seat.isBooked ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}
-                        transition-all duration-300 ease-in-out transform
-                        shadow-sm hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-                      `}
-                      title={`${seat.seatNumber} - ₹${seat.price}${seat.isBooked ? ' (Booked)' : seat.isSelected ? ' (Selected)' : ''}`}
-                      style={{
-                        animationDelay: `${index * 20}ms`
-                      }}
-                    >
-                      <span className="relative z-10">{seat.seatNumber}</span>
-                      
-                      {/* Selection indicator */}
-                      {seat.isSelected && (
-                        <div className="absolute inset-0 bg-blue-600 rounded-lg animate-pulse">
-                          <div className="absolute top-1 right-1">
-                            <div className="w-2 h-2 bg-white rounded-full"></div>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {/* Hover effect overlay */}
-                      {hoveredSeat === seat.id && !seat.isBooked && !seat.isSelected && (
-                        <div className="absolute inset-0 bg-white bg-opacity-20 rounded-lg animate-pulse"></div>
-                      )}
-                    </button>
-                  ))}
+                {/* Row with Seats */}
+                <div className="flex items-center gap-3">
+                  {/* Row Label */}
+                  <div className="w-6 text-left">
+                    <span className="text-sm font-bold text-gray-700 dark:text-gray-300">{rowKey}</span>
+                  </div>
+                  
+                  {/* Seats */}
+                  <div className="flex gap-1">
+                    {rowSeats.map((seat) => {
+                      // Extract seat number (remove row letter)
+                      const seatNumStr = seat.seatNumber.replace(rowKey, '').replace(/^0+/, '') || seat.seatNumber.replace(rowKey, '');
+                      const seatNum = parseInt(seatNumStr);
+                      return (
+                        <button
+                          key={seat.id}
+                          onClick={() => handleSeatClick(seat)}
+                          disabled={seat.isBooked}
+                          className={`
+                            relative w-12 h-10 text-sm font-bold rounded transition-all duration-200 flex items-center justify-center
+                            ${getSeatColor(seat)}
+                            ${getSeatTextColor(seat)}
+                            ${getSeatHoverEffects(seat)}
+                            ${seat.isBooked ? 'opacity-75' : ''}
+                          `}
+                          title={`${seat.seatNumber} - ₹${seat.price}${seat.isBooked ? ' (Sold)' : seat.isSelected ? ' (Selected)' : ' (Available)'}`}
+                        >
+                          <span>{seatNumStr}</span>
+                          
+                          {/* Wheelchair indicator for accessible seats (first and last seats) */}
+                          {(seat.column === 1 || seat.column === rowSeats.length) && (
+                            <span className="absolute -top-1 -right-1 text-xs">♿</span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             );
@@ -419,92 +466,40 @@ const SeatMap: React.FC<SeatMapProps> = ({ showtimeId, onSeatSelection }) => {
         </div>
       </div>
 
-      {/* Enhanced Legend */}
-      <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 mb-8">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-center">Seat Legend</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {categories.map((category) => (
-            <div key={category.id} className="flex items-center gap-3 p-3 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
-              <div 
-                className={`w-8 h-8 rounded-lg ${
-                  category.id.includes('premium') || category.name.toLowerCase().includes('premium') ? 'bg-gradient-to-br from-yellow-400 to-yellow-600' :
-                  category.id.includes('standard') || category.name.toLowerCase().includes('standard') ? 'bg-gradient-to-br from-green-400 to-green-600' :
-                  category.id.includes('economy') || category.name.toLowerCase().includes('economy') ? 'bg-gradient-to-br from-blue-400 to-blue-600' :
-                  'bg-gradient-to-br from-gray-300 to-gray-500'
-                } shadow-sm`}
-              ></div>
-              <div>
-                <div className="text-sm font-semibold text-gray-900 dark:text-white">
-                  {category.name}
-                </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">
-                  ₹{category.price}
-                </div>
-              </div>
-            </div>
-          ))}
-          <div className="flex items-center gap-3 p-3 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
-            <div className="w-8 h-8 rounded-lg bg-red-600 shadow-sm"></div>
-            <div>
-              <div className="text-sm font-semibold text-gray-900 dark:text-white">Booked</div>
-              <div className="text-xs text-gray-600 dark:text-gray-400">Unavailable</div>
-            </div>
+      {/* Screen Indicator */}
+      <div className="px-4 mb-8">
+        <div className="bg-blue-100 dark:bg-blue-900/30 rounded-lg py-4 text-center">
+          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">All eyes this way please</p>
+        </div>
+      </div>
+
+      {/* Legend */}
+      <div className="px-4 mb-6">
+        <div className="flex items-center justify-center gap-6">
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 rounded bg-green-500"></div>
+            <span className="text-sm text-gray-700 dark:text-gray-300">Selected</span>
           </div>
-          <div className="flex items-center gap-3 p-3 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 shadow-sm"></div>
-            <div>
-              <div className="text-sm font-semibold text-gray-900 dark:text-white">Selected</div>
-              <div className="text-xs text-gray-600 dark:text-gray-400">By You</div>
-            </div>
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 rounded bg-white border border-gray-300"></div>
+            <span className="text-sm text-gray-700 dark:text-gray-300">Available</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 rounded bg-gray-300 dark:bg-gray-600"></div>
+            <span className="text-sm text-gray-700 dark:text-gray-300">Sold</span>
           </div>
         </div>
       </div>
 
-      {/* Enhanced Selected Seats Summary */}
-      {selectedSeats.length > 0 && (
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-200 dark:border-blue-700 rounded-xl p-6 mb-8 animate-slide-up">
-          <div className="flex items-center justify-between mb-4">
-            <h4 className="text-xl font-bold text-blue-800 dark:text-blue-300 flex items-center gap-2">
-              <Ticket className="w-5 h-5" />
-              Selected Seats
-            </h4>
-            <div className="text-sm text-blue-600 dark:text-blue-400">
-              Reserved for you
-            </div>
+      {/* Footer */}
+      <div className="px-4 pb-6 flex items-center justify-between text-sm">
+        <div className="flex items-center gap-2 text-red-600">
+          <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center">
+            <span className="text-white text-xs">✓</span>
           </div>
-          
-          <div className="flex flex-wrap gap-2 mb-4">
-            {selectedSeats.map((seat, index) => (
-                <span 
-                  key={seat.id}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm hover:bg-blue-700 transition-colors animate-bounce"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  {seat.seatNumber}
-                </span>
-            ))}
-          </div>
-          
-          <div className="flex justify-between items-center pt-4 border-t border-blue-200 dark:border-blue-600">
-            <div className="text-2xl font-bold text-blue-800 dark:text-blue-300">
-              ₹{selectedSeats.reduce((sum, seat) => sum + seat.price, 0)}
-            </div>
-            <div className="text-sm text-blue-600 dark:text-blue-400">
-              {selectedSeats.length} seat{selectedSeats.length === 1 ? '' : 's'}
-            </div>
-          </div>
+          <span>YES Private Debit Card Offer</span>
         </div>
-      )}
-
-      {/* Enhanced Instructions */}
-      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 text-center">
-        <div className="flex items-center justify-center gap-2 mb-2">
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Seat Selection Tips</span>
-        </div>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          Click on available seats to select them. Selected seats will be held for 10 minutes to complete your booking.
-        </p>
+        <div className="text-gray-600 dark:text-gray-400">1/3</div>
       </div>
     </div>
   );

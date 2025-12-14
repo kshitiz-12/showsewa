@@ -927,7 +927,11 @@ const EventModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
+  const [selectedCities, setSelectedCities] = useState<string[]>([]);
+  const [selectedTheaters, setSelectedTheaters] = useState<string[]>([]);
+  const [bulkMode, setBulkMode] = useState(false);
   const [theaters, setTheaters] = useState<any[]>([]);
+  const [allTheaters, setAllTheaters] = useState<any[]>([]);
   const [theaterSearchQuery, setTheaterSearchQuery] = useState('');
   const [formData, setFormData] = useState({
     title: '',
@@ -956,16 +960,38 @@ const EventModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
     termsAndConditionsNe: ''
   });
 
-  // Fetch theaters when city changes
+  // Fetch all theaters for bulk mode
+  useEffect(() => {
+    const fetchAllTheaters = async () => {
+      if (!bulkMode) return;
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:5000/api/admin/theaters?limit=1000`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setAllTheaters(data.data.theaters || []);
+        }
+      } catch (err) {
+        console.error('Error fetching all theaters:', err);
+      }
+    };
+    if (bulkMode) {
+      fetchAllTheaters();
+    }
+  }, [bulkMode]);
+
+  // Fetch theaters when city changes (single mode)
   useEffect(() => {
     const fetchTheaters = async () => {
-      if (!selectedCity) {
-        setTheaters([]);
+      if (bulkMode || !selectedCity) {
+        if (!bulkMode) setTheaters([]);
         return;
       }
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:5000/api/admin/theaters?limit=100`, {
+        const response = await fetch(`http://localhost:5000/api/admin/theaters?limit=1000`, {
           headers: { 'Authorization': `Bearer ${token}` },
         });
         if (response.ok) {
@@ -980,12 +1006,75 @@ const EventModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
       }
     };
     fetchTheaters();
-  }, [selectedCity]);
+  }, [selectedCity, bulkMode]);
 
   // Filter theaters by search
   const filteredTheaters = theaters.filter(t => 
     t.name?.toLowerCase().includes(theaterSearchQuery.toLowerCase())
   );
+
+  // Filter theaters for bulk mode
+  const getFilteredTheatersForBulk = () => {
+    if (!bulkMode) return [];
+    let filtered = allTheaters;
+    
+    // Filter by selected cities if any
+    if (selectedCities.length > 0) {
+      filtered = filtered.filter(t => 
+        selectedCities.some(city => 
+          t.city?.toLowerCase() === city.toLowerCase()
+        )
+      );
+    }
+    
+    // Filter by search query
+    if (theaterSearchQuery) {
+      filtered = filtered.filter(t => 
+        t.name?.toLowerCase().includes(theaterSearchQuery.toLowerCase())
+      );
+    }
+    
+    return filtered;
+  };
+
+  const bulkTheaters = getFilteredTheatersForBulk();
+
+  // Handle select all cities
+  const handleSelectAllCities = () => {
+    if (selectedCities.length === nepalCities.length) {
+      setSelectedCities([]);
+    } else {
+      setSelectedCities(nepalCities.map(c => c.name));
+    }
+  };
+
+  // Handle select all theaters
+  const handleSelectAllTheaters = () => {
+    const filtered = getFilteredTheatersForBulk();
+    if (selectedTheaters.length === filtered.length && filtered.length > 0) {
+      setSelectedTheaters([]);
+    } else {
+      setSelectedTheaters(filtered.map(t => t.id));
+    }
+  };
+
+  // Handle city checkbox change
+  const handleCityCheckboxChange = (cityName: string) => {
+    if (selectedCities.includes(cityName)) {
+      setSelectedCities(selectedCities.filter(c => c !== cityName));
+    } else {
+      setSelectedCities([...selectedCities, cityName]);
+    }
+  };
+
+  // Handle theater checkbox change
+  const handleTheaterCheckboxChange = (theaterId: string) => {
+    if (selectedTheaters.includes(theaterId)) {
+      setSelectedTheaters(selectedTheaters.filter(t => t !== theaterId));
+    } else {
+      setSelectedTheaters([...selectedTheaters, theaterId]);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -994,29 +1083,95 @@ const EventModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/admin/events', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          ...formData,
-          priceMin: Number.parseFloat(formData.priceMin) || 0,
-          priceMax: Number.parseFloat(formData.priceMax) || 0,
-          totalSeats: Number.parseInt(formData.totalSeats),
-          availableSeats: Number.parseInt(formData.availableSeats) || Number.parseInt(formData.totalSeats),
-          tags: formData.tags.length > 0 ? formData.tags : [],
-          galleryImages: formData.galleryImages.length > 0 ? formData.galleryImages : []
-        }),
-      });
+      
+      // If bulk mode, create events for all selected combinations
+      if (bulkMode && selectedCities.length > 0 && selectedTheaters.length > 0) {
+        let successCount = 0;
+        let failCount = 0;
+        const errors: string[] = [];
 
-      const data = await response.json();
+        // Create event for each theater
+        for (const theaterId of selectedTheaters) {
+          const theater = allTheaters.find(t => t.id === theaterId);
+          if (!theater) continue;
 
-      if (response.ok && data.success) {
-        onSuccess();
+          // Only create if theater city is in selected cities
+          if (!selectedCities.some(c => c.toLowerCase() === theater.city?.toLowerCase())) {
+            continue;
+          }
+
+          try {
+            const response = await fetch('http://localhost:5000/api/admin/events', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                ...formData,
+                theaterId: theaterId,
+                venue: theater.name,
+                location: `${theater.area}, ${theater.city}`,
+                priceMin: Number.parseFloat(formData.priceMin) || 0,
+                priceMax: Number.parseFloat(formData.priceMax) || 0,
+                totalSeats: Number.parseInt(formData.totalSeats),
+                availableSeats: Number.parseInt(formData.availableSeats) || Number.parseInt(formData.totalSeats),
+                tags: formData.tags.length > 0 ? formData.tags : [],
+                galleryImages: formData.galleryImages.length > 0 ? formData.galleryImages : []
+              }),
+            });
+
+            const data = await response.json();
+            if (response.ok && data.success) {
+              successCount++;
+            } else {
+              failCount++;
+              errors.push(`${theater.name}: ${data.message || 'Failed'}`);
+            }
+          } catch (err) {
+            failCount++;
+            errors.push(`${theater.name}: Network error`);
+          }
+        }
+
+        if (successCount > 0) {
+          onSuccess();
+        } else {
+          setError(`Failed to create events. ${failCount} failed. ${errors.slice(0, 3).join(', ')}`);
+        }
       } else {
-        setError(data.message || 'Failed to create event');
+        // Single event creation (original logic)
+        // Validate required fields for single mode
+        if (!bulkMode && !selectedCity) {
+          setError('Please select a city');
+          setLoading(false);
+          return;
+        }
+
+        const response = await fetch('http://localhost:5000/api/admin/events', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            ...formData,
+            priceMin: Number.parseFloat(formData.priceMin) || 0,
+            priceMax: Number.parseFloat(formData.priceMax) || 0,
+            totalSeats: Number.parseInt(formData.totalSeats),
+            availableSeats: Number.parseInt(formData.availableSeats) || Number.parseInt(formData.totalSeats),
+            tags: formData.tags.length > 0 ? formData.tags : [],
+            galleryImages: formData.galleryImages.length > 0 ? formData.galleryImages : []
+          }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          onSuccess();
+        } else {
+          setError(data.message || 'Failed to create event');
+        }
       }
     } catch (err) {
       console.error('Error creating event:', err);
@@ -1089,89 +1244,203 @@ const EventModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
             </div>
           </div>
 
-          {/* City Selection */}
-          <div>
-            <label htmlFor="event-city" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">City *</label>
-            <select
-              id="event-city"
-              required
-              value={selectedCity}
+          {/* Bulk Mode Toggle */}
+          <div className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+            <input
+              id="event-bulk-mode"
+              type="checkbox"
+              checked={bulkMode}
               onChange={(e) => {
-                setSelectedCity(e.target.value);
-                setFormData({...formData, theaterId: ''});
-                if (formData.venue) {
-                  setFormData({...formData, location: e.target.value, theaterId: ''});
-                } else {
-                  setFormData({...formData, location: e.target.value, theaterId: ''});
+                setBulkMode(e.target.checked);
+                if (!e.target.checked) {
+                  setSelectedCities([]);
+                  setSelectedTheaters([]);
                 }
               }}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            >
-              <option value="">Select a city</option>
-              {[...nepalCities]
-                .sort((a, b) => {
-                  if (a.isPopular && !b.isPopular) return -1;
-                  if (!a.isPopular && b.isPopular) return 1;
-                  return a.name.localeCompare(b.name);
-                })
-                .map((city) => (
-                  <option key={city.name} value={city.name}>
-                    {city.icon} {city.name} {city.isPopular ? '⭐' : ''}
-                  </option>
-                ))}
-            </select>
+              className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            />
+            <label htmlFor="event-bulk-mode" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Enable Bulk Mode (Select multiple cities/theaters)
+            </label>
+          </div>
+
+          {/* City Selection */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label htmlFor="event-city" className="block text-sm font-medium text-gray-700 dark:text-gray-300">City *</label>
+              {bulkMode && (
+                <button
+                  type="button"
+                  onClick={handleSelectAllCities}
+                  className="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+                >
+                  {selectedCities.length === nepalCities.length ? 'Deselect All' : 'Select All'}
+                </button>
+              )}
+            </div>
+            {bulkMode ? (
+              <div className="max-h-48 overflow-y-auto border border-gray-300 dark:border-gray-700 rounded-lg p-2 bg-white dark:bg-gray-700">
+                {[...nepalCities]
+                  .sort((a, b) => {
+                    if (a.isPopular && !b.isPopular) return -1;
+                    if (!a.isPopular && b.isPopular) return 1;
+                    return a.name.localeCompare(b.name);
+                  })
+                  .map((city) => (
+                    <label key={city.name} className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-600 rounded cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={selectedCities.includes(city.name)}
+                        onChange={() => handleCityCheckboxChange(city.name)}
+                        className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <span className="text-sm text-gray-700 dark:text-gray-300">
+                        {city.icon} {city.name} {city.isPopular ? '⭐' : ''}
+                      </span>
+                    </label>
+                  ))}
+              </div>
+            ) : (
+              <select
+                id="event-city"
+                required
+                value={selectedCity}
+                onChange={(e) => {
+                  setSelectedCity(e.target.value);
+                  setFormData({...formData, theaterId: ''});
+                  if (formData.venue) {
+                    setFormData({...formData, location: e.target.value, theaterId: ''});
+                  } else {
+                    setFormData({...formData, location: e.target.value, theaterId: ''});
+                  }
+                }}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              >
+                <option value="">Select a city</option>
+                {[...nepalCities]
+                  .sort((a, b) => {
+                    if (a.isPopular && !b.isPopular) return -1;
+                    if (!a.isPopular && b.isPopular) return 1;
+                    return a.name.localeCompare(b.name);
+                  })
+                  .map((city) => (
+                    <option key={city.name} value={city.name}>
+                      {city.icon} {city.name} {city.isPopular ? '⭐' : ''}
+                    </option>
+                  ))}
+              </select>
+            )}
+            {bulkMode && selectedCities.length > 0 && (
+              <p className="text-xs text-gray-500 mt-1">
+                {selectedCities.length} city/cities selected
+              </p>
+            )}
           </div>
 
           {/* Theater/Venue Selection */}
           <div>
-            <label htmlFor="event-venue" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Venue / Theater</label>
-            {selectedCity && (
-              <div className="relative mb-2">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <input
-                  type="text"
-                  placeholder="Search venues..."
-                  value={theaterSearchQuery}
-                  onChange={(e) => setTheaterSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
-            )}
-            {selectedCity ? (
-              <select
-                id="event-venue"
-                value={formData.theaterId}
-                onChange={(e) => {
-                  const theater = filteredTheaters.find(t => t.id === e.target.value);
-                  setFormData({
-                    ...formData,
-                    theaterId: e.target.value,
-                    venue: theater?.name || '',
-                    location: theater ? `${theater.area}, ${theater.city}` : selectedCity
-                  });
-                }}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              >
-                <option value="">Or select a theater/venue</option>
-                {filteredTheaters.map((theater) => (
-                  <option key={theater.id} value={theater.id}>
-                    {theater.name} - {theater.area}
-                  </option>
-                ))}
-              </select>
+            <div className="flex items-center justify-between mb-2">
+              <label htmlFor="event-venue" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Venue / Theater</label>
+              {bulkMode && bulkTheaters.length > 0 && (
+                <button
+                  type="button"
+                  onClick={handleSelectAllTheaters}
+                  className="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+                >
+                  {selectedTheaters.length === bulkTheaters.length ? 'Deselect All' : 'Select All'}
+                </button>
+              )}
+            </div>
+            {bulkMode ? (
+              <>
+                <div className="relative mb-2">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <input
+                    type="text"
+                    placeholder="Search theaters..."
+                    value={theaterSearchQuery}
+                    onChange={(e) => setTheaterSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+                <div className="max-h-48 overflow-y-auto border border-gray-300 dark:border-gray-700 rounded-lg p-2 bg-white dark:bg-gray-700">
+                  {bulkTheaters.length > 0 ? (
+                    bulkTheaters.map((theater) => (
+                      <label key={theater.id} className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-600 rounded cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedTheaters.includes(theater.id)}
+                          onChange={() => handleTheaterCheckboxChange(theater.id)}
+                          className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">
+                          {theater.name} - {theater.area} ({theater.city})
+                        </span>
+                      </label>
+                    ))
+                  ) : (
+                    <p className="text-sm text-gray-500 dark:text-gray-400 p-2">
+                      {selectedCities.length === 0 ? 'Select cities first' : 'No theaters found'}
+                    </p>
+                  )}
+                </div>
+                {selectedTheaters.length > 0 && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    {selectedTheaters.length} theater(s) selected
+                  </p>
+                )}
+              </>
             ) : (
-              <input
-                id="event-venue-manual"
-                type="text"
-                value={formData.venue}
-                onChange={(e) => setFormData({...formData, venue: e.target.value})}
-                placeholder="Enter venue name manually"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              />
+              <>
+                {selectedCity && (
+                  <div className="relative mb-2">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <input
+                      type="text"
+                      placeholder="Search venues..."
+                      value={theaterSearchQuery}
+                      onChange={(e) => setTheaterSearchQuery(e.target.value)}
+                      className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
+                  </div>
+                )}
+                {selectedCity ? (
+                  <select
+                    id="event-venue"
+                    value={formData.theaterId}
+                    onChange={(e) => {
+                      const theater = filteredTheaters.find(t => t.id === e.target.value);
+                      setFormData({
+                        ...formData,
+                        theaterId: e.target.value,
+                        venue: theater?.name || '',
+                        location: theater ? `${theater.area}, ${theater.city}` : selectedCity
+                      });
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  >
+                    <option value="">Or select a theater/venue</option>
+                    {filteredTheaters.map((theater) => (
+                      <option key={theater.id} value={theater.id}>
+                        {theater.name} - {theater.area}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    id="event-venue-manual"
+                    type="text"
+                    value={formData.venue}
+                    onChange={(e) => setFormData({...formData, venue: e.target.value})}
+                    placeholder="Enter venue name manually"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                )}
+                <p className="text-xs text-gray-500 mt-1">
+                  Select a theater or enter a custom venue name
+                </p>
+              </>
             )}
-            <p className="text-xs text-gray-500 mt-1">
-              Select a theater or enter a custom venue name
-            </p>
           </div>
 
           <div>
@@ -1414,7 +1683,10 @@ const ShowtimeModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
   const [allTheaters, setAllTheaters] = useState<any[]>([]); // Store all theaters
   const [screens, setScreens] = useState<any[]>([]);
   const [selectedCity, setSelectedCity] = useState('');
+  const [selectedCities, setSelectedCities] = useState<string[]>([]);
   const [selectedTheaterId, setSelectedTheaterId] = useState('');
+  const [selectedTheaters, setSelectedTheaters] = useState<string[]>([]);
+  const [bulkMode, setBulkMode] = useState(false);
   const [theaterSearchQuery, setTheaterSearchQuery] = useState('');
   const [dataLoading, setDataLoading] = useState(true);
   const [formData, setFormData] = useState({
@@ -1450,7 +1722,7 @@ const ShowtimeModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
       });
       
       // Fetch theaters
-      const theatersResponse = await fetch('http://localhost:5000/api/admin/theaters?limit=100', {
+      const theatersResponse = await fetch('http://localhost:5000/api/admin/theaters?limit=1000', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -1517,11 +1789,13 @@ const ShowtimeModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
     return filtered;
   };
 
-  // Use useEffect to update theaters when city or search changes
+  // Use useEffect to update theaters when city or search changes (single mode)
   useEffect(() => {
-    const filtered = filterTheaters();
-    setTheaters(filtered);
-  }, [selectedCity, theaterSearchQuery, allTheaters]);
+    if (!bulkMode) {
+      const filtered = filterTheaters();
+      setTheaters(filtered);
+    }
+  }, [selectedCity, theaterSearchQuery, allTheaters, bulkMode]);
 
   // Handle city change - filter theaters by selected city
   const handleCityChange = (city: string) => {
@@ -1661,12 +1935,34 @@ const ShowtimeModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
 
           {/* Theater Selection */}
           <div>
-            <label htmlFor="showtime-theater" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Theater *
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label htmlFor="showtime-theater" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Theater *
+              </label>
+              {bulkMode && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const filtered = allTheaters.filter(t => 
+                      selectedCities.length === 0 || selectedCities.some(c => 
+                        t.city?.toLowerCase() === c.toLowerCase()
+                      )
+                    );
+                    if (selectedTheaters.length === filtered.length && filtered.length > 0) {
+                      setSelectedTheaters([]);
+                    } else {
+                      setSelectedTheaters(filtered.map(t => t.id));
+                    }
+                  }}
+                  className="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+                >
+                  Select All
+                </button>
+              )}
+            </div>
             
             {/* Theater Search Bar */}
-            {selectedCity && !dataLoading && theaters.length > 0 && (
+            {((bulkMode && selectedCities.length > 0) || (!bulkMode && selectedCity)) && !dataLoading && theaters.length > 0 && (
               <div className="relative mb-2">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <input
@@ -1684,35 +1980,81 @@ const ShowtimeModal: React.FC<ModalProps> = ({ onClose, onSuccess }) => {
                 <Loader2 className="w-4 h-4 animate-spin mr-2 text-gray-500 dark:text-gray-400" />
                 <span className="text-gray-500 dark:text-gray-400">Loading theaters...</span>
               </div>
+            ) : bulkMode ? (
+              <div className="max-h-48 overflow-y-auto border border-gray-300 dark:border-gray-700 rounded-lg p-2 bg-white dark:bg-gray-700">
+                {(() => {
+                  const filtered = allTheaters.filter(t => 
+                    (selectedCities.length === 0 || selectedCities.some(c => 
+                      t.city?.toLowerCase() === c.toLowerCase()
+                    )) &&
+                    (!theaterSearchQuery || t.name?.toLowerCase().includes(theaterSearchQuery.toLowerCase()))
+                  );
+                  
+                  if (filtered.length === 0) {
+                    return (
+                      <p className="text-sm text-gray-500 dark:text-gray-400 p-2">
+                        {selectedCities.length === 0 ? 'Select cities first' : 'No theaters found'}
+                      </p>
+                    );
+                  }
+                  
+                  return filtered.map((theater) => (
+                    <label key={theater.id} className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-600 rounded cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={selectedTheaters.includes(theater.id)}
+                        onChange={() => {
+                          if (selectedTheaters.includes(theater.id)) {
+                            setSelectedTheaters(selectedTheaters.filter(t => t !== theater.id));
+                          } else {
+                            setSelectedTheaters([...selectedTheaters, theater.id]);
+                          }
+                        }}
+                        className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <span className="text-sm text-gray-700 dark:text-gray-300">
+                        {theater.name} ({theater.city})
+                      </span>
+                    </label>
+                  ));
+                })()}
+              </div>
             ) : (
-              <select
-                id="showtime-theater"
-                required
-                value={selectedTheaterId || ''}
-                onChange={(e) => {
-                  handleTheaterChange(e.target.value);
-                  setFormData(prev => ({...prev, screenId: ''}));
-                }}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                disabled={!selectedCity}
-              >
-                <option value="">
-                  {(() => {
-                    if (!selectedCity) return 'Please select a city first';
-                    if (theaters.length === 0) return `No theaters found in ${selectedCity}`;
-                    if (theaterSearchQuery && theaters.length === 0) return 'No matching theaters';
-                    return `Select a theater (${theaters.length} ${theaters.length === 1 ? 'theater' : 'theaters'})`;
-                  })()}
-                </option>
-                {theaters.length > 0 && theaters.map((theater) => (
-                  <option key={theater.id} value={theater.id}>
-                    {theater.name}
+              <>
+                <select
+                  id="showtime-theater"
+                  required
+                  value={selectedTheaterId || ''}
+                  onChange={(e) => {
+                    handleTheaterChange(e.target.value);
+                    setFormData(prev => ({...prev, screenId: ''}));
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  disabled={!selectedCity}
+                >
+                  <option value="">
+                    {(() => {
+                      if (!selectedCity) return 'Please select a city first';
+                      if (theaters.length === 0) return `No theaters found in ${selectedCity}`;
+                      if (theaterSearchQuery && theaters.length === 0) return 'No matching theaters';
+                      return `Select a theater (${theaters.length} ${theaters.length === 1 ? 'theater' : 'theaters'})`;
+                    })()}
                   </option>
-                ))}
-              </select>
+                  {theaters.length > 0 && theaters.map((theater) => (
+                    <option key={theater.id} value={theater.id}>
+                      {theater.name}
+                    </option>
+                  ))}
+                </select>
+                {theaters.length === 0 && selectedCity && (
+                  <p className="text-sm text-red-600 mt-1">No theaters found in {selectedCity}. Please add theaters in this city first.</p>
+                )}
+              </>
             )}
-            {theaters.length === 0 && selectedCity && !dataLoading && (
-              <p className="text-sm text-red-600 mt-1">No theaters found in {selectedCity}. Please add theaters in this city first.</p>
+            {bulkMode && selectedTheaters.length > 0 && (
+              <p className="text-xs text-gray-500 mt-1">
+                {selectedTheaters.length} theater(s) selected
+              </p>
             )}
           </div>
 

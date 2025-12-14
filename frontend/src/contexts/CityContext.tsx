@@ -9,13 +9,15 @@ interface CityContextType {
 const CityContext = createContext<CityContextType | undefined>(undefined);
 
 export function CityProvider({ children }: { children: React.ReactNode }) {
-  const [selectedCity, setSelectedCity] = useState('Kathmandu');
+  const [selectedCity, setSelectedCity] = useState(''); // Default to empty (show all cities)
 
   useEffect(() => {
-    // Load saved city from localStorage
+    // Load saved city from localStorage, but if it's empty/null, default to '' (show all)
     const savedCity = localStorage.getItem('selectedCity');
-    if (savedCity) {
+    if (savedCity && savedCity.trim() !== '') {
       setSelectedCity(savedCity);
+    } else {
+      setSelectedCity(''); // Default to empty (show all)
     }
   }, []);
 
