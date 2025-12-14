@@ -438,7 +438,15 @@ export function EventDetail({ eventId, onNavigate }: EventDetailProps) {
                 </div>
               </div>
               <button
-                onClick={() => onNavigate('event-checkout', event.id)}
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    // Store redirect destination
+                    localStorage.setItem('redirectAfterLogin', JSON.stringify({ page: 'event-checkout', id: event.id }));
+                    onNavigate('login');
+                    return;
+                  }
+                  onNavigate('event-checkout', event.id);
+                }}
                 disabled={!event.availableSeats || event.availableSeats === 0}
                 className="bg-red-600 text-white px-6 sm:px-8 py-3 rounded-lg hover:bg-red-700 transition-colors font-semibold text-base sm:text-lg disabled:bg-gray-400 disabled:cursor-not-allowed whitespace-nowrap"
               >

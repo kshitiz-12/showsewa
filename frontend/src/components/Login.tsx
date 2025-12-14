@@ -4,7 +4,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 
 interface LoginProps {
-  onNavigate: (page: string) => void;
+  onNavigate: (page: string, id?: string) => void;
 }
 
 export function Login({ onNavigate }: Readonly<LoginProps>) {
@@ -68,7 +68,19 @@ export function Login({ onNavigate }: Readonly<LoginProps>) {
           const data = await response.json();
           if (data.success) {
             login({ user: data.data.user, token: data.data.token });
-            onNavigate('home');
+            // Check for redirect destination
+            const redirectData = localStorage.getItem('redirectAfterLogin');
+            if (redirectData) {
+              try {
+                const redirect = JSON.parse(redirectData);
+                localStorage.removeItem('redirectAfterLogin');
+                onNavigate(redirect.page, redirect.id);
+              } catch (e) {
+                onNavigate('home');
+              }
+            } else {
+              onNavigate('home');
+            }
           } else {
             setError(data.message || 'Login failed');
             setLoading(false);
@@ -135,7 +147,19 @@ export function Login({ onNavigate }: Readonly<LoginProps>) {
         if (data.success) {
           // Store token and user data
           login({ user: data.data.user, token: data.data.token });
-          onNavigate('home');
+          // Check for redirect destination
+          const redirectData = localStorage.getItem('redirectAfterLogin');
+          if (redirectData) {
+            try {
+              const redirect = JSON.parse(redirectData);
+              localStorage.removeItem('redirectAfterLogin');
+              onNavigate(redirect.page, redirect.id);
+            } catch (e) {
+              onNavigate('home');
+            }
+          } else {
+            onNavigate('home');
+          }
         } else {
           setError(data.message || 'OTP verification failed');
         }

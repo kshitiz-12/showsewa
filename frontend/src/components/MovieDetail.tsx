@@ -3,6 +3,7 @@ import { Clock, Film, Calendar, ArrowLeft, Play, Image as ImageIcon, Star, Heart
 import { useLanguage } from '../contexts/LanguageContext';
 import { useCity } from '../contexts/CityContext';
 import { useFavorites } from '../contexts/FavoritesContext';
+import { useAuth } from '../contexts/AuthContext';
 import { ReviewSection } from './ReviewSection';
 
 interface Movie {
@@ -51,6 +52,7 @@ export function MovieDetail({ movieId, onNavigate }: Readonly<MovieDetailProps>)
   const { language, t } = useLanguage();
   const { selectedCity } = useCity();
   const { favoriteTheaterIds } = useFavorites();
+  const { isAuthenticated } = useAuth();
   const [movie, setMovie] = useState<Movie | null>(null);
   const [showtimes, setShowtimes] = useState<Showtime[]>([]);
   const [filteredShowtimes, setFilteredShowtimes] = useState<Showtime[]>([]);
@@ -398,7 +400,14 @@ export function MovieDetail({ movieId, onNavigate }: Readonly<MovieDetailProps>)
                                   {showtimes.map((showtime) => (
                                     <button
                                       key={showtime.id}
-                                      onClick={() => onNavigate('booking-page', showtime.id)}
+                                      onClick={() => {
+                                        if (!isAuthenticated) {
+                                          localStorage.setItem('redirectAfterLogin', JSON.stringify({ page: 'booking-page', id: showtime.id }));
+                                          onNavigate('login');
+                                          return;
+                                        }
+                                        onNavigate('booking-page', showtime.id);
+                                      }}
                                       className="group relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-700 dark:to-gray-800 border-2 border-gray-200 dark:border-gray-600 hover:border-red-500 hover:shadow-lg rounded-xl p-4 transition-all duration-300 transform hover:-translate-y-1"
                                     >
                                       <div className="text-center">

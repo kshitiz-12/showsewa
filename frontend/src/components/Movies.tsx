@@ -3,6 +3,7 @@ import { Search, Filter, Heart, SlidersHorizontal, X } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useCity } from '../contexts/CityContext';
 import { useFavorites } from '../contexts/FavoritesContext';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Movie {
   id: string;
@@ -421,6 +422,23 @@ export function Movies({ onNavigate }: MoviesProps) {
                       <button 
                         onClick={async (e) => {
                           e.stopPropagation();
+                          if (!isAuthenticated) {
+                            // Store redirect destination - will navigate after checking showtimes
+                            try {
+                              const response = await fetch(`http://localhost:5000/api/movies/${movie.id}`);
+                              const data = await response.json();
+                              if (data.success && data.data.movie.showtimes && data.data.movie.showtimes.length > 0) {
+                                const firstShowtime = data.data.movie.showtimes[0];
+                                localStorage.setItem('redirectAfterLogin', JSON.stringify({ page: 'booking-page', id: firstShowtime.id }));
+                              } else {
+                                localStorage.setItem('redirectAfterLogin', JSON.stringify({ page: 'movie-detail', id: movie.id }));
+                              }
+                            } catch (error) {
+                              localStorage.setItem('redirectAfterLogin', JSON.stringify({ page: 'movie-detail', id: movie.id }));
+                            }
+                            onNavigate('login');
+                            return;
+                          }
                           try {
                             // Fetch showtimes for this specific movie
                             const response = await fetch(`http://localhost:5000/api/movies/${movie.id}`);
