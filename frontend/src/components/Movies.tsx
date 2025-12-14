@@ -45,6 +45,7 @@ export function Movies({ onNavigate }: MoviesProps) {
   const { language, t } = useLanguage();
   const { selectedCity } = useCity();
   const { favoriteTheaterIds } = useFavorites();
+  const { isAuthenticated } = useAuth();
   const [movies, setMovies] = useState<Movie[]>([]);
   const [filteredMovies, setFilteredMovies] = useState<Movie[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
