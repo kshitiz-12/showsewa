@@ -21,11 +21,49 @@ NODE_ENV=production
 # JWT Configuration
 JWT_SECRET="showsewa-super-secret-jwt-key-2024"
 
-# Email Configuration (Gmail SMTP)
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=showsewa@gmail.com
-SMTP_PASS=jepv ceon wxfx jerz
+# Email Configuration
+# Choose email provider: 'smtp' (development) or 'resend' (production - recommended)
+EMAIL_PROVIDER=resend
+
+# Production Email Service - Resend (Recommended for scalability)
+# Sign up at https://resend.com (free tier: 3,000 emails/month)
+# Get API key from https://resend.com/api-keys
+RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+# From email address (should be verified in Resend dashboard)
+FROM_EMAIL=noreply@showsewa.com
+FROM_NAME=ShowSewa
+
+# Development Email Service - SMTP (Gmail/Google Workspace)
+# Only used if EMAIL_PROVIDER=smtp or RESEND_API_KEY is not set
+# For Google Workspace: Use your business email (e.g., noreply@showsewa.com)
+# For regular Gmail: Use your Gmail address (e.g., showsewa@gmail.com)
+#
+# IMPORTANT: You MUST use an App Password, not your regular password
+# Steps to generate App Password for Google Workspace:
+# 1. Go to Google Admin Console (admin.google.com) or your Google Account
+# 2. Enable 2-Step Verification on the account
+# 3. Go to Security → App Passwords
+# 4. Select "Mail" and generate a new 16-character password
+# 5. Use that password below (remove spaces if any)
+SMTP_USER=noreply@showsewa.com
+SMTP_PASS=your-16-character-app-password
+
+# Alternative: Separate env vars for SMTP
+# SMTP_HOST=smtp.gmail.com
+# SMTP_PORT=587
+# GOOGLE_WORKSPACE_EMAIL=noreply@showsewa.com
+# GOOGLE_APP_PASSWORD=your-16-character-app-password
+
+# Redis Configuration (for OTP storage and caching)
+# Option 1: Use REDIS_URL (recommended for Upstash, Render, Railway)
+REDIS_URL="redis://default:your-password@your-redis-host:6379"
+# Example for Upstash: REDIS_URL="rediss://default:your-password@your-endpoint.upstash.io:6379"
+
+# Option 2: Use separate connection parameters (for local Redis or custom setup)
+# REDIS_HOST=localhost
+# REDIS_PORT=6379
+# REDIS_PASSWORD=your-redis-password
 
 # Payment Gateway Secrets
 ESEWA_SECRET="your-esewa-secret"

@@ -4,14 +4,14 @@ import jwt from 'jsonwebtoken';
 import prisma from '../lib/prisma';
 import { AuthRequest } from '../middleware/auth';
 import { emailService } from '../services/emailService';
+import redis from '../lib/redis';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 const SALT_ROUNDS = 12;
 
-// In-memory OTP store (in production, use Redis or database)
+// OTP data interface
 interface OTPData {
   otp: string;
-  expiresAt: number;
   type: 'registration' | 'password_reset';
   registrationData?: {
     name: string;
@@ -21,39 +21,64 @@ interface OTPData {
   };
 }
 
-const otpStore = new Map<string, OTPData>();
+// Redis key prefix for OTPs
+const OTP_KEY_PREFIX = 'otp:';
+const OTP_TTL_SECONDS = 10 * 60; // 10 minutes
 
 // Generate OTP
-const generateOTP = () => {
+const generateOTP = (): string => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
-// Store OTP with expiration (10 minutes)
-const storeOTP = (email: string, otp: string, type: 'registration' | 'password_reset' = 'registration', registrationData?: any) => {
-  const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
-  otpStore.set(email, { otp, expiresAt, type, ...(registrationData && { registrationData }) });
+// Store OTP in Redis with expiration (10 minutes)
+const storeOTP = async (
+  email: string,
+  otp: string,
+  type: 'registration' | 'password_reset' = 'registration',
+  registrationData?: any
+): Promise<void> => {
+  const key = `${OTP_KEY_PREFIX}${email}`;
+  const data: OTPData = {
+    otp,
+    type,
+    ...(registrationData && { registrationData })
+  };
+
+  try {
+    // Store in Redis with TTL (Time To Live) - auto-expires after 10 minutes
+    await redis.setex(key, OTP_TTL_SECONDS, JSON.stringify(data));
+  } catch (error) {
+    console.error('Error storing OTP in Redis:', error);
+    throw error;
+  }
 };
 
-// Verify and consume OTP
-const verifyAndConsumeOTP = (email: string, inputOtp: string): boolean => {
-  const storedData = otpStore.get(email);
-  
-  if (!storedData) {
-    return false;
+// Get OTP data from Redis
+const getOTPData = async (email: string): Promise<OTPData | null> => {
+  const key = `${OTP_KEY_PREFIX}${email}`;
+
+  try {
+    const data = await redis.get(key);
+    if (!data) {
+      return null;
+    }
+    return JSON.parse(data) as OTPData;
+  } catch (error) {
+    console.error('Error getting OTP from Redis:', error);
+    return null;
   }
-  
-  if (Date.now() > storedData.expiresAt) {
-    otpStore.delete(email);
-    return false;
+};
+
+// Delete OTP from Redis (used after successful verification)
+const deleteOTP = async (email: string): Promise<void> => {
+  const key = `${OTP_KEY_PREFIX}${email}`;
+
+  try {
+    await redis.del(key);
+  } catch (error) {
+    console.error('Error deleting OTP from Redis:', error);
+    // Don't throw - OTP will expire anyway
   }
-  
-  if (storedData.otp !== inputOtp) {
-    return false;
-  }
-  
-  // OTP is valid, remove it
-  otpStore.delete(email);
-  return true;
 };
 
 const sendEmailOTP = async (email: string, otp: string, type: 'registration' | 'password_reset' = 'registration') => {
@@ -98,8 +123,8 @@ export const register = async (req: Request, res: Response) => {
     // Generate OTP
     const otp = generateOTP();
 
-    // Store OTP with registration data (don't create user yet)
-    storeOTP(email, otp, 'registration', {
+    // Store OTP with registration data in Redis (don't create user yet)
+    await storeOTP(email, otp, 'registration', {
       name,
       email,
       password: hashedPassword,
@@ -153,8 +178,8 @@ export const verifyOTP = async (req: Request, res: Response) => {
       });
     }
 
-    // Get OTP data
-    const storedData = otpStore.get(email);
+    // Get OTP data from Redis (auto-expires after TTL)
+    const storedData = await getOTPData(email);
     
     if (!storedData) {
       return res.status(400).json({
@@ -163,20 +188,16 @@ export const verifyOTP = async (req: Request, res: Response) => {
       });
     }
 
-    if (Date.now() > storedData.expiresAt) {
-      otpStore.delete(email);
-      return res.status(400).json({
-        success: false,
-        message: 'OTP has expired. Please request a new one.'
-      });
-    }
-
+    // Verify OTP matches
     if (storedData.otp !== otp) {
       return res.status(400).json({
         success: false,
         message: 'Invalid OTP'
       });
     }
+
+    // OTP is valid, delete it from Redis (consume it)
+    await deleteOTP(email);
 
     // If it's a registration, create the user now
     let user;
@@ -213,7 +234,7 @@ export const verifyOTP = async (req: Request, res: Response) => {
       }
 
       if (user.isVerified) {
-        otpStore.delete(email);
+        await deleteOTP(email);
         return res.status(400).json({
           success: false,
           message: 'User already verified'
@@ -227,9 +248,6 @@ export const verifyOTP = async (req: Request, res: Response) => {
 
       user.isVerified = true;
     }
-
-    // OTP is valid, remove it
-    otpStore.delete(email);
 
     // Generate JWT token
     const token = jwt.sign(
@@ -298,7 +316,7 @@ export const requestLoginOTP = async (req: Request, res: Response) => {
     }
 
     const otp = generateOTP();
-    storeOTP(email, otp, 'registration'); // Reuse registration OTP type
+    await storeOTP(email, otp, 'registration'); // Reuse registration OTP type
     sendEmailOTP(email, otp, 'registration').catch(error => {
       console.error('Background OTP email sending failed:', error);
       // Log OTP in console for development/testing
@@ -518,7 +536,7 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
     }
 
     const otp = generateOTP();
-    storeOTP(email, otp, 'password_reset');
+    await storeOTP(email, otp, 'password_reset');
     sendEmailOTP(email, otp, 'password_reset').catch(error => {
       console.error('Background OTP email sending failed:', error);
       // Log OTP in console for development/testing
@@ -574,21 +592,13 @@ export const resetPassword = async (req: Request, res: Response) => {
       });
     }
 
-    // Verify OTP
-    const storedData = otpStore.get(email);
+    // Verify OTP from Redis
+    const storedData = await getOTPData(email);
     
     if (!storedData || storedData.type !== 'password_reset') {
       return res.status(400).json({
         success: false,
-        message: 'Invalid OTP'
-      });
-    }
-
-    if (Date.now() > storedData.expiresAt) {
-      otpStore.delete(email);
-      return res.status(400).json({
-        success: false,
-        message: 'OTP has expired. Please request a new one.'
+        message: 'Invalid or expired OTP. Please request a new one.'
       });
     }
 
@@ -599,8 +609,8 @@ export const resetPassword = async (req: Request, res: Response) => {
       });
     }
 
-    // OTP is valid, remove it and update password
-    otpStore.delete(email);
+    // OTP is valid, delete it from Redis and update password
+    await deleteOTP(email);
 
     // Hash new password
     const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);

@@ -13,6 +13,7 @@ import { initScheduler } from './services/eventScheduler';
 import { bookingReminderService } from './services/bookingReminderService';
 import { scheduleMovieCleanup } from './services/movieCleanupService';
 import prisma from './lib/prisma';
+import { disconnectRedis, isRedisAvailable } from './lib/redis';
 
 // Import routes
 import authRoutes from './routes/auth';
@@ -174,6 +175,19 @@ const server = app.listen(PORT, async () => {
   } catch (error) {
     console.error('❌ Database connection failed:', error);
   }
+
+  // Test Redis connection
+  try {
+    const redisAvailable = await isRedisAvailable();
+    if (redisAvailable) {
+      console.log('✅ Redis connected successfully');
+    } else {
+      console.warn('⚠️ Redis not available - OTP functionality may not work properly');
+    }
+  } catch (error) {
+    console.error('❌ Redis connection failed:', error);
+    console.warn('⚠️ OTP functionality may not work properly');
+  }
 });
 
 // Handle server errors
@@ -193,6 +207,7 @@ process.on('SIGTERM', async () => {
   console.log('SIGTERM received, shutting down gracefully');
   server.close(async () => {
     await prisma.$disconnect();
+    await disconnectRedis();
     console.log('Process terminated');
     process.exit(0);
   });
@@ -202,6 +217,7 @@ process.on('SIGINT', async () => {
   console.log('SIGINT received, shutting down gracefully');
   server.close(async () => {
     await prisma.$disconnect();
+    await disconnectRedis();
     console.log('Process terminated');
     process.exit(0);
   });

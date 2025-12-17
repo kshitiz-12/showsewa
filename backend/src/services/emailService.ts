@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 interface EmailOptions {
   to: string;
@@ -20,55 +21,145 @@ interface BookingEmailData {
   qrCode?: string;
 }
 
+// Email provider type
+type EmailProvider = 'smtp' | 'resend';
+
 class EmailService {
-  private readonly transporter: nodemailer.Transporter;
+  private readonly transporter: nodemailer.Transporter | null;
+  private readonly resend: Resend | null;
+  private readonly provider: EmailProvider;
+  private readonly fromEmail: string;
+  private readonly fromName: string;
 
   constructor() {
-    // Configure email transporter
-    // In production, use real SMTP settings
-    this.transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port: Number.parseInt(process.env.SMTP_PORT || '587'),
-      secure: false, // true for 465, false for other ports
+    // Determine which email provider to use
+    // Default: SMTP for development, Resend for production (if API key is set)
+    this.provider = (process.env.EMAIL_PROVIDER?.toLowerCase() as EmailProvider) || 
+                    (process.env.RESEND_API_KEY ? 'resend' : 'smtp');
+
+    // Set from email and name
+    this.fromEmail = process.env.FROM_EMAIL || process.env.SMTP_USER || 'noreply@showsewa.com';
+    this.fromName = process.env.FROM_NAME || 'ShowSewa';
+
+    if (this.provider === 'resend') {
+      // Initialize Resend (production - scalable)
+      const apiKey = process.env.RESEND_API_KEY;
+      if (!apiKey) {
+        console.warn('⚠️ RESEND_API_KEY not found, falling back to SMTP');
+        this.resend = null;
+        this.transporter = this.createSMTPTransporter();
+      } else {
+        this.resend = new Resend(apiKey);
+        this.transporter = null;
+        console.log('✅ Using Resend for emails (production-ready, scalable)');
+      }
+    } else {
+      // Initialize SMTP (development/local)
+      this.transporter = this.createSMTPTransporter();
+      this.resend = null;
+      console.log('✅ Using SMTP for emails (development mode)');
+    }
+  }
+
+  private createSMTPTransporter(): nodemailer.Transporter {
+    // Configure email transporter for Google Workspace Gmail
+    // Works with both regular Gmail and Google Workspace (business email)
+    // For Google Workspace: Use your business email (e.g., noreply@yourdomain.com)
+    // For regular Gmail: Use your Gmail address (e.g., yourname@gmail.com)
+    // 
+    // IMPORTANT: You MUST use an App Password, not your regular password
+    return nodemailer.createTransport({
+      service: 'gmail', // Use 'gmail' service (works for both Gmail and Google Workspace)
       auth: {
-        user: process.env.SMTP_USER || 'your-email@gmail.com',
-        pass: process.env.SMTP_PASS || 'your-app-password'
+        user: process.env.SMTP_USER || process.env.GOOGLE_WORKSPACE_EMAIL || 'your-email@yourdomain.com',
+        pass: process.env.SMTP_PASS || process.env.GOOGLE_APP_PASSWORD || 'your-app-password'
       },
       connectionTimeout: 10000, // 10 seconds
       greetingTimeout: 5000, // 5 seconds
-      socketTimeout: 10000 // 10 seconds
+      socketTimeout: 10000, // 10 seconds
     });
   }
 
   async sendEmail(options: EmailOptions): Promise<boolean> {
     try {
-      // Always try to send emails, but log in development
+      // Log email sending attempt
       if (process.env.NODE_ENV === 'development') {
         console.log('📧 SENDING EMAIL:');
+        console.log('Provider:', this.provider);
         console.log('To:', options.to);
         console.log('Subject:', options.subject);
-        console.log('From:', process.env.SMTP_USER);
+        console.log('From:', this.fromEmail);
       }
 
+      if (this.provider === 'resend' && this.resend) {
+        // Use Resend API (production - scalable)
+        return await this.sendViaResend(options);
+      } else if (this.transporter) {
+        // Use SMTP (development)
+        return await this.sendViaSMTP(options);
+      } else {
+        console.error('❌ No email provider configured');
+        return false;
+      }
+    } catch (error) {
+      console.error('❌ Email sending failed:', error);
+      console.error('📧 Failed to send to:', options.to);
+      console.error('📧 Subject was:', options.subject);
+      return false;
+    }
+  }
+
+  private async sendViaResend(options: EmailOptions): Promise<boolean> {
+    if (!this.resend) {
+      throw new Error('Resend not initialized');
+    }
+
+    try {
+      const result = await this.resend.emails.send({
+        from: `${this.fromName} <${this.fromEmail}>`,
+        to: options.to,
+        subject: options.subject,
+        html: options.html,
+        text: options.text,
+      });
+
+      if (result.error) {
+        console.error('❌ Resend API error:', result.error);
+        return false;
+      }
+
+      console.log('✅ Email sent via Resend:', result.data?.id);
+      console.log('📧 Email delivered to:', options.to);
+      return true;
+    } catch (error) {
+      console.error('❌ Resend sending failed:', error);
+      return false;
+    }
+  }
+
+  private async sendViaSMTP(options: EmailOptions): Promise<boolean> {
+    if (!this.transporter) {
+      throw new Error('SMTP transporter not initialized');
+    }
+
+    try {
       // Add timeout to prevent hanging
       const timeoutPromise = new Promise<never>((_, reject) => {
         setTimeout(() => reject(new Error('Email sending timeout')), 15000); // 15 seconds timeout
       });
 
       const sendPromise = this.transporter.sendMail({
-        from: `"ShowSewa" <${process.env.SMTP_USER}>`,
+        from: `"${this.fromName}" <${this.fromEmail}>`,
         ...options
       });
 
       const info = await Promise.race([sendPromise, timeoutPromise]);
 
-      console.log('✅ Email sent successfully:', info.messageId);
+      console.log('✅ Email sent via SMTP:', info.messageId);
       console.log('📧 Email delivered to:', options.to);
       return true;
     } catch (error) {
-      console.error('❌ Email sending failed:', error);
-      console.error('📧 Failed to send to:', options.to);
-      console.error('📧 Subject was:', options.subject);
+      console.error('❌ SMTP sending failed:', error);
       return false;
     }
   }
