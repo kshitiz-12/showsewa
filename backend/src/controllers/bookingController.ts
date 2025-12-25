@@ -207,6 +207,11 @@ export const createBooking = async (req: Request, res: Response) => {
     // Generate booking reference
     const bookingReference = `SS${Date.now()}${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
+    // Determine payment status based on payment method
+    const isOnlinePayment = paymentMethod === 'KHALTI' || paymentMethod === 'ESEWA';
+    const initialPaymentStatus = isOnlinePayment ? 'PENDING' : 'COMPLETED';
+    const initialBookingStatus = isOnlinePayment ? 'PENDING' : 'CONFIRMED';
+
     // Create booking using transaction
     const booking = await prisma.$transaction(async (tx) => {
       // Create the booking
@@ -223,15 +228,14 @@ export const createBooking = async (req: Request, res: Response) => {
           ticketPrice: totalAmount,
           totalAmount,
           paymentMethod,
-          // Complete all payments immediately for dummy payment flow
-          paymentStatus: 'COMPLETED',
-          bookingStatus: 'CONFIRMED',
+          paymentStatus: initialPaymentStatus,
+          bookingStatus: initialBookingStatus,
           bookingReference,
           ...(userId ? { bookingSource: 'SHOWSEWA' as any } : { bookingSource: 'POS_SYSTEM' as any })
         }
       });
 
-      // Step 6: Clear any existing holds for these seats
+      // Clear any existing holds for these seats
       await tx.seatHold.deleteMany({
         where: {
           seatId: {
@@ -240,29 +244,33 @@ export const createBooking = async (req: Request, res: Response) => {
         }
       });
 
-      // Step 7: Update seat status to BOOKED
-      await tx.seat.updateMany({
-        where: {
-          id: {
-            in: selectedSeats.map((seat: any) => seat.id)
+      // Only update seats and showtime if payment is completed (CASH)
+      // For online payments, seats will be updated after payment verification
+      if (!isOnlinePayment) {
+        // Update seat status to BOOKED
+        await tx.seat.updateMany({
+          where: {
+            id: {
+              in: selectedSeats.map((seat: any) => seat.id)
+            }
+          },
+          data: {
+            status: 'BOOKED',
+            bookingId: newBooking.id,
+            updatedAt: new Date()
           }
-        },
-        data: {
-          status: 'BOOKED',
-          bookingId: newBooking.id,
-          updatedAt: new Date()
-        }
-      });
+        });
 
-      // Step 8: Update showtime available seats count
-      await tx.showtime.update({
-        where: { id: showtimeId },
-        data: {
-          availableSeats: {
-            decrement: seatNumbers.length
+        // Update showtime available seats count
+        await tx.showtime.update({
+          where: { id: showtimeId },
+          data: {
+            availableSeats: {
+              decrement: seatNumbers.length
+            }
           }
-        }
-      });
+        });
+      }
 
       return { booking: newBooking, seats: selectedSeats };
     }, {
@@ -295,7 +303,31 @@ export const createBooking = async (req: Request, res: Response) => {
 
     // Handle post-booking tasks (non-blocking)
     if (bookingWithDetails) {
-      // Send confirmation email (async, don't wait)
+      // For online payments, return booking ID for payment initiation
+      if (isOnlinePayment) {
+        return res.status(201).json({
+          success: true,
+          message: 'Booking created. Please complete payment.',
+          data: {
+            booking: {
+              id: bookingWithDetails.id,
+              bookingReference: bookingWithDetails.bookingReference,
+              customerName: bookingWithDetails.customerName,
+              customerEmail: bookingWithDetails.customerEmail,
+              seats: bookingWithDetails.seats,
+              totalAmount: bookingWithDetails.totalAmount,
+              paymentMethod: bookingWithDetails.paymentMethod,
+              paymentStatus: bookingWithDetails.paymentStatus,
+              bookingStatus: bookingWithDetails.bookingStatus,
+              showtime: bookingWithDetails.showtime,
+              createdAt: bookingWithDetails.createdAt
+            },
+            requiresPayment: true
+          }
+        });
+      }
+
+      // Send confirmation email (async, don't wait) - only for completed payments
       if (bookingWithDetails.paymentStatus === 'COMPLETED') {
         // Generate QR code for the booking
         generateQRCodeString(bookingWithDetails.id).then((qrString) => {

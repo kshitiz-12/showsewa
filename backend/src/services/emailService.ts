@@ -52,12 +52,16 @@ class EmailService {
         this.resend = new Resend(apiKey);
         this.transporter = null;
         console.log('✅ Using Resend for emails (production-ready, scalable)');
+        console.log('📧 Resend From Email:', this.fromEmail);
+        console.log('📧 Resend From Name:', this.fromName);
+        console.log('🔑 Resend API Key:', apiKey.substring(0, 8) + '...' + apiKey.substring(apiKey.length - 4));
       }
     } else {
       // Initialize SMTP (development/local)
       this.transporter = this.createSMTPTransporter();
       this.resend = null;
       console.log('✅ Using SMTP for emails (development mode)');
+      console.log('📧 SMTP User:', this.fromEmail);
     }
   }
 
@@ -468,7 +472,19 @@ If you didn't request this, please ignore this email.
     };
 
     console.log('🧪 Sending test email to:', to);
+    console.log('🧪 Using provider:', this.provider);
     return this.sendBookingConfirmation(testData);
+  }
+
+  // Get email service status
+  getStatus() {
+    return {
+      provider: this.provider,
+      fromEmail: this.fromEmail,
+      fromName: this.fromName,
+      isResendConfigured: this.provider === 'resend' && this.resend !== null,
+      isSMTPConfigured: this.provider === 'smtp' && this.transporter !== null,
+    };
   }
 }
 

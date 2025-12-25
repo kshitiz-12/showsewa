@@ -19,7 +19,9 @@ PORT=5000
 NODE_ENV=production
 
 # JWT Configuration
-JWT_SECRET="showsewa-super-secret-jwt-key-2024"
+# IMPORTANT: This is a secure random secret. Keep it secret and never commit to git!
+# If you change this, all existing JWT tokens will be invalidated (users will need to log in again)
+JWT_SECRET="a3db785b3c6ac108df81af16898feafef0ac7204123e4df0edb679b8514c159783c6c66f7fe14200ac658c21e0dc8de5dbfa6ad8b2b9a95e70512a5f41fe638f"
 
 # Email Configuration
 # Choose email provider: 'smtp' (development) or 'resend' (production - recommended)
@@ -57,14 +59,37 @@ SMTP_PASS=your-16-character-app-password
 
 # Redis Configuration (for OTP storage and caching)
 # Option 1: Use REDIS_URL (recommended for Upstash, Render, Railway)
-REDIS_URL="redis://default:your-password@your-redis-host:6379"
-# Example for Upstash: REDIS_URL="rediss://default:your-password@your-endpoint.upstash.io:6379"
+# IMPORTANT: Copy ONLY the URL, no command-line flags like --tls -u
+# For Upstash: Use rediss:// (with double 's') for TLS
+# Example for Upstash:
+REDIS_URL="rediss://default:your-password@your-endpoint.upstash.io:6379"
+# 
+# How to get Upstash URL:
+# 1. Go to https://console.upstash.com
+# 2. Select your Redis database
+# 3. Copy the "Redis URL" that starts with rediss://
+# 4. Paste it here (no extra characters, no --tls -u prefixes)
 
 # Option 2: Use separate connection parameters (for local Redis or custom setup)
 # REDIS_HOST=localhost
 # REDIS_PORT=6379
 # REDIS_PASSWORD=your-redis-password
 
-# Payment Gateway Secrets
-ESEWA_SECRET="your-esewa-secret"
-KHALTI_SECRET="your-khalti-secret"
+# Payment Gateway Configuration
+# For Nepal: Khalti and eSewa
+
+# Khalti Configuration
+# Sign up at: https://khalti.com
+# Get API keys from: https://khalti.com/merchant/dashboard
+KHALTI_SECRET_KEY="your-khalti-secret-key"
+KHALTI_PUBLIC_KEY="your-khalti-public-key"  # Optional, for frontend if needed
+
+# eSewa Configuration
+# Sign up at: https://esewa.com.np
+# Get merchant credentials from: https://merchant.esewa.com.np
+ESEWA_MERCHANT_ID="your-esewa-merchant-id"
+ESEWA_SECRET="your-esewa-secret"  # Optional, if required by eSewa API
+
+# Frontend URL (for payment callbacks)
+FRONTEND_URL="https://www.showsewa.com"
+# Production domain: www.showsewa.com

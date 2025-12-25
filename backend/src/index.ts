@@ -29,6 +29,7 @@ import loyaltyRoutes from './routes/loyalty';
 import inventoryRoutes from './routes/inventory';
 import testingRoutes from './routes/testing';
 import qrRoutes from './routes/qr';
+import paymentRoutes from './routes/payments';
 
 // Load environment variables
 dotenv.config();
@@ -111,6 +112,7 @@ app.use('/api/loyalty', loyaltyRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/testing', testingRoutes);
 app.use('/api/qr', qrRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
