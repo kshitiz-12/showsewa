@@ -87,8 +87,8 @@ KHALTI_PUBLIC_KEY="your-khalti-public-key"  # Optional, for frontend if needed
 # eSewa Configuration
 # Sign up at: https://esewa.com.np
 # Get merchant credentials from: https://merchant.esewa.com.np
-ESEWA_MERCHANT_ID="your-esewa-merchant-id"
-ESEWA_SECRET="your-esewa-secret"  # Optional, if required by eSewa API
+ESEWA_MERCHANT_ID="your-esewa-merchant-id"  # Also used as product_code
+ESEWA_SECRET="your-esewa-secret"  # Required for eSewa verification
 
 # Frontend URL (for payment callbacks)
 FRONTEND_URL="https://www.showsewa.com"

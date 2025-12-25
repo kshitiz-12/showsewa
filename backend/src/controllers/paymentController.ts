@@ -7,14 +7,17 @@ import { addPoints, POINTS_REWARDS } from './loyaltyController';
 
 // Initialize NepPayments with Khalti and eSewa
 const payments = new NepPayments({
-  khalti: {
-    secretKey: process.env.KHALTI_SECRET_KEY || '',
-    environment: process.env.NODE_ENV === 'production' ? 'live' : 'sandbox',
-  },
-  esewa: {
-    merchantId: process.env.ESEWA_MERCHANT_ID || '',
-    environment: process.env.NODE_ENV === 'production' ? 'live' : 'sandbox',
-  },
+  khalti: process.env.KHALTI_SECRET_KEY ? {
+    secretKey: process.env.KHALTI_SECRET_KEY,
+    environment: process.env.NODE_ENV === 'production' ? 'production' : 'sandbox',
+  } : undefined,
+  esewa: process.env.ESEWA_MERCHANT_ID ? {
+    productCode: process.env.ESEWA_MERCHANT_ID,
+    secretKey: process.env.ESEWA_SECRET || '',
+    environment: process.env.NODE_ENV === 'production' ? 'production' : 'sandbox',
+    successUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/payment/success`,
+    failureUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/payment/failure`,
+  } : undefined,
 });
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
@@ -94,7 +97,7 @@ export const initiatePayment = async (req: Request, res: Response) => {
 
     if (paymentMethod === 'KHALTI') {
       // Initiate Khalti payment
-      if (!process.env.KHALTI_SECRET_KEY) {
+      if (!process.env.KHALTI_SECRET_KEY || !payments.khalti) {
         return res.status(500).json({
           success: false,
           message: 'Khalti is not configured. Please set KHALTI_SECRET_KEY'
@@ -119,29 +122,34 @@ export const initiatePayment = async (req: Request, res: Response) => {
       };
     } else if (paymentMethod === 'ESEWA') {
       // Initiate eSewa payment
-      if (!process.env.ESEWA_MERCHANT_ID) {
+      if (!process.env.ESEWA_MERCHANT_ID || !payments.esewa) {
         return res.status(500).json({
           success: false,
           message: 'eSewa is not configured. Please set ESEWA_MERCHANT_ID'
         });
       }
 
+      const transactionUuid = `ESEWA_${booking.bookingReference}_${Date.now()}`;
       const esewaPayment = await payments.esewa.createPayment({
-        amount: amountInPaisa,
-        product_code: booking.bookingReference,
-        product_name: booking.showtime 
-          ? `Movie: ${booking.showtime.movie.title}` 
-          : `Event: ${booking.event?.title || 'Booking'}`,
+        amount: Math.round(amount), // eSewa uses rupees, not paisa
+        tax_amount: 0,
+        total_amount: Math.round(amount),
+        transaction_uuid: transactionUuid,
+        product_code: process.env.ESEWA_MERCHANT_ID,
         product_service_charge: 0,
         product_delivery_charge: 0,
-        success_url: `${FRONTEND_URL}/payment/success?bookingId=${bookingId}`,
+        success_url: `${FRONTEND_URL}/payment/success?bookingId=${bookingId}&transaction_uuid=${transactionUuid}`,
         failure_url: `${FRONTEND_URL}/payment/failure?bookingId=${bookingId}`,
-        customer_info: customerInfo,
+        signed_field_names: 'total_amount,transaction_uuid,product_code',
       });
 
+      // eSewa returns form HTML - we'll return it to frontend to submit
+      const esewaFormHtml = 'form_html' in esewaPayment ? (esewaPayment as { form_html: string }).form_html : null;
       paymentResponse = {
-        paymentUrl: esewaPayment.payment_url,
-        paymentMethod: 'ESEWA'
+        paymentUrl: null, // eSewa doesn't use redirect URLs
+        paymentMethod: 'ESEWA',
+        transactionUuid: transactionUuid,
+        formHtml: esewaFormHtml
       };
     }
 
@@ -150,7 +158,7 @@ export const initiatePayment = async (req: Request, res: Response) => {
       where: { id: bookingId },
       data: {
         paymentMethod: paymentMethod as any,
-        transactionId: paymentResponse.pidx || null
+        transactionId: paymentResponse.pidx || paymentResponse.transactionUuid || null
       }
     });
 
@@ -228,6 +236,13 @@ export const verifyPayment = async (req: Request, res: Response) => {
         });
       }
 
+      if (!payments.khalti) {
+        return res.status(500).json({
+          success: false,
+          message: 'Khalti is not configured'
+        });
+      }
+
       verificationResult = await payments.khalti.verifyPayment({
         pidx: pidx
       });
@@ -249,30 +264,37 @@ export const verifyPayment = async (req: Request, res: Response) => {
         });
       }
     } else if (paymentMethod === 'ESEWA') {
-      // eSewa verification
-      const { oid, amt, refId } = req.body;
+      // eSewa verification - eSewa sends data in query params
+      const { transaction_uuid, total_amount } = req.body;
 
-      if (!oid || !amt || !refId) {
+      if (!transaction_uuid || !total_amount || !process.env.ESEWA_MERCHANT_ID) {
         return res.status(400).json({
           success: false,
           message: 'eSewa verification parameters missing'
         });
       }
 
-      // Verify amount matches
-      const expectedAmount = Math.round(booking.totalAmount * 100);
-      if (parseInt(amt) !== expectedAmount) {
+      // Verify amount matches (eSewa uses rupees, not paisa)
+      const expectedAmount = Math.round(booking.totalAmount);
+      if (Number.parseFloat(total_amount) !== expectedAmount) {
         return res.status(400).json({
           success: false,
           message: 'Amount mismatch'
         });
       }
 
+      if (!payments.esewa) {
+        return res.status(500).json({
+          success: false,
+          message: 'eSewa is not configured'
+        });
+      }
+
       // Verify with eSewa
       verificationResult = await payments.esewa.verifyPayment({
-        oid: oid,
-        amt: amt,
-        refId: refId
+        product_code: process.env.ESEWA_MERCHANT_ID,
+        transaction_uuid: transaction_uuid,
+        total_amount: Number.parseFloat(total_amount),
       });
 
       if (!verificationResult.success) {
@@ -280,7 +302,7 @@ export const verifyPayment = async (req: Request, res: Response) => {
           where: { id: bookingId },
           data: {
             paymentStatus: 'FAILED',
-            transactionId: refId
+            transactionId: transaction_uuid
           }
         });
 
@@ -296,11 +318,11 @@ export const verifyPayment = async (req: Request, res: Response) => {
       // Update booking status
       const updated = await tx.booking.update({
         where: { id: bookingId },
-        data: {
-          paymentStatus: 'COMPLETED',
-          bookingStatus: 'CONFIRMED',
-          transactionId: pidx || req.body.refId || null
-        },
+      data: {
+        paymentStatus: 'COMPLETED',
+        bookingStatus: 'CONFIRMED',
+        transactionId: pidx || req.body.transaction_uuid || req.body.refId || null
+      },
         include: {
           showtime: {
             include: {
