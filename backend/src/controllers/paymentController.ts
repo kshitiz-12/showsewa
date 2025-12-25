@@ -5,22 +5,49 @@ import { emailService } from '../services/emailService';
 import { generateQRCodeString } from '../services/qrService';
 import { addPoints, POINTS_REWARDS } from './loyaltyController';
 
-// Initialize NepPayments with Khalti and eSewa
-const payments = new NepPayments({
-  khalti: process.env.KHALTI_SECRET_KEY ? {
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+
+// Lazy initialization function for NepPayments
+// Only initializes if at least one payment gateway is configured
+// Returns null if no gateways are configured (payment features will be disabled)
+let paymentsInstance: NepPayments | null = null;
+
+function getPaymentsInstance(): NepPayments | null {
+  if (paymentsInstance !== null) {
+    return paymentsInstance;
+  }
+
+  const khaltiConfig = process.env.KHALTI_SECRET_KEY ? {
     secretKey: process.env.KHALTI_SECRET_KEY,
-    environment: process.env.NODE_ENV === 'production' ? 'production' : 'sandbox',
-  } : undefined,
-  esewa: process.env.ESEWA_MERCHANT_ID ? {
+    environment: (process.env.NODE_ENV === 'production' ? 'production' : 'sandbox') as 'production' | 'sandbox',
+  } : undefined;
+
+  const esewaConfig = process.env.ESEWA_MERCHANT_ID ? {
     productCode: process.env.ESEWA_MERCHANT_ID,
     secretKey: process.env.ESEWA_SECRET || '',
-    environment: process.env.NODE_ENV === 'production' ? 'production' : 'sandbox',
-    successUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/payment/success`,
-    failureUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/payment/failure`,
-  } : undefined,
-});
+    environment: (process.env.NODE_ENV === 'production' ? 'production' : 'sandbox') as 'production' | 'sandbox',
+    successUrl: `${FRONTEND_URL}/payment/success`,
+    failureUrl: `${FRONTEND_URL}/payment/failure`,
+  } : undefined;
 
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+  // Only initialize if at least one gateway is configured
+  if (!khaltiConfig && !esewaConfig) {
+    // Return null instead of throwing - allows server to start without payment config
+    console.warn('⚠️  Payment gateways not configured. Payment features will be disabled. Set KHALTI_SECRET_KEY or ESEWA_MERCHANT_ID to enable payments.');
+    return null;
+  }
+
+  try {
+    paymentsInstance = new NepPayments({
+      khalti: khaltiConfig,
+      esewa: esewaConfig,
+    });
+    return paymentsInstance;
+  } catch (error) {
+    console.error('Failed to initialize payment gateways:', error);
+    return null;
+  }
+}
 
 interface AuthRequest extends Request {
   user?: {
@@ -97,10 +124,18 @@ export const initiatePayment = async (req: Request, res: Response) => {
 
     if (paymentMethod === 'KHALTI') {
       // Initiate Khalti payment
-      if (!process.env.KHALTI_SECRET_KEY || !payments.khalti) {
-        return res.status(500).json({
+      if (!process.env.KHALTI_SECRET_KEY) {
+        return res.status(503).json({
           success: false,
-          message: 'Khalti is not configured. Please set KHALTI_SECRET_KEY'
+          message: 'Khalti payment is not configured. Please set KHALTI_SECRET_KEY environment variable.'
+        });
+      }
+
+      const payments = getPaymentsInstance();
+      if (!payments || !payments.khalti) {
+        return res.status(503).json({
+          success: false,
+          message: 'Khalti payment is not available. Payment gateway configuration is missing.'
         });
       }
 
@@ -122,10 +157,18 @@ export const initiatePayment = async (req: Request, res: Response) => {
       };
     } else if (paymentMethod === 'ESEWA') {
       // Initiate eSewa payment
-      if (!process.env.ESEWA_MERCHANT_ID || !payments.esewa) {
-        return res.status(500).json({
+      if (!process.env.ESEWA_MERCHANT_ID) {
+        return res.status(503).json({
           success: false,
-          message: 'eSewa is not configured. Please set ESEWA_MERCHANT_ID'
+          message: 'eSewa payment is not configured. Please set ESEWA_MERCHANT_ID environment variable.'
+        });
+      }
+
+      const payments = getPaymentsInstance();
+      if (!payments || !payments.esewa) {
+        return res.status(503).json({
+          success: false,
+          message: 'eSewa payment is not available. Payment gateway configuration is missing.'
         });
       }
 
@@ -236,10 +279,11 @@ export const verifyPayment = async (req: Request, res: Response) => {
         });
       }
 
-      if (!payments.khalti) {
-        return res.status(500).json({
+      const payments = getPaymentsInstance();
+      if (!payments || !payments.khalti) {
+        return res.status(503).json({
           success: false,
-          message: 'Khalti is not configured'
+          message: 'Khalti payment is not available. Payment gateway configuration is missing.'
         });
       }
 
@@ -283,10 +327,11 @@ export const verifyPayment = async (req: Request, res: Response) => {
         });
       }
 
-      if (!payments.esewa) {
-        return res.status(500).json({
+      const payments = getPaymentsInstance();
+      if (!payments || !payments.esewa) {
+        return res.status(503).json({
           success: false,
-          message: 'eSewa is not configured'
+          message: 'eSewa payment is not available. Payment gateway configuration is missing.'
         });
       }
 
