@@ -20,9 +20,8 @@ export function PaymentSuccess({ onNavigate }: PaymentSuccessProps) {
 
   const bookingId = params.get('bookingId');
   const pidx = params.get('pidx'); // Khalti
-  const refId = params.get('refId'); // eSewa
-  const oid = params.get('oid'); // eSewa
-  const amt = params.get('amt'); // eSewa
+  const transaction_uuid = params.get('transaction_uuid'); // eSewa
+  const total_amount = params.get('total_amount'); // eSewa
 
   useEffect(() => {
     const verifyPayment = async () => {
@@ -46,9 +45,8 @@ export function PaymentSuccess({ onNavigate }: PaymentSuccessProps) {
             bookingId,
             paymentMethod,
             pidx: pidx || null,
-            refId: refId || null,
-            oid: oid || null,
-            amt: amt || null,
+            transaction_uuid: transaction_uuid || null,
+            total_amount: total_amount || null,
           }),
         });
 
@@ -69,7 +67,7 @@ export function PaymentSuccess({ onNavigate }: PaymentSuccessProps) {
     };
 
     verifyPayment();
-  }, [bookingId, pidx, refId, oid, amt]);
+  }, [bookingId, pidx, transaction_uuid, total_amount]);
 
   if (loading) {
     return (

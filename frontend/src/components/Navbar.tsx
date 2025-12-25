@@ -76,6 +76,7 @@ export function Navbar({ onNavigate, currentPage }: Readonly<NavbarProps>) {
             <button
               onClick={() => setIsCityModalOpen(true)}
               className="btn-secondary"
+              aria-label={`Select city. Currently: ${selectedCity && selectedCity.trim() ? selectedCity : 'All Cities'}`}
             >
               <MapPin className="w-4 h-4 text-red-600" />
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -137,7 +138,9 @@ export function Navbar({ onNavigate, currentPage }: Readonly<NavbarProps>) {
               <div className="relative">
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300 transform hover:scale-105 group"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300 transform hover:scale-105 group min-h-[44px]"
+                  aria-label={`User menu for ${user.name}`}
+                  aria-expanded={showUserMenu}
                 >
                   <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110 shadow-lg">
                     <span className="text-white font-semibold text-sm">
@@ -230,8 +233,10 @@ export function Navbar({ onNavigate, currentPage }: Readonly<NavbarProps>) {
           </div>
 
           <button
-            className="md:hidden p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="md:hidden p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
           </button>
@@ -247,7 +252,8 @@ export function Navbar({ onNavigate, currentPage }: Readonly<NavbarProps>) {
                 setIsCityModalOpen(true);
                 setMobileMenuOpen(false);
               }}
-              className="w-full flex items-center justify-between px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"
+              className="w-full flex items-center justify-between px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 min-h-[44px]"
+              aria-label={`Select city. Currently: ${selectedCity && selectedCity.trim() ? selectedCity : 'All Cities'}`}
             >
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-red-600" />
@@ -277,13 +283,15 @@ export function Navbar({ onNavigate, currentPage }: Readonly<NavbarProps>) {
             <div className="flex gap-2 pt-2">
               <button
                 onClick={toggleTheme}
-                className="flex-1 p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                className="flex-1 p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors min-h-[44px] flex items-center justify-center"
+                aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
               >
                 {darkMode ? <Sun className="w-5 h-5 mx-auto" /> : <Moon className="w-5 h-5 mx-auto" />}
               </button>
               <button
                 onClick={toggleLanguage}
-                className="flex-1 px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors font-medium"
+                className="flex-1 px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors font-medium min-h-[44px] flex items-center justify-center"
+                aria-label={language === 'en' ? 'Switch to Nepali' : 'Switch to English'}
               >
                 {language === 'en' ? 'नेपाली' : 'English'}
               </button>

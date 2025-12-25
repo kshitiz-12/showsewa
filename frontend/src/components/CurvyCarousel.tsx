@@ -194,9 +194,9 @@ export const CurvyCarousel: React.FC<CurvyCarouselProps> = ({
                 </div>
 
                 {/* Title */}
-                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight">
                   {language === 'en' ? currentItem.title : (currentItem.titleNe || currentItem.title)}
-                </h1>
+                </h2>
 
                 {/* Description */}
                 {(currentItem.description || currentItem.descriptionNe) && (

@@ -1,0 +1,11 @@
+# robots.txt for ShowSewa
+# Allow all search engines to crawl the site
+User-agent: *
+Allow: /
+
+# Disallow admin and private routes
+Disallow: /admin/
+Disallow: /api/
+
+# Sitemap location (update when you have a sitemap)
+# Sitemap: https://www.showsewa.com/sitemap.xml

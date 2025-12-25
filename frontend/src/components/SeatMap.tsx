@@ -441,12 +441,13 @@ const SeatMap: React.FC<SeatMapProps> = ({ showtimeId, onSeatSelection, showtime
                           onClick={() => handleSeatClick(seat)}
                           disabled={seat.isBooked}
                           className={`
-                            relative w-12 h-10 text-sm font-bold rounded transition-all duration-200 flex items-center justify-center
+                            relative w-12 h-12 sm:w-14 sm:h-14 text-sm font-bold rounded transition-all duration-200 flex items-center justify-center min-w-[44px] min-h-[44px]
                             ${getSeatColor(seat)}
                             ${getSeatTextColor(seat)}
                             ${getSeatHoverEffects(seat)}
                             ${seat.isBooked ? 'opacity-75' : ''}
                           `}
+                          aria-label={`${seat.seatNumber} seat, ${seat.isBooked ? 'Sold' : seat.isSelected ? 'Selected' : 'Available'}, Price: ₹${seat.price}`}
                           title={`${seat.seatNumber} - ₹${seat.price}${seat.isBooked ? ' (Sold)' : seat.isSelected ? ' (Selected)' : ' (Available)'}`}
                         >
                           <span>{seatNumStr}</span>

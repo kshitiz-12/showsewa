@@ -236,7 +236,7 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
                     <TrendingUp className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-white font-semibold text-sm sm:text-base">Trending Now</h3>
+                    <p className="text-white font-semibold text-sm sm:text-base">Trending Now</p>
                     <p className="text-gray-300 text-xs sm:text-sm">Most popular this week</p>
                   </div>
                 </div>

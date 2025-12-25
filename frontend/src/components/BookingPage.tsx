@@ -219,10 +219,27 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
 
             const paymentData = await paymentResponse.json();
             
-            if (paymentData.success && paymentData.data?.paymentUrl) {
-              // Redirect to payment gateway
-              window.location.href = paymentData.data.paymentUrl;
-              return; // Don't proceed further, user will be redirected
+            if (paymentData.success && paymentData.data) {
+              // Handle eSewa form submission
+              if (paymentMethod === 'ESEWA' && paymentData.data.formHtml) {
+                // Create a form and submit it for eSewa
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = 'https://rc-epay.esewa.com.np/api/epay/main/v2/form';
+                form.innerHTML = paymentData.data.formHtml;
+                document.body.appendChild(form);
+                form.submit();
+                return; // Don't proceed further
+              }
+              
+              // Handle Khalti redirect
+              if (paymentMethod === 'KHALTI' && paymentData.data.paymentUrl) {
+                // Redirect to payment gateway
+                window.location.href = paymentData.data.paymentUrl;
+                return; // Don't proceed further, user will be redirected
+              }
+              
+              throw new Error('Invalid payment response');
             } else {
               throw new Error(paymentData.message || 'Failed to initiate payment');
             }

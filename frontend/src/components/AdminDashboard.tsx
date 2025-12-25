@@ -162,11 +162,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                 <button
                   key={id}
                   onClick={() => setCurrentView(id as any)}
-                  className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-3 sm:py-4 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                  className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-3 sm:py-4 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap min-h-[44px] ${
                     currentView === id
                       ? 'border-blue-600 text-blue-600 dark:text-blue-400'
                       : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600'
                   }`}
+                  aria-label={label}
                 >
                   <Icon className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="hidden xs:inline">{label}</span>
