@@ -104,7 +104,7 @@ function Stepper({step}:{step:'summary'|'payment'|'done'}) {
               {/* MAIN PANE: Event poster and details */}
               <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-700 p-8 flex flex-col gap-8 relative overflow-hidden select-none">
                 {event.imageUrl && (
-                  <img src={event.imageUrl} alt={event.title} className="w-full h-64 object-cover rounded-2xl shadow-md mb-7 border-4 border-white dark:border-gray-900" style={{maxHeight: '15rem'}} />
+                  <img src={event.imageUrl} alt={event.title} className="w-full h-64 object-cover rounded-2xl shadow-md mb-7 border-4 border-white dark:border-gray-900" style={{maxHeight: '15rem'}} loading="eager" decoding="async" fetchPriority="high" />
                 )}
                 <div>
                   <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2 line-clamp-2">
@@ -271,7 +271,7 @@ export function EventBookingSuccess({ eventId, onNavigate }: { eventId: string, 
             <div className="md:col-span-2">
               <div className="flex gap-5 items-start">
                 <div className="w-28 h-36 rounded-xl overflow-hidden bg-gray-200 shadow">
-                  {event?.imageUrl ? <img src={event.imageUrl} alt={event.title} className="w-full h-full object-cover" /> : null}
+                  {event?.imageUrl ? <img src={event.imageUrl} alt={event.title} className="w-full h-full object-cover" loading="lazy" decoding="async" /> : null}
                 </div>
                 <div className="space-y-2">
                   <div className="text-xl font-bold text-gray-900 dark:text-white">{event?.title}</div>

@@ -58,6 +58,8 @@ export const TicketCard: React.FC<TicketCardProps> = ({
                   src={showtimeInfo.movie.posterUrl} 
                   alt={showtimeInfo.movie?.title || "Movie"}
                   className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
@@ -105,6 +107,8 @@ export const TicketCard: React.FC<TicketCardProps> = ({
                   src={qrCodeUrl}
                   alt="QR Code"
                   className="w-full h-full object-contain"
+                  loading="eager"
+                  decoding="async"
                 />
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">

@@ -256,6 +256,9 @@ export function EventDetail({ eventId, onNavigate }: EventDetailProps) {
           alt={eventTitle}
           className="w-full h-full object-contain sm:object-cover opacity-60"
           style={{ objectPosition: 'center' }}
+          loading="eager"
+          decoding="async"
+          fetchPriority="high"
           onError={(e) => {
             (e.target as HTMLImageElement).style.display = 'none';
           }}
@@ -533,6 +536,8 @@ export function EventDetail({ eventId, onNavigate }: EventDetailProps) {
                         src={relatedEvent.imageUrl}
                         alt={language === 'en' ? relatedEvent.title : relatedEvent.titleNe}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        loading="lazy"
+                        decoding="async"
                         onError={(e) => {
                           (e.target as HTMLImageElement).style.display = 'none';
                         }}

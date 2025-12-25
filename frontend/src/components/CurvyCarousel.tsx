@@ -287,6 +287,9 @@ export const CurvyCarousel: React.FC<CurvyCarouselProps> = ({
                         src={currentItem.image}
                         alt={language === 'en' ? currentItem.title : (currentItem.titleNe || currentItem.title)}
                         className="w-full h-full object-cover transition-all duration-1000 ease-out"
+                        loading="eager"
+                        decoding="async"
+                        fetchPriority="high"
                         onError={(e) => {
                           e.currentTarget.style.display = 'none';
                           e.currentTarget.nextElementSibling?.classList.remove('hidden');

@@ -332,6 +332,8 @@ export function UserBookings({ onNavigate }: Readonly<UserBookingsProps>) {
                           src={booking.moviePosterUrl} 
                           alt={booking.movieTitle}
                           className="w-full h-full object-cover"
+                          loading="lazy"
+                          decoding="async"
                           onError={(e) => {
                             e.currentTarget.style.display = 'none';
                             e.currentTarget.nextElementSibling?.classList.remove('hidden');

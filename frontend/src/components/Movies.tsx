@@ -405,21 +405,23 @@ export function Movies({ onNavigate }: MoviesProps) {
             {filteredMovies.map((movie, index) => (
               <div
                 key={movie.id}
-                className="group cursor-pointer animate-page-fade-in"
-                style={{ animationDelay: `${index * 0.1}s` }}
+                className="group cursor-pointer stagger-item"
+                style={{ animationDelay: `${index * 0.08}s` }}
                 onClick={() => onNavigate('movie-detail', movie.id)}
               >
-                <div className="relative rounded-lg sm:rounded-xl overflow-hidden shadow-md sm:shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-2">
+                <div className="relative rounded-lg sm:rounded-xl overflow-hidden shadow-md sm:shadow-lg hover:shadow-2xl transition-all duration-500 ease-out transform hover:scale-[1.05] hover:-translate-y-3 bg-white dark:bg-gray-800 card-hover">
                   <img
                     src={movie.posterUrl}
                     alt={language === 'en' ? movie.title : movie.titleNe}
-                    className="w-full aspect-[2/3] object-cover"
+                    className="w-full aspect-[2/3] object-cover transition-transform duration-500 group-hover:scale-110"
+                    loading="lazy"
+                    decoding="async"
                   />
                   <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 bg-red-600 text-white px-1.5 py-0.5 sm:px-2 sm:py-1 rounded text-[10px] sm:text-xs font-bold">
                     {movie.rating}
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-4">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-4 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
                       <button 
                         onClick={async (e) => {
                           e.stopPropagation();
@@ -458,17 +460,17 @@ export function Movies({ onNavigate }: MoviesProps) {
                             onNavigate('movie-detail', movie.id);
                           }
                         }}
-                        className="w-full bg-red-600 text-white py-1.5 sm:py-2 rounded-lg hover:bg-red-700 transition-colors font-semibold text-xs sm:text-sm"
+                        className="w-full bg-red-600 text-white py-1.5 sm:py-2 rounded-lg hover:bg-red-700 transition-all duration-300 font-semibold text-xs sm:text-sm transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl"
                       >
                         {t('home.book_now')}
                       </button>
                     </div>
                   </div>
                 </div>
-                <h3 className="mt-2 sm:mt-3 text-xs sm:text-sm font-semibold text-gray-900 dark:text-white line-clamp-2">
+                <h3 className="mt-2 sm:mt-3 text-xs sm:text-sm font-semibold text-gray-900 dark:text-white line-clamp-2 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors duration-300">
                   {language === 'en' ? movie.title : movie.titleNe}
                 </h3>
-                <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 mt-0.5 sm:mt-1 line-clamp-2">
+                <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 mt-0.5 sm:mt-1 line-clamp-2 transition-colors duration-300">
                   {Array.isArray(movie.genre) ? movie.genre.join(', ') : movie.genre} • {Array.isArray(movie.language) ? movie.language.join(', ') : movie.language}
                 </p>
               </div>

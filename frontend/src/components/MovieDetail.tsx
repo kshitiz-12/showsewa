@@ -178,7 +178,9 @@ export function MovieDetail({ movieId, onNavigate }: Readonly<MovieDetailProps>)
                 src={movie.posterUrl}
                 alt={language === 'en' ? movie.title : movie.titleNe}
                 className="w-full rounded-xl shadow-2xl transition-transform duration-300 group-hover:scale-105"
-                loading="lazy"
+                loading="eager"
+                decoding="async"
+                fetchPriority="high"
               />
               {movie.trailerUrl && (
                 <button
@@ -211,6 +213,8 @@ export function MovieDetail({ movieId, onNavigate }: Readonly<MovieDetailProps>)
                         src={image}
                         alt="Gallery thumbnail"
                         className="w-full h-full object-cover hover:opacity-80 transition-opacity"
+                        loading="lazy"
+                        decoding="async"
                       />
                     </button>
                   ))}
@@ -503,6 +507,8 @@ export function MovieDetail({ movieId, onNavigate }: Readonly<MovieDetailProps>)
               src={selectedImage}
               alt="Gallery view"
               className="max-w-full max-h-full object-contain rounded-lg"
+              loading="eager"
+              decoding="async"
             />
           </div>
         </div>

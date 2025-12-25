@@ -235,6 +235,8 @@ export function Booking({ itemId, onNavigate }: BookingProps) {
                       src="https://esewa.com.np/common/images/esewa_logo.png"
                       alt="eSewa"
                       className="h-6"
+                      loading="lazy"
+                      decoding="async"
                     />
                   </div>
                   <div className="flex-1 p-3 border-2 border-gray-300 dark:border-gray-700 rounded-lg flex items-center justify-center">
@@ -242,6 +244,8 @@ export function Booking({ itemId, onNavigate }: BookingProps) {
                       src="https://khalti.com/logo.png"
                       alt="Khalti"
                       className="h-6"
+                      loading="lazy"
+                      decoding="async"
                     />
                   </div>
                 </div>

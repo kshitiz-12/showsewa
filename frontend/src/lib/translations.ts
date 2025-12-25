@@ -59,8 +59,10 @@ export const translations = {
       founders_title: 'Meet Our Founders',
       founder_1_name: 'Tanisha Gupta',
       founder_1_role: 'Co-Founder & CEO',
+      founder_1_about: 'Passionate about making entertainment accessible to everyone in Nepal.',
       founder_2_name: 'Vansh',
       founder_2_role: 'Co-Founder & CTO',
+      founder_2_about: 'Dedicated to building innovative solutions for seamless booking experiences.',
       launch_date: 'Launching Soon',
     },
     contact: {
@@ -140,8 +142,10 @@ export const translations = {
       founders_title: 'हाम्रा संस्थापकहरू भेट्नुहोस्',
       founder_1_name: 'तनिषा गुप्ता',
       founder_1_role: 'सह-संस्थापक र सीईओ',
+      founder_1_about: 'नेपालका सबैलाई मनोरञ्जन पहुँचयोग्य बनाउनको लागि उत्साहित।',
       founder_2_name: 'वंश',
       founder_2_role: 'सह-संस्थापक र सीटीओ',
+      founder_2_about: 'सहज बुकिङ अनुभवको लागि नवीन समाधानहरू निर्माण गर्न समर्पित।',
       launch_date: 'चाँडै सुरु हुँदैछ',
     },
     contact: {

@@ -19,6 +19,8 @@ import AdminDashboard from './components/AdminDashboard';
 import { LoyaltyPoints } from './components/LoyaltyPoints';
 import { UserProfile } from './components/UserProfile';
 import { UserBookings } from './components/UserBookings';
+import { PaymentSuccess } from './components/PaymentSuccess';
+import { PaymentFailure } from './components/PaymentFailure';
 
 // URL routing utilities
 const parseUrl = () => {
@@ -57,6 +59,10 @@ const parseUrl = () => {
       return { page: 'profile', id: undefined };
     case 'bookings':
       return { page: 'bookings', id: undefined };
+    case 'payment':
+      if (segments[1] === 'success') return { page: 'payment-success', id: undefined };
+      if (segments[1] === 'failure') return { page: 'payment-failure', id: undefined };
+      return { page: 'home', id: undefined };
     default:
       return { page: 'home', id: undefined };
   }
@@ -94,6 +100,10 @@ const buildUrl = (page: string, id?: string) => {
       return '/profile';
     case 'bookings':
       return '/bookings';
+    case 'payment-success':
+      return '/payment/success';
+    case 'payment-failure':
+      return '/payment/failure';
     default:
       return '/';
   }
@@ -185,6 +195,10 @@ function App() {
         return <UserProfile onNavigate={handleNavigate} />;
       case 'bookings':
         return <UserBookings onNavigate={handleNavigate} />;
+      case 'payment-success':
+        return <PaymentSuccess onNavigate={handleNavigate} />;
+      case 'payment-failure':
+        return <PaymentFailure onNavigate={handleNavigate} />;
       default:
         return <Home onNavigate={handleNavigate} />;
     }

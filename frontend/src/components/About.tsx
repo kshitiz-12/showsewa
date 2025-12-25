@@ -122,11 +122,9 @@ export function About() {
                     <p className="text-red-600 font-semibold text-lg mb-4">
                       {t('about.founder_1_role')}
                     </p>
-                    <div className="flex gap-2">
-                      <Heart className="w-5 h-5 text-red-500" />
-                      <Heart className="w-5 h-5 text-red-500" />
-                      <Heart className="w-5 h-5 text-red-500" />
-                    </div>
+                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed max-w-md mx-auto">
+                      {t('about.founder_1_about')}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -149,11 +147,9 @@ export function About() {
                     <p className="text-red-600 font-semibold text-lg mb-4">
                       {t('about.founder_2_role')}
                     </p>
-                    <div className="flex gap-2">
-                      <Heart className="w-5 h-5 text-red-500" />
-                      <Heart className="w-5 h-5 text-red-500" />
-                      <Heart className="w-5 h-5 text-red-500" />
-                    </div>
+                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed max-w-md mx-auto">
+                      {t('about.founder_2_about')}
+                    </p>
                   </div>
                 </div>
               </div>

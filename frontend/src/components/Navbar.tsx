@@ -103,7 +103,7 @@ export function Navbar({ onNavigate, currentPage }: Readonly<NavbarProps>) {
               <button
                 key={item.id}
                 onClick={() => onNavigate(item.id)}
-                className={`font-medium transition-all duration-300 relative ${
+                className={`font-medium transition-all duration-300 relative transform hover:scale-105 ${
                   currentPage === item.id
                     ? 'text-red-600'
                     : 'text-gray-700 dark:text-gray-300 hover:text-red-600'
@@ -111,7 +111,7 @@ export function Navbar({ onNavigate, currentPage }: Readonly<NavbarProps>) {
               >
                 {item.label}
                 {currentPage === item.id && (
-                  <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-red-600 animate-page-fade-in"></div>
+                  <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-red-600 animate-scale-in"></div>
                 )}
               </button>
             ))}
@@ -120,14 +120,14 @@ export function Navbar({ onNavigate, currentPage }: Readonly<NavbarProps>) {
           <div className="hidden md:flex items-center gap-4">
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-300 transform hover:scale-110 active:scale-95"
               aria-label="Toggle theme"
             >
-              {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              {darkMode ? <Sun className="w-5 h-5 transition-transform duration-300 hover:rotate-180" /> : <Moon className="w-5 h-5 transition-transform duration-300 hover:rotate-12" />}
             </button>
             <button
               onClick={toggleLanguage}
-              className="px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors font-medium"
+              className="px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-300 font-medium transform hover:scale-105 active:scale-95"
             >
               {language === 'en' ? 'नेपाली' : 'English'}
             </button>
@@ -137,9 +137,9 @@ export function Navbar({ onNavigate, currentPage }: Readonly<NavbarProps>) {
               <div className="relative">
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300 transform hover:scale-105 group"
                 >
-                  <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
+                  <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110 shadow-lg">
                     <span className="text-white font-semibold text-sm">
                       {user.name.charAt(0).toUpperCase()}
                     </span>
@@ -151,7 +151,7 @@ export function Navbar({ onNavigate, currentPage }: Readonly<NavbarProps>) {
 
                 {/* Dropdown Menu */}
                 {showUserMenu && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-2 z-50">
+                  <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-2 z-50 animate-scale-in">
                     <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
                         {user.name}

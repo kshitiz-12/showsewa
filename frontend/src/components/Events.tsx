@@ -98,10 +98,10 @@ export function Events({ onNavigate }: EventsProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-4 sm:py-6 lg:py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-4 sm:py-6 lg:py-8 animate-page-fade-in">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">
+        <div className="mb-6 sm:mb-8 animate-fade-in-up">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6 bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
             {t('events.title')}
           </h1>
 
@@ -193,10 +193,11 @@ export function Events({ onNavigate }: EventsProps) {
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-            {filteredEvents.map(event => (
+            {filteredEvents.map((event, index) => (
               <div
                 key={event.id}
-                className="group cursor-pointer bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                className="group cursor-pointer stagger-item bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 ease-out transform hover:-translate-y-3 hover:scale-[1.02] card-hover"
+                style={{ animationDelay: `${index * 0.08}s` }}
                 onClick={() => onNavigate('event-detail', event.id)}
               >
                 <div className="relative h-40 sm:h-48 lg:h-56 overflow-hidden bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800">
@@ -205,6 +206,8 @@ export function Events({ onNavigate }: EventsProps) {
                       src={event.imageUrl}
                       alt={language === 'en' ? event.title : event.titleNe}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      loading="lazy"
+                      decoding="async"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none';
                         const fallback = e.currentTarget.nextElementSibling;
@@ -229,7 +232,7 @@ export function Events({ onNavigate }: EventsProps) {
                   </div>
                 </div>
                 <div className="p-3 sm:p-4">
-                  <h3 className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 dark:text-white mb-1.5 sm:mb-2 line-clamp-2 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+                  <h3 className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 dark:text-white mb-1.5 sm:mb-2 line-clamp-2 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors duration-300">
                     {language === 'en' ? event.title : event.titleNe}
                   </h3>
                   <div className="space-y-1.5 sm:space-y-2">

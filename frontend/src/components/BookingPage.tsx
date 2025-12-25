@@ -172,7 +172,9 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
       
       // Create booking via API
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/bookings', {
+      const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      
+      const response = await fetch(`${API_BASE_URL}/api/bookings`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -197,6 +199,42 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
       }
 
       if (data.success) {
+        const bookingId = data.data?.booking?.id;
+        const requiresPayment = data.data?.requiresPayment || false;
+        
+        // If online payment is required (Khalti/eSewa), initiate payment
+        if (requiresPayment && (paymentMethod === 'KHALTI' || paymentMethod === 'ESEWA')) {
+          try {
+            // Initiate payment
+            const paymentResponse = await fetch(`${API_BASE_URL}/api/payments/initiate`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                bookingId: bookingId,
+                paymentMethod: paymentMethod
+              }),
+            });
+
+            const paymentData = await paymentResponse.json();
+            
+            if (paymentData.success && paymentData.data?.paymentUrl) {
+              // Redirect to payment gateway
+              window.location.href = paymentData.data.paymentUrl;
+              return; // Don't proceed further, user will be redirected
+            } else {
+              throw new Error(paymentData.message || 'Failed to initiate payment');
+            }
+          } catch (paymentError) {
+            console.error('Payment initiation error:', paymentError);
+            alert(`Payment initiation failed: ${paymentError instanceof Error ? paymentError.message : 'Unknown error'}`);
+            setLoading(false);
+            return;
+          }
+        }
+
+        // For CASH payments or if payment already completed
         // Store booking response
         setBookingResponse(data);
         // Generate booking reference and set payment method
@@ -210,7 +248,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
         } else if (data.data?.booking?.id) {
           // Fetch QR code if not in response
           try {
-            const qrResponse = await fetch(`http://localhost:5000/api/qr/generate/${data.data.booking.id}`);
+            const qrResponse = await fetch(`${API_BASE_URL}/api/qr/generate/${data.data.booking.id}`);
             const qrData = await qrResponse.json();
             if (qrData.success && qrData.data?.qrString) {
               setQrCodeUrl(`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData.data.qrString)}`);
@@ -603,6 +641,8 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
                     src={showtimeInfo.movie.posterUrl} 
                     alt={showtimeInfo.movie?.title || "Movie Poster"}
                     className="w-full h-full object-cover"
+                    loading="lazy"
+                    decoding="async"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
                       e.currentTarget.nextElementSibling?.classList.remove('hidden');
