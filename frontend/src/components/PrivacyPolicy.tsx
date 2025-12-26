@@ -224,3 +224,4 @@ export function PrivacyPolicy({ onNavigate }: PrivacyPolicyProps) {
     </div>
   );
 }
+

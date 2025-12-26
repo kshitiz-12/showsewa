@@ -287,3 +287,4 @@ export function TermsAndConditions({ onNavigate }: TermsAndConditionsProps) {
     </div>
   );
 }
+
