@@ -135,9 +135,27 @@ export function Footer({ onNavigate }: FooterProps) {
               in Nepal
             </p>
             <div className="flex gap-4">
-              <button className="hover:text-red-500 transition-colors">Privacy</button>
-              <button className="hover:text-red-500 transition-colors">Terms</button>
-              <button className="hover:text-red-500 transition-colors">Support</button>
+              <button 
+                onClick={() => onNavigate('privacy')}
+                className="hover:text-red-500 transition-colors"
+                aria-label="Privacy Policy"
+              >
+                Privacy
+              </button>
+              <button 
+                onClick={() => onNavigate('terms')}
+                className="hover:text-red-500 transition-colors"
+                aria-label="Terms and Conditions"
+              >
+                Terms
+              </button>
+              <button 
+                onClick={() => onNavigate('contact')}
+                className="hover:text-red-500 transition-colors"
+                aria-label="Support"
+              >
+                Support
+              </button>
             </div>
           </div>
         </div>

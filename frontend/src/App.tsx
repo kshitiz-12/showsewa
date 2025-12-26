@@ -21,6 +21,8 @@ import { UserProfile } from './components/UserProfile';
 import { UserBookings } from './components/UserBookings';
 import { PaymentSuccess } from './components/PaymentSuccess';
 import { PaymentFailure } from './components/PaymentFailure';
+import { PrivacyPolicy } from './components/PrivacyPolicy';
+import { TermsAndConditions } from './components/TermsAndConditions';
 
 // URL routing utilities
 const parseUrl = () => {
@@ -63,6 +65,10 @@ const parseUrl = () => {
       if (segments[1] === 'success') return { page: 'payment-success', id: undefined };
       if (segments[1] === 'failure') return { page: 'payment-failure', id: undefined };
       return { page: 'home', id: undefined };
+    case 'privacy':
+      return { page: 'privacy', id: undefined };
+    case 'terms':
+      return { page: 'terms', id: undefined };
     default:
       return { page: 'home', id: undefined };
   }
@@ -104,6 +110,10 @@ const buildUrl = (page: string, id?: string) => {
       return '/payment/success';
     case 'payment-failure':
       return '/payment/failure';
+    case 'privacy':
+      return '/privacy';
+    case 'terms':
+      return '/terms';
     default:
       return '/';
   }
@@ -199,6 +209,10 @@ function App() {
         return <PaymentSuccess onNavigate={handleNavigate} />;
       case 'payment-failure':
         return <PaymentFailure onNavigate={handleNavigate} />;
+      case 'privacy':
+        return <PrivacyPolicy onNavigate={handleNavigate} />;
+      case 'terms':
+        return <TermsAndConditions onNavigate={handleNavigate} />;
       default:
         return <Home onNavigate={handleNavigate} />;
     }
@@ -224,7 +238,7 @@ function App() {
                   {renderPage()}
                 </div>
               </main>
-              {currentPage !== 'login' && currentPage !== 'admin' && currentPage !== 'loyalty' && currentPage !== 'profile' && currentPage !== 'bookings' && (
+              {currentPage !== 'login' && currentPage !== 'admin' && currentPage !== 'loyalty' && currentPage !== 'profile' && currentPage !== 'bookings' && currentPage !== 'privacy' && currentPage !== 'terms' && (
                 <div className="animate-page-slide-in-bottom">
                   <Footer onNavigate={handleNavigate} />
                 </div>

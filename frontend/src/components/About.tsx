@@ -22,7 +22,7 @@ export function About() {
             {t('about.title')}
           </h1>
           <p className="text-2xl text-red-100 max-w-3xl mx-auto mb-8 animate-page-fade-in" style={{ animationDelay: '0.1s' }}>
-            Nepal's Premier Digital Ticketing Platform
+            Tapai ko Show, Hamro Sewa
           </p>
           <div className="flex flex-wrap justify-center gap-4 animate-page-fade-in" style={{ animationDelay: '0.2s' }}>
             <div className="bg-white/20 backdrop-blur-sm rounded-full px-6 py-3 text-white">
@@ -49,7 +49,7 @@ export function About() {
               </div>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Our Mission</h3>
               <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                Making entertainment accessible to everyone across Nepal with seamless digital experiences
+                {t('about.mission_text')}
               </p>
             </div>
 
@@ -87,6 +87,33 @@ export function About() {
             <p className="text-xl text-gray-700 dark:text-gray-300 leading-relaxed">
               {t('about.vision_text')}
             </p>
+          </div>
+
+          {/* Mission Section */}
+          <div className="bg-gradient-to-br from-blue-50 to-white dark:from-gray-800 dark:to-gray-700 rounded-3xl shadow-2xl p-10 md:p-12 mb-12 border border-blue-100 dark:border-gray-600">
+            <div className="flex items-start gap-4 mb-8">
+              <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Target className="w-7 h-7 text-white" />
+              </div>
+              <h2 className="text-4xl font-bold text-gray-900 dark:text-white">
+                {t('about.mission_title')}
+              </h2>
+            </div>
+            <p className="text-xl text-gray-700 dark:text-gray-300 leading-relaxed">
+              {t('about.mission_text')}
+            </p>
+          </div>
+
+          {/* About ShowSewa Section */}
+          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-10 md:p-12 mb-12 border border-gray-100 dark:border-gray-700">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-8 text-center">
+              About ShowSewa
+            </h2>
+            <div className="prose prose-lg dark:prose-invert max-w-none">
+              <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+                {t('about.about_text')}
+              </p>
+            </div>
           </div>
 
           {/* Founders Section */}
