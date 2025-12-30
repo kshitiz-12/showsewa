@@ -62,6 +62,9 @@ export function MovieDetail({ movieId, onNavigate }: Readonly<MovieDetailProps>)
   const [showTrailer, setShowTrailer] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('');
+  const [selectedFormat, setSelectedFormat] = useState<string>('');
 
   useEffect(() => {
     loadMovie();
@@ -145,7 +148,7 @@ export function MovieDetail({ movieId, onNavigate }: Readonly<MovieDetailProps>)
   }
 
   // Get available dates for date selector
-  const availableDates = [...new Set(showtimes.map(s => s.showDate))].sort();
+  const availableDates = [...new Set(showtimes.map(s => s.showDate))].sort((a, b) => a.localeCompare(b));
   
   // Get available languages
   const availableLanguages = movie ? [...new Set(movie.language)] : [];
