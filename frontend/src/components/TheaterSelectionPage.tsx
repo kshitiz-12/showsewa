@@ -54,6 +54,8 @@ export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSe
 
   useEffect(() => {
     // Reset filters when movieId or city changes
+    setShowtimes([]);
+    setFilteredShowtimes([]);
     setSelectedDate('');
     setSelectedLanguage('');
     setSelectedFormat('');
@@ -85,11 +87,13 @@ export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSe
         if (data.success) {
           setMovie(data.data.movie);
           // Filter showtimes by selected city
-          if (data.data.movie.showtimes) {
+          if (data.data.movie.showtimes && Array.isArray(data.data.movie.showtimes)) {
             const cityShowtimes = data.data.movie.showtimes.filter((showtime: Showtime) => 
-              showtime.screen.theater.city.toLowerCase() === selectedCity.toLowerCase()
+              showtime.screen?.theater?.city?.toLowerCase() === selectedCity.toLowerCase()
             );
             setShowtimes(cityShowtimes);
+          } else {
+            setShowtimes([]);
           }
         } else {
           setError('Failed to load movie details');
@@ -106,22 +110,21 @@ export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSe
   }
 
   function filterShowtimes() {
-    let filtered = showtimes;
+    let filtered = [...showtimes]; // Start with all showtimes
 
-    // Filter by selected date
+    // Filter by selected date (only if a date is selected)
     if (selectedDate) {
       filtered = filtered.filter(showtime => showtime.showDate === selectedDate);
     }
 
-    // Filter by language
+    // Filter by language (only if a language is selected)
     if (selectedLanguage) {
       filtered = filtered.filter(showtime => 
-        showtime.screen.theater.city.toLowerCase().includes(selectedLanguage.toLowerCase()) ||
         movie?.language.some(lang => lang.toLowerCase() === selectedLanguage.toLowerCase())
       );
     }
 
-    // Filter by format
+    // Filter by format (only if a format is selected)
     if (selectedFormat) {
       filtered = filtered.filter(showtime => 
         showtime.screen?.screenType?.toLowerCase() === selectedFormat.toLowerCase()

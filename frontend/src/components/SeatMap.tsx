@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Ticket, ArrowLeft, Pencil } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { API_BASE_URL } from '../config/api';
 
 interface Seat {
   id: string;
@@ -36,7 +37,6 @@ const SeatMap: React.FC<SeatMapProps> = ({ showtimeId, onSeatSelection, showtime
   const [selectedSeats, setSelectedSeats] = useState<Seat[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [hoveredSeat, setHoveredSeat] = useState<string | null>(null);
 
   // Fetch seats from API
   useEffect(() => {
@@ -188,7 +188,7 @@ const SeatMap: React.FC<SeatMapProps> = ({ showtimeId, onSeatSelection, showtime
       const userId = user?.id || 'demo-user-id';
 
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/seats/hold', {
+      const response = await fetch(`${API_BASE_URL}/api/seats/hold`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -319,35 +319,47 @@ const SeatMap: React.FC<SeatMapProps> = ({ showtimeId, onSeatSelection, showtime
   const seatsByRow = getSeatsByRow();
   const rowKeys = Object.keys(seatsByRow).sort((a, b) => a.localeCompare(b));
 
-  // Group seats by row and category for pricing display
-  const getRowCategory = (rowKey: string) => {
-    // Get the first seat in the row to determine its category and price
-    const rowSeats = seatsByRow[rowKey];
-    if (!rowSeats || rowSeats.length === 0) {
-      return { name: '', price: 0 };
-    }
-    
-    const firstSeat = rowSeats[0];
-    const category = categories.find(c => c.id === firstSeat.categoryId);
-    
-    // Map category names to row labels
+  // Group seats by category/price section - BookMyShow Style
+  const getCategorySection = (categoryId: string, price: number) => {
+    const category = categories.find(c => c.id === categoryId);
     const categoryName = category?.name?.toUpperCase() || '';
-    let rowLabel = '';
-    if (categoryName.includes('PREMIUM') || categoryName.includes('PRIME')) {
-      rowLabel = 'PRIME ROWS';
-    } else if (categoryName.includes('PLUS') || categoryName.includes('CLASSIC PLUS')) {
-      rowLabel = 'CLASSIC PLUS ROWS';
-    } else if (categoryName.includes('CLASSIC') || categoryName.includes('STANDARD')) {
-      rowLabel = 'CLASSIC ROWS';
-    } else {
-      // Fallback: use actual category name or default
-      rowLabel = categoryName || 'ROWS';
-    }
     
-    return { 
-      name: rowLabel, 
-      price: firstSeat.price || category?.price || 200 
-    };
+    // Map to BookMyShow style sections
+    if (price >= 700 || categoryName.includes('RECLINER') || categoryName.includes('PREMIUM')) {
+      return { name: 'RECLINER ROWS', price: price >= 700 ? price : 700 };
+    } else if (price >= 390 || categoryName.includes('PRIME')) {
+      return { name: 'PRIME ROWS', price: price >= 390 ? price : 390 };
+    } else if (price >= 330 || categoryName.includes('PLUS') || categoryName.includes('CLASSIC PLUS')) {
+      return { name: 'CLASSIC PLUS ROWS', price: price >= 330 ? price : 330 };
+    } else {
+      return { name: 'CLASSIC ROWS', price: price >= 270 ? price : 270 };
+    }
+  };
+  
+  // Group rows by category section
+  const getRowsBySection = () => {
+    const sections: { [key: string]: { rows: string[], price: number, name: string } } = {};
+    
+    rowKeys.forEach(rowKey => {
+      const rowSeats = seatsByRow[rowKey];
+      if (rowSeats && rowSeats.length > 0) {
+        const firstSeat = rowSeats[0];
+        const section = getCategorySection(firstSeat.categoryId, firstSeat.price);
+        const sectionKey = `${section.name}_${section.price}`;
+        
+        if (!sections[sectionKey]) {
+          sections[sectionKey] = {
+            name: section.name,
+            price: section.price,
+            rows: []
+          };
+        }
+        sections[sectionKey].rows.push(rowKey);
+      }
+    });
+    
+    // Sort sections by price (highest first)
+    return Object.values(sections).sort((a, b) => b.price - a.price);
   };
   
   // Format date like "Sun, 14 December, 2025"
@@ -404,86 +416,82 @@ const SeatMap: React.FC<SeatMapProps> = ({ showtimeId, onSeatSelection, showtime
         </div>
       </div>
 
-      {/* Seating Layout */}
+      {/* Seating Layout - BookMyShow Style */}
       <div className="px-4 mb-8 overflow-x-auto">
-        <div className="space-y-4 min-w-max">
-          {rowKeys.map((rowKey, rowIndex) => {
-            const rowSeats = seatsByRow[rowKey];
-            const rowCategory = getRowCategory(rowKey);
-            const prevRowCategory = rowIndex > 0 ? getRowCategory(rowKeys[rowIndex - 1]) : null;
-            const showCategoryLabel = !prevRowCategory || prevRowCategory.name !== rowCategory.name;
-
-            return (
-              <div key={rowKey}>
-                {/* Category Label */}
-                {showCategoryLabel && (
-                  <div className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    ₹{rowCategory.price} {rowCategory.name}
-                  </div>
-                )}
-                
-                {/* Row with Seats */}
-                <div className="flex items-center gap-3">
-                  {/* Row Label */}
-                  <div className="w-6 text-left">
-                    <span className="text-sm font-bold text-gray-700 dark:text-gray-300">{rowKey}</span>
-                  </div>
-                  
-                  {/* Seats */}
-                  <div className="flex gap-1">
-                    {rowSeats.map((seat) => {
-                      // Extract seat number (remove row letter)
-                      const seatNumStr = seat.seatNumber.replace(rowKey, '').replace(/^0+/, '') || seat.seatNumber.replace(rowKey, '');
-                      const seatNum = parseInt(seatNumStr);
-                      return (
-                        <button
-                          key={seat.id}
-                          onClick={() => handleSeatClick(seat)}
-                          disabled={seat.isBooked}
-                          className={`
-                            relative w-12 h-12 sm:w-14 sm:h-14 text-sm font-bold rounded transition-all duration-200 flex items-center justify-center min-w-[44px] min-h-[44px]
-                            ${getSeatColor(seat)}
-                            ${getSeatTextColor(seat)}
-                            ${getSeatHoverEffects(seat)}
-                            ${seat.isBooked ? 'opacity-75' : ''}
-                          `}
-                          aria-label={`${seat.seatNumber} seat, ${seat.isBooked ? 'Sold' : seat.isSelected ? 'Selected' : 'Available'}, Price: ₹${seat.price}`}
-                          title={`${seat.seatNumber} - ₹${seat.price}${seat.isBooked ? ' (Sold)' : seat.isSelected ? ' (Selected)' : ' (Available)'}`}
-                        >
-                          <span>{seatNumStr}</span>
-                          
-                          {/* Wheelchair indicator for accessible seats (first and last seats) */}
-                          {(seat.column === 1 || seat.column === rowSeats.length) && (
-                            <span className="absolute -top-1 -right-1 text-xs">♿</span>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
+        <div className="space-y-6 min-w-max">
+          {getRowsBySection().map((section, sectionIndex) => (
+            <div key={`${section.name}_${section.price}`} className="space-y-3">
+              {/* Section Header - BookMyShow Style */}
+              <div className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                NPR {section.price} {section.name}
               </div>
-            );
-          })}
+              
+              {/* Rows in this section */}
+              {section.rows.map((rowKey) => {
+                const rowSeats = seatsByRow[rowKey];
+                return (
+                  <div key={rowKey} className="flex items-center gap-4">
+                    {/* Row Label - BookMyShow Style (Left Side) */}
+                    <div className="w-8 text-left">
+                      <span className="text-base font-bold text-gray-900 dark:text-white">{rowKey}</span>
+                    </div>
+                    
+                    {/* Seats */}
+                    <div className="flex gap-1.5">
+                      {rowSeats.map((seat) => {
+                        // Extract seat number (remove row letter, pad with 0 if needed)
+                        const seatNumStr = seat.seatNumber.replace(rowKey, '').padStart(2, '0');
+                        return (
+                          <button
+                            key={seat.id}
+                            onClick={() => handleSeatClick(seat)}
+                            disabled={seat.isBooked}
+                            className={`
+                              relative w-10 h-10 sm:w-12 sm:h-12 text-xs sm:text-sm font-bold rounded transition-all duration-200 flex items-center justify-center min-w-[40px] min-h-[40px]
+                              ${seat.isBooked 
+                                ? 'bg-gray-300 dark:bg-gray-600 text-gray-500 cursor-not-allowed' 
+                                : seat.isSelected 
+                                ? 'bg-green-500 text-white ring-2 ring-green-300' 
+                                : 'bg-white dark:bg-gray-800 border-2 border-green-500 text-gray-900 dark:text-white hover:border-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 cursor-pointer'
+                              }
+                            `}
+                            aria-label={`${seat.seatNumber} seat, ${seat.isBooked ? 'Sold' : seat.isSelected ? 'Selected' : 'Available'}, Price: NPR ${seat.price}`}
+                            title={`${seat.seatNumber} - NPR ${seat.price}${seat.isBooked ? ' (Sold)' : seat.isSelected ? ' (Selected)' : ' (Available)'}`}
+                          >
+                            <span>{seatNumStr}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Screen Indicator */}
+      {/* Screen Indicator - BookMyShow Style */}
       <div className="px-4 mb-8">
-        <div className="bg-blue-100 dark:bg-blue-900/30 rounded-lg py-4 text-center">
-          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">All eyes this way please</p>
+        <div className="bg-blue-200 dark:bg-blue-800 rounded-lg py-6 text-center">
+          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">SCREEN</p>
         </div>
       </div>
 
-      {/* Legend */}
+      {/* Legend - BookMyShow Style */}
       <div className="px-4 mb-6">
-        <div className="flex items-center justify-center gap-6">
+        <div className="flex items-center justify-center gap-6 flex-wrap">
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 rounded bg-yellow-400"></div>
+            <span className="text-sm text-gray-700 dark:text-gray-300">Bestseller</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 rounded bg-white border-2 border-green-500"></div>
+            <span className="text-sm text-gray-700 dark:text-gray-300">Available</span>
+          </div>
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 rounded bg-green-500"></div>
             <span className="text-sm text-gray-700 dark:text-gray-300">Selected</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded bg-white border border-gray-300"></div>
-            <span className="text-sm text-gray-700 dark:text-gray-300">Available</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 rounded bg-gray-300 dark:bg-gray-600"></div>

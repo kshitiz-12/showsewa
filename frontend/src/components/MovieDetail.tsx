@@ -33,7 +33,7 @@ interface MovieDetailProps {
 }
 
 export function MovieDetail({ movieId, onNavigate }: Readonly<MovieDetailProps>) {
-  const { language, t } = useLanguage();
+  const { language } = useLanguage();
   const { selectedCity } = useCity();
   const { isAuthenticated } = useAuth();
   const [movie, setMovie] = useState<Movie | null>(null);
@@ -41,9 +41,12 @@ export function MovieDetail({ movieId, onNavigate }: Readonly<MovieDetailProps>)
   const [showTrailer, setShowTrailer] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [averageRating, setAverageRating] = useState<number>(0);
+  const [totalReviews, setTotalReviews] = useState<number>(0);
 
   useEffect(() => {
     loadMovie();
+    loadReviews();
   }, [movieId, selectedCity]); // Reload when city changes
 
   async function loadMovie() {
@@ -66,6 +69,21 @@ export function MovieDetail({ movieId, onNavigate }: Readonly<MovieDetailProps>)
       setError('Failed to load movie details');
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function loadReviews() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/reviews?movieId=${movieId}&limit=1`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setAverageRating(data.data.averageRating || 0);
+          setTotalReviews(data.data.total || 0);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading reviews:', error);
     }
   }
 
@@ -115,14 +133,15 @@ export function MovieDetail({ movieId, onNavigate }: Readonly<MovieDetailProps>)
           <span className="font-medium">Back to Movies</span>
         </button>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="md:col-span-1 space-y-6">
-            {/* Movie Poster */}
+        {/* BookMyShow Style Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Left: Poster */}
+          <div className="lg:col-span-4">
             <div className="relative group">
               <img
                 src={movie.posterUrl}
                 alt={language === 'en' ? movie.title : movie.titleNe}
-                className="w-full rounded-xl shadow-2xl transition-transform duration-300 group-hover:scale-105"
+                className="w-full rounded-xl shadow-2xl"
                 loading="eager"
                 decoding="async"
                 fetchPriority="high"
@@ -130,131 +149,106 @@ export function MovieDetail({ movieId, onNavigate }: Readonly<MovieDetailProps>)
               {movie.trailerUrl && (
                 <button
                   onClick={() => setShowTrailer(true)}
-                  className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  className="absolute bottom-4 left-4 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-all"
                 >
-                  <div className="bg-red-600 rounded-full p-4">
-                    <Play className="w-8 h-8 text-white" />
-                  </div>
+                  <Play className="w-4 h-4" />
+                  Trailers ({movie.galleryImages?.length || 0})
                 </button>
               )}
             </div>
-
-            {/* Gallery Images */}
-            {movie.galleryImages && movie.galleryImages.length > 0 && (
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                  <ImageIcon className="w-5 h-5 text-red-600" />
-                  Gallery
-                </h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {movie.galleryImages.slice(0, 4).map((image) => (
-                    <button
-                      key={image}
-                      type="button"
-                      onClick={() => setSelectedImage(image)}
-                      className="w-full h-24 rounded-lg overflow-hidden focus:outline-none focus:ring-2 focus:ring-red-500"
-                    >
-                      <img
-                        src={image}
-                        alt="Gallery thumbnail"
-                        className="w-full h-full object-cover hover:opacity-80 transition-opacity"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    </button>
-                  ))}
-                </div>
-                {movie.galleryImages.length > 4 && (
-                  <button
-                    onClick={() => setSelectedImage(movie.galleryImages[0])}
-                    className="mt-2 text-sm text-red-600 hover:text-red-700 font-medium"
-                  >
-                    View All ({movie.galleryImages.length} images)
-                  </button>
-                )}
-              </div>
-            )}
           </div>
 
-          <div className="md:col-span-2">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
-                    {language === 'en' ? movie.title : movie.titleNe}
-                  </h1>
-                  {movie.imdbRating && (
-                    <div className="flex items-center gap-2 mt-2">
-                      <Star className="w-5 h-5 text-yellow-500 fill-current" />
-                      <span className="text-lg font-semibold text-gray-900 dark:text-white">
-                        {movie.imdbRating}/10
+          {/* Right: Details */}
+          <div className="lg:col-span-8">
+            {/* Title and Rating Row */}
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex-1">
+                <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+                  {language === 'en' ? movie.title : movie.titleNe}
+                </h1>
+                
+                {/* Rating with Votes - BookMyShow Style */}
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex items-center gap-2">
+                    <Star className="w-6 h-6 text-red-600 fill-red-600" />
+                    <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                      {averageRating > 0 ? averageRating.toFixed(1) : movie.imdbRating || 'N/A'}/10
+                    </span>
+                  </div>
+                  {totalReviews > 0 && (
+                    <>
+                      <span className="text-gray-600 dark:text-gray-400">
+                        ({totalReviews > 1000 ? `${(totalReviews / 1000).toFixed(1)}K+` : totalReviews} Votes)
                       </span>
-                      <span className="text-sm text-gray-600 dark:text-gray-400">IMDb</span>
-                    </div>
+                      <span className="text-gray-400">›</span>
+                    </>
                   )}
+                  <button className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600">
+                    Rate now
+                  </button>
                 </div>
-                <span className="bg-red-600 text-white px-3 py-1 rounded-lg font-semibold">
-                  {movie.rating}
+              </div>
+              <span className="bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-lg">
+                {movie.rating}
+              </span>
+            </div>
+
+            {/* Metadata Line - BookMyShow Style */}
+            <div className="flex flex-wrap items-center gap-2 mb-6 text-gray-700 dark:text-gray-300">
+              <span>{Math.floor(movie.duration / 60)}h {movie.duration % 60}m</span>
+              <span className="text-gray-400">•</span>
+              <span>{movie.genre.join(', ')}</span>
+              <span className="text-gray-400">•</span>
+              <span>{movie.rating}</span>
+              <span className="text-gray-400">•</span>
+              <span>{new Date(movie.releaseDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+            </div>
+
+            {/* Format Tags - BookMyShow Style */}
+            <div className="flex flex-wrap gap-2 mb-6">
+              {movie.language.map((lang) => (
+                <span key={lang} className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md text-sm font-medium">
+                  {lang}
                 </span>
-              </div>
+              ))}
+              <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md text-sm font-medium">
+                2D
+              </span>
+              {movie.language.includes('English') && (
+                <>
+                  <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md text-sm font-medium">
+                    DOLBY CINEMA 2D
+                  </span>
+                  <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md text-sm font-medium">
+                    IMAX 2D
+                  </span>
+                </>
+              )}
+            </div>
 
-              <div className="flex flex-wrap gap-4 mb-6">
-                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                  <Film className="w-5 h-5 text-red-600" />
-                  <span>{movie.genre.join(', ')}</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                  <Clock className="w-5 h-5 text-red-600" />
-                  <span>{movie.duration} {t('movies.minutes')}</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                  <Calendar className="w-5 h-5 text-red-600" />
-                  <span>{new Date(movie.releaseDate).toLocaleDateString()}</span>
-                </div>
-              </div>
+            {/* Book tickets Button - BookMyShow Style */}
+            <button
+              onClick={() => {
+                if (!isAuthenticated) {
+                  localStorage.setItem('redirectAfterLogin', JSON.stringify({ page: 'theater-selection', id: movieId }));
+                  onNavigate('login');
+                  return;
+                }
+                onNavigate('theater-selection', movieId);
+              }}
+              className="w-full sm:w-auto px-12 py-4 bg-red-600 text-white rounded-lg font-bold text-lg hover:bg-red-700 transition-all duration-300 shadow-lg hover:shadow-xl mb-8"
+            >
+              Book tickets
+            </button>
 
-              <div className="mb-6 space-y-2">
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  <span className="font-semibold">Language:</span> <span className="text-gray-900 dark:text-white">{movie.language.join(', ')}</span>
-                </div>
-                {movie.director && (
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
-                    <span className="font-semibold">Director:</span> <span className="text-gray-900 dark:text-white">{movie.director}</span>
-                  </div>
-                )}
-                {movie.cast && movie.cast.length > 0 && (
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
-                    <span className="font-semibold">Cast:</span> <span className="text-gray-900 dark:text-white">{movie.cast.join(', ')}</span>
-                  </div>
-                )}
-              </div>
-
-              <div className="mb-8">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
-                  Synopsis
-                </h2>
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  {language === 'en' ? movie.description : movie.descriptionNe}
-                </p>
-              </div>
-
-              {/* Book Now Button */}
-              <div className="mb-8">
-                <button
-                  onClick={() => {
-                    if (!isAuthenticated) {
-                      localStorage.setItem('redirectAfterLogin', JSON.stringify({ page: 'theater-selection', id: movieId }));
-                      onNavigate('login');
-                      return;
-                    }
-                    onNavigate('theater-selection', movieId);
-                  }}
-                  className="w-full sm:w-auto px-8 py-4 bg-red-600 text-white rounded-lg font-bold text-lg hover:bg-red-700 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
-                >
-                  <Ticket className="w-6 h-6" />
-                  Book Now
-                </button>
-              </div>
+            {/* About the movie Section */}
+            <div className="mt-8">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                About the movie
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-lg">
+                {language === 'en' ? movie.description : movie.descriptionNe}
+              </p>
             </div>
           </div>
         </div>

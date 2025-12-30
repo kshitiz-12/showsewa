@@ -114,12 +114,14 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
     fetchShowtimeInfo();
   }, [showtimeId]);
 
-  // Show the seat quantity modal when showtimeInfo is loaded
+  // Show the seat quantity modal when showtimeInfo is loaded and we're on seats step
   useEffect(() => {
-    if (showtimeInfo && showtimeId && currentStep === 'seats' && !error) {
+    if (showtimeInfo && showtimeId && currentStep === 'seats' && !error && !loading) {
       setShowSeatQuantityModal(true);
+    } else {
+      setShowSeatQuantityModal(false);
     }
-  }, [showtimeInfo, showtimeId, currentStep, error]);
+  }, [showtimeInfo, showtimeId, currentStep, error, loading]);
 
   // Fetch other showtimes for the same theater/movie
   const fetchOtherShowtimes = async (currentShowtime: any) => {
@@ -745,15 +747,25 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
         {/* "How many seats?" Modal - BookMyShow Style */}
         {showSeatQuantityModal && showtimeInfo && currentStep === 'seats' && !error && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full p-6">
-              {/* Movie and Theater Info at Top */}
-              <div className="mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
-                <div className="flex items-start justify-between mb-2">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full">
+              {/* Header with Back Arrow */}
+              <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex items-start gap-4 mb-4">
+                  <button
+                    onClick={() => {
+                      setShowSeatQuantityModal(false);
+                      onNavigate('theater-selection', showtimeInfo.movie?.id);
+                    }}
+                    className="text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                    aria-label="Back to theaters"
+                  >
+                    <ArrowLeft className="w-6 h-6" />
+                  </button>
                   <div className="flex-1">
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                    <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
                       {showtimeInfo.movie?.title || 'Movie Title'}
                       {showtimeInfo.movie?.language && showtimeInfo.movie.language.length > 0 && (
-                        <span className="text-lg font-normal text-gray-600 dark:text-gray-400 ml-2">
+                        <span className="text-base font-normal text-gray-600 dark:text-gray-400 ml-2">
                           - ({showtimeInfo.movie.language[0]})
                         </span>
                       )}
@@ -764,102 +776,102 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
                       </span>
                       <span className="text-gray-400">|</span>
                       <span>{showtimeInfo.screen?.theater?.city || 'Location'}</span>
-                      <span className="text-gray-400">||</span>
+                      <span className="text-gray-400">|</span>
                       <span>
                         {new Date(showtimeInfo.showDate).toLocaleDateString('en-US', { 
+                          weekday: 'short',
                           month: 'short', 
-                          day: 'numeric' 
-                        })} {showtimeInfo.showTime}
+                          day: 'numeric',
+                          year: 'numeric'
+                        })}, {showtimeInfo.showTime}
                       </span>
                     </div>
                   </div>
-                  {/* Back to Theaters Button */}
-                  <button
-                    onClick={() => {
-                      setShowSeatQuantityModal(false);
-                      onNavigate('theater-selection', showtimeInfo.movie?.id);
-                    }}
-                    className="flex items-center gap-2 px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
-                    aria-label="Back to theaters"
-                  >
-                    <ArrowLeft className="w-5 h-5" />
-                    <span className="text-sm font-medium">Change</span>
-                  </button>
                 </div>
               </div>
               
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">How many seats?</h2>
-              
-              {/* Ticket Quantity Selector */}
-              <div className="mb-6">
-                <div className="flex gap-2 justify-center">
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-                    <button
-                      key={num}
-                      onClick={() => setSelectedSeatQuantity(num)}
-                      className={`w-12 h-12 rounded-lg font-bold text-lg transition-all ${
-                        selectedSeatQuantity === num
-                          ? 'bg-red-600 text-white scale-110'
-                          : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                      }`}
-                    >
-                      {num}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Seat Categories Overview */}
-              {seatCategories.length > 0 && (
-                <div className="mb-6">
-                  <div className="flex gap-3 overflow-x-auto pb-2">
-                    {seatCategories.map((category: any) => {
-                      // Calculate availability based on showtime's available seats
-                      // TODO: Enhance with actual category-level seat counts from API
-                      const totalAvailable = showtimeInfo?.availableSeats || 0;
-                      
-                      // Determine availability status
-                      const getAvailability = (): 'SOLD OUT' | 'ALMOST FULL' | 'AVAILABLE' => {
-                        if (totalAvailable === 0) return 'SOLD OUT';
-                        if (totalAvailable <= 10) return 'ALMOST FULL';
-                        return 'AVAILABLE';
-                      };
-                      
-                      const availability = getAvailability();
-                      
-                      // Determine color class based on availability
-                      const getAvailabilityColor = () => {
-                        if (availability === 'SOLD OUT') return 'text-red-600';
-                        if (availability === 'ALMOST FULL') return 'text-orange-600';
-                        return 'text-green-600';
-                      };
-                      
-                      return (
-                        <div
-                          key={category.id}
-                          className="flex-shrink-0 bg-gray-50 dark:bg-gray-700 rounded-lg p-4 min-w-[200px]"
-                        >
-                          <div className="font-bold text-gray-900 dark:text-white mb-1">{category.name}</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">NPR {category.price}</div>
-                          <div className={`text-xs font-medium ${getAvailabilityColor()}`}>
-                            {availability}
-                          </div>
-                        </div>
-                      );
-                    })}
+              <div className="p-6">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">How many seats?</h2>
+                
+                {/* Ticket Quantity Selector - BookMyShow Style (Circular) */}
+                <div className="mb-8">
+                  <div className="flex gap-3 justify-center flex-wrap">
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                      <button
+                        key={num}
+                        onClick={() => setSelectedSeatQuantity(num)}
+                        className={`w-14 h-14 rounded-full font-bold text-lg transition-all ${
+                          selectedSeatQuantity === num
+                            ? 'bg-red-600 text-white ring-4 ring-red-200 scale-110'
+                            : 'bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-red-300 dark:hover:border-red-600'
+                        }`}
+                      >
+                        {num}
+                      </button>
+                    ))}
                   </div>
                 </div>
-              )}
 
-              {/* Select Seats Button */}
-              <button
-                onClick={() => {
-                  setShowSeatQuantityModal(false);
-                }}
-                className="w-full bg-red-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-red-700 transition-colors"
-              >
-                Select Seats
-              </button>
+                {/* Seat Categories Overview - BookMyShow Style */}
+                {seatCategories.length > 0 && (
+                  <div className="mb-6">
+                    <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                      {seatCategories.map((category: any) => {
+                        const totalAvailable = showtimeInfo?.availableSeats || 0;
+                        
+                        const getAvailability = (): 'SOLD OUT' | 'ALMOST FULL' | 'AVAILABLE' => {
+                          if (totalAvailable === 0) return 'SOLD OUT';
+                          if (totalAvailable <= 10) return 'ALMOST FULL';
+                          return 'AVAILABLE';
+                        };
+                        
+                        const availability = getAvailability();
+                        
+                        const getAvailabilityColor = () => {
+                          if (availability === 'SOLD OUT') return 'text-red-600 dark:text-red-400';
+                          if (availability === 'ALMOST FULL') return 'text-yellow-600 dark:text-yellow-400';
+                          return 'text-green-600 dark:text-green-400';
+                        };
+                        
+                        return (
+                          <div
+                            key={category.id}
+                            className="flex-shrink-0 bg-gray-50 dark:bg-gray-700 rounded-lg p-4 min-w-[220px] border border-gray-200 dark:border-gray-600"
+                          >
+                            <div className="font-bold text-gray-900 dark:text-white mb-2 text-lg">{category.name}</div>
+                            <div className="text-xl font-bold text-gray-900 dark:text-white mb-2">NPR {category.price}</div>
+                            <div className={`text-sm font-semibold ${getAvailabilityColor()}`}>
+                              {availability}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Bestseller Seats Checkbox - BookMyShow Style */}
+                <div className="mb-6 flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="bestseller-seats"
+                    className="w-5 h-5 text-red-600 rounded focus:ring-red-500"
+                  />
+                  <label htmlFor="bestseller-seats" className="text-gray-700 dark:text-gray-300 text-sm cursor-pointer">
+                    Book the Bestseller Seats in this cinema at no extra cost!
+                  </label>
+                </div>
+
+                {/* Select Seats Button - BookMyShow Style */}
+                <button
+                  onClick={() => {
+                    setShowSeatQuantityModal(false);
+                  }}
+                  className="w-full bg-red-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-red-700 transition-colors shadow-lg"
+                >
+                  Select Seats
+                </button>
+              </div>
             </div>
           </div>
         )}
