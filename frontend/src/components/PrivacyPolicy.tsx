@@ -1,18 +1,53 @@
-import { Shield, Eye, Lock, Globe, Cookie, Users, Mail } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Shield, Eye, Lock, Globe, Cookie, Users, Mail, Database, Key, Baby, RefreshCw, ArrowRight } from 'lucide-react';
 
 interface PrivacyPolicyProps {
   readonly onNavigate?: (page: string, id?: string) => void;
 }
 
 export function PrivacyPolicy({ onNavigate }: PrivacyPolicyProps) {
+  const [isVisible, setIsVisible] = useState<Record<string, boolean>>({});
+  const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible((prev) => ({
+              ...prev,
+              [entry.target.id]: true,
+            }));
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+    );
+
+    Object.values(sectionRefs.current).forEach((ref) => {
+      if (ref) observer.observe(ref);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  const setRef = (id: string) => (el: HTMLDivElement | null) => {
+    sectionRefs.current[id] = el;
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-8">
+        <div
+          id="privacy-header"
+          ref={setRef('privacy-header')}
+          className={`bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-8 transform transition-all duration-700 ease-out ${
+            isVisible['privacy-header'] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
+        >
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
               <Shield className="w-6 h-6 text-red-600 dark:text-red-400" />
             </div>
             <div>
@@ -31,9 +66,17 @@ export function PrivacyPolicy({ onNavigate }: PrivacyPolicyProps) {
         {/* Content */}
         <div className="space-y-6">
           {/* Section 1 */}
-          <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-            <div className="flex items-start gap-4 mb-4">
-              <Users className="w-6 h-6 text-red-600 dark:text-red-400 flex-shrink-0 mt-1" />
+          <section
+            id="privacy-section-1"
+            ref={setRef('privacy-section-1')}
+            className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 transform transition-all duration-700 ease-out ${
+              isVisible['privacy-section-1'] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+          >
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center flex-shrink-0 transform group-hover:scale-110 transition-transform duration-300">
+                <Users className="w-6 h-6 text-red-600 dark:text-red-400" />
+              </div>
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">1. Information We Collect</h2>
                 
@@ -63,9 +106,17 @@ export function PrivacyPolicy({ onNavigate }: PrivacyPolicyProps) {
           </section>
 
           {/* Section 2 */}
-          <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-            <div className="flex items-start gap-4 mb-4">
-              <Eye className="w-6 h-6 text-red-600 dark:text-red-400 flex-shrink-0 mt-1" />
+          <section
+            id="privacy-section-2"
+            ref={setRef('privacy-section-2')}
+            className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 transform transition-all duration-700 ease-out ${
+              isVisible['privacy-section-2'] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+          >
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center flex-shrink-0 transform group-hover:scale-110 transition-transform duration-300">
+                <Eye className="w-6 h-6 text-red-600 dark:text-red-400" />
+              </div>
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">2. How We Use Your Information</h2>
                 <p className="text-gray-700 dark:text-gray-300 mb-4">
@@ -87,9 +138,17 @@ export function PrivacyPolicy({ onNavigate }: PrivacyPolicyProps) {
           </section>
 
           {/* Section 3 */}
-          <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-            <div className="flex items-start gap-4 mb-4">
-              <Lock className="w-6 h-6 text-red-600 dark:text-red-400 flex-shrink-0 mt-1" />
+          <section
+            id="privacy-section-3"
+            ref={setRef('privacy-section-3')}
+            className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 transform transition-all duration-700 ease-out ${
+              isVisible['privacy-section-3'] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+          >
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center flex-shrink-0 transform group-hover:scale-110 transition-transform duration-300">
+                <Lock className="w-6 h-6 text-red-600 dark:text-red-400" />
+              </div>
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">3. Payments and Third-Party Services</h2>
                 <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 ml-4">
@@ -102,9 +161,17 @@ export function PrivacyPolicy({ onNavigate }: PrivacyPolicyProps) {
           </section>
 
           {/* Section 4 */}
-          <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-            <div className="flex items-start gap-4 mb-4">
-              <Globe className="w-6 h-6 text-red-600 dark:text-red-400 flex-shrink-0 mt-1" />
+          <section
+            id="privacy-section-4"
+            ref={setRef('privacy-section-4')}
+            className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 transform transition-all duration-700 ease-out ${
+              isVisible['privacy-section-4'] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+          >
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center flex-shrink-0 transform group-hover:scale-110 transition-transform duration-300">
+                <Globe className="w-6 h-6 text-red-600 dark:text-red-400" />
+              </div>
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">4. Information Sharing</h2>
                 <p className="text-gray-700 dark:text-gray-300 mb-4">
@@ -123,25 +190,46 @@ export function PrivacyPolicy({ onNavigate }: PrivacyPolicyProps) {
           </section>
 
           {/* Section 5 */}
-          <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">5. Data Security</h2>
-            <p className="text-gray-700 dark:text-gray-300 mb-4">
-              ShowSewa takes reasonable technical and organizational measures to protect user data from:
-            </p>
-            <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 ml-4 mb-4">
-              <li>Unauthorized access</li>
-              <li>Data loss</li>
-              <li>Misuse or alteration</li>
-            </ul>
-            <p className="text-gray-700 dark:text-gray-300">
-              While we strive to protect your information, no online platform can guarantee complete security.
-            </p>
+          <section
+            id="privacy-section-5"
+            ref={setRef('privacy-section-5')}
+            className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 transform transition-all duration-700 ease-out ${
+              isVisible['privacy-section-5'] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+          >
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center flex-shrink-0 transform group-hover:scale-110 transition-transform duration-300">
+                <Database className="w-6 h-6 text-red-600 dark:text-red-400" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">5. Data Security</h2>
+                <p className="text-gray-700 dark:text-gray-300 mb-4">
+                  ShowSewa takes reasonable technical and organizational measures to protect user data from:
+                </p>
+                <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 ml-4 mb-4">
+                  <li>Unauthorized access</li>
+                  <li>Data loss</li>
+                  <li>Misuse or alteration</li>
+                </ul>
+                <p className="text-gray-700 dark:text-gray-300">
+                  While we strive to protect your information, no online platform can guarantee complete security.
+                </p>
+              </div>
+            </div>
           </section>
 
           {/* Section 6 */}
-          <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-            <div className="flex items-start gap-4 mb-4">
-              <Cookie className="w-6 h-6 text-red-600 dark:text-red-400 flex-shrink-0 mt-1" />
+          <section
+            id="privacy-section-6"
+            ref={setRef('privacy-section-6')}
+            className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 transform transition-all duration-700 ease-out ${
+              isVisible['privacy-section-6'] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+          >
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center flex-shrink-0 transform group-hover:scale-110 transition-transform duration-300">
+                <Cookie className="w-6 h-6 text-red-600 dark:text-red-400" />
+              </div>
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">6. Cookies and Analytics</h2>
                 <p className="text-gray-700 dark:text-gray-300 mb-4">
@@ -160,41 +248,88 @@ export function PrivacyPolicy({ onNavigate }: PrivacyPolicyProps) {
           </section>
 
           {/* Section 7 */}
-          <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">7. User Rights</h2>
-            <p className="text-gray-700 dark:text-gray-300 mb-4">
-              Users have the right to:
-            </p>
-            <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 ml-4 mb-4">
-              <li>Access their personal information</li>
-              <li>Request correction or deletion of their data</li>
-              <li>Withdraw consent for communications</li>
-            </ul>
-            <p className="text-gray-700 dark:text-gray-300">
-              Requests can be made through the official communication channels provided on the ShowSewa website.
-            </p>
+          <section
+            id="privacy-section-7"
+            ref={setRef('privacy-section-7')}
+            className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 transform transition-all duration-700 ease-out ${
+              isVisible['privacy-section-7'] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+          >
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center flex-shrink-0 transform group-hover:scale-110 transition-transform duration-300">
+                <Key className="w-6 h-6 text-red-600 dark:text-red-400" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">7. User Rights</h2>
+                <p className="text-gray-700 dark:text-gray-300 mb-4">
+                  Users have the right to:
+                </p>
+                <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 ml-4 mb-4">
+                  <li>Access their personal information</li>
+                  <li>Request correction or deletion of their data</li>
+                  <li>Withdraw consent for communications</li>
+                </ul>
+                <p className="text-gray-700 dark:text-gray-300">
+                  Requests can be made through the official communication channels provided on the ShowSewa website.
+                </p>
+              </div>
+            </div>
           </section>
 
           {/* Section 8 */}
-          <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">8. Children's Privacy</h2>
-            <p className="text-gray-700 dark:text-gray-300">
-              ShowSewa is not intended for children under the age of 13. We do not knowingly collect personal information from minors.
-            </p>
+          <section
+            id="privacy-section-8"
+            ref={setRef('privacy-section-8')}
+            className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 transform transition-all duration-700 ease-out ${
+              isVisible['privacy-section-8'] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+          >
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center flex-shrink-0 transform group-hover:scale-110 transition-transform duration-300">
+                <Baby className="w-6 h-6 text-red-600 dark:text-red-400" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">8. Children's Privacy</h2>
+                <p className="text-gray-700 dark:text-gray-300">
+                  ShowSewa is not intended for children under the age of 13. We do not knowingly collect personal information from minors.
+                </p>
+              </div>
+            </div>
           </section>
 
           {/* Section 9 */}
-          <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">9. Changes to This Privacy Policy</h2>
-            <p className="text-gray-700 dark:text-gray-300">
-              ShowSewa may update this Privacy Policy from time to time. Any changes will be posted on this page with an updated revision date.
-            </p>
+          <section
+            id="privacy-section-9"
+            ref={setRef('privacy-section-9')}
+            className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 transform transition-all duration-700 ease-out ${
+              isVisible['privacy-section-9'] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+          >
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center flex-shrink-0 transform group-hover:scale-110 transition-transform duration-300">
+                <RefreshCw className="w-6 h-6 text-red-600 dark:text-red-400" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">9. Changes to This Privacy Policy</h2>
+                <p className="text-gray-700 dark:text-gray-300">
+                  ShowSewa may update this Privacy Policy from time to time. Any changes will be posted on this page with an updated revision date.
+                </p>
+              </div>
+            </div>
           </section>
 
           {/* Section 10 */}
-          <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-            <div className="flex items-start gap-4 mb-4">
-              <Mail className="w-6 h-6 text-red-600 dark:text-red-400 flex-shrink-0 mt-1" />
+          <section
+            id="privacy-section-10"
+            ref={setRef('privacy-section-10')}
+            className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 transform transition-all duration-700 ease-out ${
+              isVisible['privacy-section-10'] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+          >
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center flex-shrink-0 transform group-hover:scale-110 transition-transform duration-300">
+                <Mail className="w-6 h-6 text-red-600 dark:text-red-400" />
+              </div>
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">10. Contact Us</h2>
                 <p className="text-gray-700 dark:text-gray-300">
@@ -206,7 +341,7 @@ export function PrivacyPolicy({ onNavigate }: PrivacyPolicyProps) {
         </div>
 
         {/* Back Button */}
-        <div className="mt-8 text-center">
+        <div className="mt-12 text-center">
           <button
             onClick={() => {
               if (onNavigate) {
@@ -215,14 +350,16 @@ export function PrivacyPolicy({ onNavigate }: PrivacyPolicyProps) {
                 globalThis.location.href = '/';
               }
             }}
-            className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors font-semibold"
+            className="group relative bg-red-600 text-white px-8 py-4 rounded-xl hover:bg-red-700 transition-all duration-300 font-semibold transform hover:scale-105 hover:shadow-xl overflow-hidden"
           >
-            Back to Home
+            <span className="relative z-10 flex items-center gap-2">
+              <ArrowRight className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300" />
+              Back to Home
+            </span>
+            <div className="absolute inset-0 bg-gradient-to-r from-red-700 to-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </button>
         </div>
       </div>
     </div>
   );
 }
-
-

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, ArrowRight, Clock, MapPin, Users, Ticket, CreditCard, Check, Download, Share2, Calendar, Film } from 'lucide-react';
 import SeatMap from './SeatMap';
-import { TheaterSelection } from './TheaterSelection';
 import { useAuth } from '../contexts/AuthContext';
 import { TicketCard } from './TicketCard';
 import { useCity } from '../contexts/CityContext';
+import { API_BASE_URL } from '../config/api';
 import jsPDF from 'jspdf';
 
 interface BookingPageProps {
@@ -29,9 +29,8 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
   const { selectedCity } = useCity();
   const [selectedSeats, setSelectedSeats] = useState<SelectedSeat[]>([]);
   const [totalPrice, setTotalPrice] = useState(0);
-  // If showtimeId is provided, skip theater selection - go straight to seats
-  const [currentStep, setCurrentStep] = useState<'theater' | 'seats' | 'summary' | 'payment' | 'confirmation'>(showtimeId ? 'seats' : 'theater');
-  const [selectedTheater, setSelectedTheater] = useState<any>(null);
+  // Always require showtimeId - no theater selection step (theater is determined by showtime)
+  const [currentStep, setCurrentStep] = useState<'seats' | 'summary' | 'payment' | 'confirmation'>('seats');
   const [customerInfo, setCustomerInfo] = useState({
     name: '',
     email: '',
@@ -44,13 +43,21 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
   const [paymentMethod, setPaymentMethod] = useState<string>('');
   const [bookingResponse, setBookingResponse] = useState<any>(null);
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
+  const [showSeatQuantityModal, setShowSeatQuantityModal] = useState(true);
+  const [selectedSeatQuantity, setSelectedSeatQuantity] = useState(1);
+  const [availableShowtimes, setAvailableShowtimes] = useState<any[]>([]);
+  const [seatCategories, setSeatCategories] = useState<any[]>([]);
 
-  // Fetch showtime information
+  // Fetch showtime information - showtimeId is required
   useEffect(() => {
     const fetchShowtimeInfo = async () => {
       if (!showtimeId) {
-        setError('No showtime selected');
+        setError('No showtime selected. Please select a showtime from the movie details page.');
         setLoading(false);
+        // Redirect back to movies after a delay
+        setTimeout(() => {
+          onNavigate('movies');
+        }, 3000);
         return;
       }
       
@@ -59,7 +66,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
         setError(null);
         console.log('Fetching showtime info for ID:', showtimeId);
         
-        const response = await fetch(`http://localhost:5000/api/seats/showtime/${showtimeId}`);
+        const response = await fetch(`${API_BASE_URL}/api/seats/showtime/${showtimeId}`);
         
         console.log('Showtime API response status:', response.status);
         
@@ -92,19 +99,9 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
         
         if (data.success && data.data && data.data.showtime) {
           setShowtimeInfo(data.data.showtime);
-          
-          // Auto-set theater from showtime (skip theater selection step)
-          if (data.data.showtime.screen?.theater) {
-            setSelectedTheater(data.data.showtime.screen.theater);
-          }
         } else if (data.warning && data.data && data.data.showtime) {
           // Handle warning case (seats being generated)
           setShowtimeInfo(data.data.showtime);
-          
-          // Auto-set theater from showtime (skip theater selection step)
-          if (data.data.showtime.screen?.theater) {
-            setSelectedTheater(data.data.showtime.screen.theater);
-          }
         } else {
           throw new Error(data.message || 'Failed to load showtime information');
         }
@@ -118,6 +115,29 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
 
     fetchShowtimeInfo();
   }, [showtimeId]);
+
+  // Fetch other showtimes for the same theater/movie
+  const fetchOtherShowtimes = async (currentShowtime: any) => {
+    try {
+      if (!currentShowtime?.movie?.id || !currentShowtime?.screen?.theater?.id) return;
+      
+      const response = await fetch(`${API_BASE_URL}/api/movies/${currentShowtime.movie.id}?city=${selectedCity}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.data.movie.showtimes) {
+          // Filter showtimes for the same theater and date
+          const sameTheaterShowtimes = data.data.movie.showtimes.filter((st: any) => 
+            st.screen.theater.id === currentShowtime.screen.theater.id &&
+            st.showDate === currentShowtime.showDate &&
+            st.id !== showtimeId
+          );
+          setAvailableShowtimes(sameTheaterShowtimes);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching other showtimes:', error);
+    }
+  };
 
   // Pre-fill customer info if user is logged in
   useEffect(() => {
@@ -151,7 +171,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
     if (currentStep === 'summary') {
       setCurrentStep('seats');
     } else if (currentStep === 'seats') {
-      setCurrentStep('theater');
+      onNavigate('movies');
     }
   };
 
@@ -316,7 +336,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
         qrDataUrl = await toDataURL(qrCodeUrl);
       } else if (bookingResponse?.data?.booking?.id) {
         try {
-          const qrRes = await fetch(`http://localhost:5000/api/qr/generate/${bookingResponse.data.booking.id}`);
+          const qrRes = await fetch(`${API_BASE_URL}/api/qr/generate/${bookingResponse.data.booking.id}`);
           const qrJson = await qrRes.json();
           const qrString: string | undefined = qrJson?.data?.qrString;
           if (qrString) {
@@ -559,16 +579,14 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
           <div className="flex items-center justify-between mb-4">
             <button
               onClick={() => {
-                if (currentStep === 'theater') {
-                  onNavigate('home');
-                } else if (currentStep === 'seats') {
-                  setCurrentStep('theater');
+                if (currentStep === 'seats') {
+                  onNavigate('movies');
                 } else if (currentStep === 'summary') {
                   setCurrentStep('seats');
                 } else if (currentStep === 'payment') {
                   setCurrentStep('summary');
                 } else {
-                  onNavigate('home');
+                  onNavigate('movies');
                 }
               }}
               className="flex items-center gap-2 text-gray-600 hover:text-red-600 transition-all duration-300 hover:gap-3 group"
@@ -615,7 +633,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
                         {label}
                       </span>
                     </div>
-                    {index < 4 && (
+                    {index < 3 && (
                       <div className={`flex-1 h-1 mx-2 rounded-full transition-all duration-300 ${
                         isCompleted || (stepOrder.indexOf(step) < currentStepIndex)
                           ? 'bg-green-500' 
@@ -631,13 +649,13 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
       </div>
 
       <div className="max-w-6xl mx-auto px-6 py-8">
-        {/* Movie Info */}
-        <div className="card mb-6">
+        {/* BookMyShow Style Header */}
+        <div className="mb-6">
           {loading ? (
             <div className="flex items-center justify-center py-8">
               <div className="flex flex-col items-center space-y-4">
                 <div className="w-8 h-8 border-4 border-red-200 border-t-red-600 rounded-full animate-spin"></div>
-                <div className="text-gray-500 dark:text-gray-400">Loading movie information...</div>
+                <div className="text-gray-500 dark:text-gray-400">Loading...</div>
               </div>
             </div>
           ) : error ? (
@@ -651,95 +669,168 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
               </button>
             </div>
           ) : showtimeInfo ? (
-            <div className="card-body flex items-center gap-6">
-              <div className="w-20 h-30 rounded-lg overflow-hidden bg-gray-200 flex items-center justify-center">
-                {showtimeInfo.movie?.posterUrl ? (
-                  <img 
-                    src={showtimeInfo.movie.posterUrl} 
-                    alt={showtimeInfo.movie?.title || "Movie Poster"}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                    decoding="async"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                      e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                    }}
-                  />
-                ) : null}
-                <div className={`w-full h-full flex items-center justify-center ${showtimeInfo.movie?.posterUrl ? 'hidden' : ''}`}>
-                  <Film className="w-8 h-8 text-gray-400" />
-                </div>
-              </div>
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
-                  {showtimeInfo.movie?.title || 'Loading...'}
-                </h2>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  {showtimeInfo.movie?.description || 'Movie description not available'}
-                </p>
-                <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-300">
-                  <div className="flex items-center gap-1">
-                    <Clock className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                    <span>{showtimeInfo.movie?.duration ? `${Math.floor(showtimeInfo.movie.duration / 60)}h ${showtimeInfo.movie.duration % 60}m` : 'Duration not available'}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <MapPin className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                    <span>{showtimeInfo.theater?.name || 'Theater not available'}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Users className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                    <span>{showtimeInfo.screen?.name || 'Screen not available'}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Ticket className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                    <span>
-                      {new Date(showtimeInfo.showDate).toLocaleDateString()} at {showtimeInfo.showTime}
-                    </span>
-                  </div>
-                </div>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-6">
+              {/* Back Button */}
+              <button
+                onClick={() => onNavigate('movies')}
+                className="mb-4 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-red-600 transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5" />
+                <span className="font-medium">Back</span>
+              </button>
+              
+              {/* Movie Title - BookMyShow Style */}
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                {showtimeInfo.movie?.title || 'Movie Title'}
+                {showtimeInfo.movie?.language && showtimeInfo.movie.language.length > 0 && (
+                  <span className="text-xl font-normal text-gray-600 dark:text-gray-400 ml-2">
+                    - ({showtimeInfo.movie.language[0]})
+                  </span>
+                )}
+              </h1>
+              
+              {/* Theater | Location || Date/Time - BookMyShow Style */}
+              <div className="flex flex-wrap items-center gap-2 text-gray-600 dark:text-gray-400 text-sm mb-6">
+                <span className="font-semibold text-gray-900 dark:text-white">
+                  {showtimeInfo.screen?.theater?.name || 'Theater'}
+                </span>
+                <span className="text-gray-400">|</span>
+                <span>{showtimeInfo.screen?.theater?.city || 'Location'}</span>
+                <span className="text-gray-400">||</span>
+                <span>
+                  {new Date(showtimeInfo.showDate).toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric' 
+                  })} {showtimeInfo.showTime}
+                </span>
               </div>
             </div>
-          ) : (
-            <div className="flex items-center justify-center py-8">
-              <div className="text-red-500">Error loading movie information</div>
-            </div>
-          )}
+          ) : null}
         </div>
 
-        {/* Step 0: Theater Selection */}
-        {currentStep === 'theater' && !error && (
-          <div>
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Select Theater</h2>
-              <p className="text-gray-600 dark:text-gray-400">Choose a theater in {selectedCity} to continue with your booking</p>
+        {/* Showtime Selector - BookMyShow Style */}
+        {showtimeInfo && currentStep === 'seats' && !error && (
+          <div className="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-4">
+            <div className="flex gap-3 overflow-x-auto pb-2">
+              {availableShowtimes.map((st: any) => {
+                const isSelected = st.id === showtimeId;
+                const isFastFilling = st.availableSeats > 0 && st.availableSeats <= 10;
+                return (
+                  <button
+                    key={st.id}
+                    onClick={() => {
+                      onNavigate('booking-page', st.id);
+                    }}
+                    className={`flex-shrink-0 px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
+                      isSelected
+                        ? 'bg-orange-500 text-white shadow-md'
+                        : isFastFilling
+                        ? 'bg-white border-2 border-yellow-500 text-orange-600 hover:bg-yellow-50'
+                        : 'bg-white border-2 border-green-500 text-orange-600 hover:bg-green-50'
+                    }`}
+                  >
+                    {st.showTime}
+                  </button>
+                );
+              })}
             </div>
-            
-            <TheaterSelection 
-              onSelectTheater={(theater) => {
-                setSelectedTheater(theater);
-                setCurrentStep('seats');
-              }}
-              selectedTheater={selectedTheater}
-            />
+          </div>
+        )}
+
+        {/* "How many seats?" Modal - BookMyShow Style */}
+        {showSeatQuantityModal && showtimeInfo && currentStep === 'seats' && !error && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full p-6">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">How many seats?</h2>
+              
+              {/* Ticket Quantity Selector */}
+              <div className="mb-6">
+                <div className="flex gap-2 justify-center">
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                    <button
+                      key={num}
+                      onClick={() => setSelectedSeatQuantity(num)}
+                      className={`w-12 h-12 rounded-lg font-bold text-lg transition-all ${
+                        selectedSeatQuantity === num
+                          ? 'bg-red-600 text-white scale-110'
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      }`}
+                    >
+                      {num}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Seat Categories Overview */}
+              {seatCategories.length > 0 && (
+                <div className="mb-6">
+                  <div className="flex gap-3 overflow-x-auto pb-2">
+                    {seatCategories.map((category: any) => {
+                      // Calculate availability based on showtime's available seats
+                      // TODO: Enhance with actual category-level seat counts from API
+                      const totalAvailable = showtimeInfo?.availableSeats || 0;
+                      
+                      // Determine availability status
+                      const getAvailability = (): 'SOLD OUT' | 'ALMOST FULL' | 'AVAILABLE' => {
+                        if (totalAvailable === 0) return 'SOLD OUT';
+                        if (totalAvailable <= 10) return 'ALMOST FULL';
+                        return 'AVAILABLE';
+                      };
+                      
+                      const availability = getAvailability();
+                      
+                      // Determine color class based on availability
+                      const getAvailabilityColor = () => {
+                        if (availability === 'SOLD OUT') return 'text-red-600';
+                        if (availability === 'ALMOST FULL') return 'text-orange-600';
+                        return 'text-green-600';
+                      };
+                      
+                      return (
+                        <div
+                          key={category.id}
+                          className="flex-shrink-0 bg-gray-50 dark:bg-gray-700 rounded-lg p-4 min-w-[200px]"
+                        >
+                          <div className="font-bold text-gray-900 dark:text-white mb-1">{category.name}</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">NPR {category.price}</div>
+                          <div className={`text-xs font-medium ${getAvailabilityColor()}`}>
+                            {availability}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Select Seats Button */}
+              <button
+                onClick={() => {
+                  setShowSeatQuantityModal(false);
+                }}
+                className="w-full bg-red-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-red-700 transition-colors"
+              >
+                Select Seats
+              </button>
+            </div>
           </div>
         )}
 
         {/* Step 1: Seat Selection */}
-        {currentStep === 'seats' && !error && (
+        {currentStep === 'seats' && !error && showtimeId && !showSeatQuantityModal && (
           <div>
-            {showtimeId && (
-              <SeatMap 
-                showtimeId={showtimeId}
-                onSeatSelection={handleSeatSelection}
-                showtimeInfo={showtimeInfo}
-              />
-            )}
+            <SeatMap 
+              showtimeId={showtimeId}
+              onSeatSelection={handleSeatSelection}
+              showtimeInfo={showtimeInfo}
+            />
             
             {selectedSeats.length > 0 && (
               <div className="mt-6 text-center">
                 <button
                   onClick={handleProceedToSummary}
-                  className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 hover:scale-105"
+                  className="bg-red-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-red-700 transition-all duration-300 hover:scale-105"
                 >
                   Review Booking
                 </button>

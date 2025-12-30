@@ -5,6 +5,7 @@ import { useCity } from '../contexts/CityContext';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { useAuth } from '../contexts/AuthContext';
 import { ReviewSection } from './ReviewSection';
+import { API_BASE_URL } from '../config/api';
 
 interface Movie {
   id: string;
@@ -68,13 +69,23 @@ export function MovieDetail({ movieId, onNavigate }: Readonly<MovieDetailProps>)
 
   useEffect(() => {
     filterShowtimes();
-  }, [showtimes, showFavoritesOnly, favoriteTheaterIds]);
+  }, [showtimes, showFavoritesOnly, favoriteTheaterIds, selectedDate, selectedLanguage, selectedFormat]);
+
+  // Set default selected date to first available date
+  useEffect(() => {
+    if (showtimes.length > 0 && !selectedDate) {
+      const dates = [...new Set(showtimes.map(s => s.showDate))].sort();
+      if (dates.length > 0) {
+        setSelectedDate(dates[0]);
+      }
+    }
+  }, [showtimes, selectedDate]);
 
   async function loadMovie() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`http://localhost:5000/api/movies/${movieId}?city=${selectedCity}`);
+      const response = await fetch(`${API_BASE_URL}/api/movies/${movieId}?city=${selectedCity}`);
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
@@ -103,6 +114,26 @@ export function MovieDetail({ movieId, onNavigate }: Readonly<MovieDetailProps>)
   function filterShowtimes() {
     let filtered = showtimes;
 
+    // Filter by selected date
+    if (selectedDate) {
+      filtered = filtered.filter(showtime => showtime.showDate === selectedDate);
+    }
+
+    // Filter by language
+    if (selectedLanguage) {
+      filtered = filtered.filter(showtime => 
+        showtime.screen.theater.city.toLowerCase().includes(selectedLanguage.toLowerCase()) ||
+        movie?.language.some(lang => lang.toLowerCase() === selectedLanguage.toLowerCase())
+      );
+    }
+
+    // Filter by format
+    if (selectedFormat) {
+      filtered = filtered.filter(showtime => 
+        showtime.screen?.screenType?.toLowerCase() === selectedFormat.toLowerCase()
+      );
+    }
+
     // Filter by favorite theaters if enabled
     if (showFavoritesOnly && favoriteTheaterIds.size > 0) {
       filtered = filtered.filter(showtime => 
@@ -112,6 +143,15 @@ export function MovieDetail({ movieId, onNavigate }: Readonly<MovieDetailProps>)
 
     setFilteredShowtimes(filtered);
   }
+
+  // Get available dates for date selector
+  const availableDates = [...new Set(showtimes.map(s => s.showDate))].sort();
+  
+  // Get available languages
+  const availableLanguages = movie ? [...new Set(movie.language)] : [];
+  
+  // Get available formats
+  const availableFormats = [...new Set(showtimes.map(s => s.screen?.screenType || '2D'))].sort((a, b) => a.localeCompare(b));
 
   if (loading) {
     return (
@@ -294,6 +334,80 @@ export function MovieDetail({ movieId, onNavigate }: Readonly<MovieDetailProps>)
               </div>
 
               <div>
+                {/* Date Selector - BookMyShow Style */}
+                <div className="mb-6">
+                  <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                    {availableDates.map((date) => {
+                      const dateObj = new Date(date);
+                      const isSelected = date === selectedDate;
+                      return (
+                        <button
+                          key={date}
+                          onClick={() => setSelectedDate(date)}
+                          className={`flex-shrink-0 px-4 py-2 rounded-lg font-semibold transition-all ${
+                            isSelected
+                              ? 'bg-red-600 text-white shadow-md'
+                              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:border-red-300'
+                          }`}
+                        >
+                          <div className="text-xs uppercase">{dateObj.toLocaleDateString('en-US', { weekday: 'short' })}</div>
+                          <div className="text-sm">{dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Filters - BookMyShow Style */}
+                <div className="flex flex-wrap items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+                  {/* Language/Format Filter */}
+                  {availableLanguages.length > 0 && (
+                    <div className="relative">
+                      <select
+                        value={selectedLanguage}
+                        onChange={(e) => setSelectedLanguage(e.target.value)}
+                        className="appearance-none bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 pr-8 text-sm font-medium text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500"
+                      >
+                        <option value="">All Languages</option>
+                        {availableLanguages.map((lang) => (
+                          <option key={lang} value={lang}>{lang}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {/* Format Filter */}
+                  {availableFormats.length > 0 && (
+                    <div className="relative">
+                      <select
+                        value={selectedFormat}
+                        onChange={(e) => setSelectedFormat(e.target.value)}
+                        className="appearance-none bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 pr-8 text-sm font-medium text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500"
+                      >
+                        <option value="">All Formats</option>
+                        {availableFormats.map((format) => (
+                          <option key={format} value={format}>{format}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {/* Favorites Filter Toggle */}
+                  {favoriteTheaterIds.size > 0 && (
+                    <button
+                      onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors ${
+                        showFavoritesOnly 
+                          ? 'bg-red-50 border-red-300 text-red-700' 
+                          : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-red-300'
+                      }`}
+                    >
+                      <Heart className={`w-4 h-4 ${showFavoritesOnly ? 'fill-red-600 text-red-600' : 'text-gray-400'}`} />
+                      <span className="font-medium text-sm">My Favorites</span>
+                    </button>
+                  )}
+                </div>
+
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                   <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                     <Calendar className="w-6 h-6 text-red-600" />
@@ -320,27 +434,9 @@ export function MovieDetail({ movieId, onNavigate }: Readonly<MovieDetailProps>)
                         </span>
                       </button>
                     )}
-                    
-                    {/* Summary Stats */}
-                    {filteredShowtimes.length > 0 && (
-                      <div className="flex flex-wrap gap-3 text-sm">
-                        <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-3 py-2 rounded-lg flex items-center gap-2">
-                          <Calendar className="w-4 h-4" />
-                          {Object.keys(groupedShowtimes).length} date{Object.keys(groupedShowtimes).length > 1 ? 's' : ''}
-                        </div>
-                        <div className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-3 py-2 rounded-lg flex items-center gap-2">
-                          <Film className="w-4 h-4" />
-                          {Object.values(groupedShowtimes).reduce((total, theaters) => total + Object.keys(theaters).length, 0)} theater{Object.values(groupedShowtimes).reduce((total, theaters) => total + Object.keys(theaters).length, 0) > 1 ? 's' : ''}
-                        </div>
-                        <div className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-3 py-2 rounded-lg flex items-center gap-2">
-                          <Clock className="w-4 h-4" />
-                          {filteredShowtimes.length} showtime{filteredShowtimes.length > 1 ? 's' : ''}
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
-                {Object.keys(groupedShowtimes).length === 0 ? (
+                {filteredShowtimes.length === 0 ? (
                   <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6 text-center">
                     <Calendar className="w-12 h-12 text-blue-500 mx-auto mb-3" />
                     <p className="text-blue-700 dark:text-blue-300 font-medium mb-2">
@@ -354,14 +450,9 @@ export function MovieDetail({ movieId, onNavigate }: Readonly<MovieDetailProps>)
                     </p>
                   </div>
                 ) : (
-                  <div className="space-y-8">
+                  <div className="space-y-4">
                     {Object.entries(groupedShowtimes).map(([date, theaters], dateIndex) => (
                       <div key={date} className="animate-page-fade-in" style={{ animationDelay: `${dateIndex * 0.1}s` }}>
-                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
-                          <Calendar className="w-6 h-6 text-red-600" />
-                          {new Date(date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-                        </h3>
-                        
                         <div className="grid grid-cols-1 gap-4">
                           {Object.entries(theaters).map(([theaterName, showtimes], theaterIndex) => (
                             <div
@@ -400,42 +491,35 @@ export function MovieDetail({ movieId, onNavigate }: Readonly<MovieDetailProps>)
                               
                               {/* Showtimes Grid - BookMyShow Style */}
                               <div className="p-4">
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                                  {showtimes.map((showtime) => (
-                                    <button
-                                      key={showtime.id}
-                                      onClick={() => {
-                                        if (!isAuthenticated) {
-                                          localStorage.setItem('redirectAfterLogin', JSON.stringify({ page: 'booking-page', id: showtime.id }));
-                                          onNavigate('login');
-                                          return;
-                                        }
-                                        onNavigate('booking-page', showtime.id);
-                                      }}
-                                      className="group relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-700 dark:to-gray-800 border-2 border-gray-200 dark:border-gray-600 hover:border-red-500 hover:shadow-lg rounded-xl p-4 transition-all duration-300 transform hover:-translate-y-1"
-                                    >
-                                      <div className="text-center">
-                                        <div className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 mb-1">
-                                          {showtime.showTime}
-                                        </div>
-                                        <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">
-                                          {showtime.availableSeats > 0 ? (
-                                            <span className="text-green-600 dark:text-green-400 font-medium">{showtime.availableSeats} seats</span>
-                                          ) : (
-                                            <span className="text-red-600 dark:text-red-400 font-medium">Sold out</span>
-                                          )}
-                                        </div>
-                                        <div className="text-sm font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-3 py-1 rounded-full">
-                                          NPR {showtime.price}
-                                        </div>
-                                      </div>
-                                      
-                                      {/* Click to Book indicator */}
-                                      <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 text-xs text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        Book →
-                                      </div>
-                                    </button>
-                                  ))}
+                                <div className="flex flex-wrap gap-3">
+                                  {showtimes.map((showtime) => {
+                                    const isFastFilling = showtime.availableSeats > 0 && showtime.availableSeats <= 10;
+                                    const isSoldOut = showtime.availableSeats === 0;
+                                    
+                                    return (
+                                      <button
+                                        key={showtime.id}
+                                        onClick={() => {
+                                          if (!isAuthenticated) {
+                                            localStorage.setItem('redirectAfterLogin', JSON.stringify({ page: 'booking-page', id: showtime.id }));
+                                            onNavigate('login');
+                                            return;
+                                          }
+                                          onNavigate('booking-page', showtime.id);
+                                        }}
+                                        disabled={isSoldOut}
+                                        className={`px-6 py-3 rounded-lg border-2 font-semibold text-base transition-all duration-200 ${
+                                          isSoldOut
+                                            ? 'border-gray-300 text-gray-400 bg-gray-50 cursor-not-allowed'
+                                            : isFastFilling
+                                            ? 'border-yellow-500 text-orange-600 bg-white hover:bg-yellow-50 hover:shadow-md active:scale-95'
+                                            : 'border-green-500 text-orange-600 bg-white hover:bg-green-50 hover:shadow-md active:scale-95'
+                                        }`}
+                                      >
+                                        {showtime.showTime}
+                                      </button>
+                                    );
+                                  })}
                                 </div>
                               </div>
                             </div>

@@ -29,11 +29,11 @@ export function Footer({ onNavigate }: FooterProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-4 sm:mb-6">
           {/* Company Info */}
           <div className="lg:col-span-2">
-            <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
-              <div className="bg-gradient-to-br from-red-600 to-red-700 p-2 sm:p-2.5 rounded-xl shadow-lg">
-                <Ticket className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3 group">
+              <div className="bg-gradient-to-br from-red-600 to-red-700 p-2 sm:p-2.5 rounded-xl shadow-lg transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+                <Ticket className="w-5 h-5 sm:w-6 sm:h-6 text-white transform group-hover:scale-110 transition-transform duration-300" />
               </div>
-              <span className="text-xl sm:text-2xl font-extrabold">
+              <span className="text-xl sm:text-2xl font-extrabold transform group-hover:scale-105 transition-transform duration-300">
                 Show<span className="text-red-500">Sewa</span>
               </span>
             </div>
@@ -45,24 +45,27 @@ export function Footer({ onNavigate }: FooterProps) {
             <div className="flex gap-1.5 sm:gap-2 mb-3 sm:mb-4">
               <a
                 href="#"
-                className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-red-600 to-red-700 rounded-lg flex items-center justify-center hover:from-red-700 hover:to-red-800 transition-all duration-300 transform hover:scale-110"
+                className="group relative w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-red-600 to-red-700 rounded-lg flex items-center justify-center hover:from-red-700 hover:to-red-800 transition-all duration-300 transform hover:scale-110 hover:rotate-6 hover:shadow-lg"
                 aria-label="Facebook"
               >
-                <Facebook className="w-4 h-4 sm:w-5 sm:h-5" />
+                <Facebook className="w-4 h-4 sm:w-5 sm:h-5 transform group-hover:scale-110 transition-transform duration-300" />
+                <div className="absolute inset-0 bg-white/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </a>
               <a
                 href="https://www.instagram.com/showsewa?igsh=bGZ6ZjRxZXUycncx"
-                className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-red-600 to-red-700 rounded-lg flex items-center justify-center hover:from-red-700 hover:to-red-800 transition-all duration-300 transform hover:scale-110"
+                className="group relative w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-red-600 to-red-700 rounded-lg flex items-center justify-center hover:from-red-700 hover:to-red-800 transition-all duration-300 transform hover:scale-110 hover:rotate-6 hover:shadow-lg"
                 aria-label="Instagram"
               >
-                <Instagram className="w-4 h-4 sm:w-5 sm:h-5" />
+                <Instagram className="w-4 h-4 sm:w-5 sm:h-5 transform group-hover:scale-110 transition-transform duration-300" />
+                <div className="absolute inset-0 bg-white/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </a>
               <a
                 href="#"
-                className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-red-600 to-red-700 rounded-lg flex items-center justify-center hover:from-red-700 hover:to-red-800 transition-all duration-300 transform hover:scale-110"
+                className="group relative w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-red-600 to-red-700 rounded-lg flex items-center justify-center hover:from-red-700 hover:to-red-800 transition-all duration-300 transform hover:scale-110 hover:rotate-6 hover:shadow-lg"
                 aria-label="Twitter"
               >
-                <Twitter className="w-4 h-4 sm:w-5 sm:h-5" />
+                <Twitter className="w-4 h-4 sm:w-5 sm:h-5 transform group-hover:scale-110 transition-transform duration-300" />
+                <div className="absolute inset-0 bg-white/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </a>
             </div>
 
@@ -131,7 +134,7 @@ export function Footer({ onNavigate }: FooterProps) {
           <div className="flex flex-col md:flex-row justify-between items-center gap-2 sm:gap-3 text-xs text-gray-400">
             <p className="flex items-center gap-1.5">
               © 2024 ShowSewa. Made with{' '}
-              <Heart className="w-3.5 h-3.5 text-red-500 inline-block fill-red-500" />{' '}
+              <Heart className="w-3.5 h-3.5 text-red-500 inline-block fill-red-500 animate-pulse" />{' '}
               in Nepal
             </p>
             <div className="flex gap-4">

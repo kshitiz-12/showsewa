@@ -507,58 +507,93 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
       </section>
 
       {/* Features Section - Classic & Elegant */}
-      <section className="py-20 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-20 bg-gradient-to-b from-white via-gray-50 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden">
+        {/* Decorative Background Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-red-100/30 dark:bg-red-900/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-yellow-100/20 dark:bg-yellow-900/10 rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight">
+            <div className="inline-block px-4 py-2 bg-red-100 dark:bg-red-900/30 rounded-full mb-6">
+              <span className="text-red-600 dark:text-red-400 font-bold text-xs uppercase tracking-wider">Why Choose Us</span>
+            </div>
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 dark:text-white mb-6 tracking-tight">
               Why Choose ShowSewa?
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mb-8">
               Experience excellence in entertainment booking
             </p>
-            <div className="w-24 h-1 bg-red-600 mx-auto mt-6"></div>
+            <div className="w-32 h-1.5 bg-gradient-to-r from-transparent via-red-600 to-transparent mx-auto"></div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
             {[
               {
-                icon: <Zap className="w-6 h-6" />,
+                icon: Zap,
                 title: "Lightning Fast",
-                description: "Book tickets in seconds with our optimized booking system"
+                description: "Book tickets in seconds with our optimized booking system",
+                gradient: "from-yellow-500 to-orange-500",
+                delay: "0s"
               },
               {
-                icon: <Heart className="w-6 h-6" />,
+                icon: Heart,
                 title: "Personalized",
-                description: "Get recommendations based on your preferences and history"
+                description: "Get recommendations based on your preferences and history",
+                gradient: "from-red-500 to-pink-500",
+                delay: "0.15s"
               },
               {
-                icon: <Award className="w-6 h-6" />,
+                icon: Award,
                 title: "Premium Quality",
-                description: "Access to the best venues and exclusive events"
+                description: "Access to the best venues and exclusive events",
+                gradient: "from-blue-500 to-indigo-600",
+                delay: "0.3s"
               },
               {
-                icon: <Users className="w-6 h-6" />,
+                icon: Users,
                 title: "Trusted Community",
-                description: "Join thousands of entertainment enthusiasts"
+                description: "Join thousands of entertainment enthusiasts",
+                gradient: "from-green-500 to-emerald-600",
+                delay: "0.45s"
               }
-            ].map((feature, index) => (
-              <div
-                key={index}
-                className="text-center group"
-              >
-                <div className="flex items-center justify-center w-16 h-16 mx-auto mb-6 bg-red-600 rounded-lg transition-all duration-300 group-hover:bg-red-700">
-                  <div className="text-white">
-                    {feature.icon}
+            ].map((feature, index) => {
+              const IconComponent = feature.icon;
+              return (
+                <div
+                  key={index}
+                  className="group relative transform transition-all duration-700 ease-out hover:-translate-y-4"
+                  style={{ animationDelay: feature.delay }}
+                >
+                  {/* Glow Effect */}
+                  <div className={`absolute -inset-1 bg-gradient-to-r ${feature.gradient} rounded-2xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500`}></div>
+                  
+                  <div className="relative bg-white dark:bg-gray-800 rounded-2xl p-8 h-full border-2 border-gray-200 dark:border-gray-700 transform transition-all duration-500 hover:shadow-2xl hover:border-red-300 dark:hover:border-red-700">
+                    {/* Icon Container */}
+                    <div className="relative mb-6">
+                      <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} rounded-xl blur-xl opacity-30 group-hover:opacity-50 transition-opacity duration-500`}></div>
+                      <div className={`relative w-20 h-20 bg-gradient-to-br ${feature.gradient} rounded-xl flex items-center justify-center shadow-xl transform group-hover:rotate-6 group-hover:scale-110 transition-all duration-500 mx-auto`}>
+                        <IconComponent className="w-10 h-10 text-white transform group-hover:scale-110 transition-transform duration-300" />
+                      </div>
+                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse flex items-center justify-center">
+                        <span className="w-2 h-2 bg-yellow-900 rounded-full"></span>
+                      </div>
+                    </div>
+
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors duration-300 text-center">
+                      {feature.title}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-center">
+                      {feature.description}
+                    </p>
+
+                    {/* Decorative Line */}
+                    <div className="mt-6 w-16 h-1 bg-gradient-to-r from-red-500 to-transparent mx-auto transform group-hover:scale-x-150 transition-transform duration-500 origin-center"></div>
                   </div>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  {feature.description}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>

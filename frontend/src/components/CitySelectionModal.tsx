@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Search, MapPin, X, Landmark } from 'lucide-react';
+import { Search, MapPin, X, Landmark, Building2 } from 'lucide-react';
 import { popularCities, nepalCities, getProvinces } from '../data/nepalCities';
+import { cityIconMap, DefaultCityIcon } from '../data/cityIcons';
 
 interface CitySelectionModalProps {
   isOpen: boolean;
@@ -125,39 +126,66 @@ export function CitySelectionModal({ isOpen, onClose, onSelectCity, currentCity 
                   onSelectCity(''); // Empty string means show all cities
                   onClose();
                 }}
-                className={`p-4 rounded-xl border-2 transition-all duration-200 hover:scale-105 ${
+                className={`group p-4 rounded-xl border-2 transition-all duration-200 hover:scale-105 ${
                   !currentCity || currentCity === ''
                     ? 'border-red-500 bg-red-50'
                     : 'border-gray-200 hover:border-red-300 hover:bg-gray-50'
                 }`}
               >
-                <div className="text-4xl mb-2">🌍</div>
+                <div className="flex items-center justify-center mb-2">
+                  <div className={`p-3 rounded-xl transform group-hover:scale-110 transition-all duration-200 ${
+                    !currentCity || currentCity === ''
+                      ? 'bg-red-600'
+                      : 'bg-gray-200 group-hover:bg-red-100'
+                  }`}>
+                    <Building2 className={`w-8 h-8 ${
+                      !currentCity || currentCity === ''
+                        ? 'text-white'
+                        : 'text-gray-600 group-hover:text-red-600'
+                    } transition-colors duration-200`} />
+                  </div>
+                </div>
                 <div className={`font-semibold text-sm mb-1 ${!currentCity || currentCity === '' ? 'text-red-600' : 'text-gray-900'}`}>
                   All Cities
                 </div>
                 <div className="text-xs text-gray-500">Show all</div>
               </button>
               
-              {displayCities.map((city) => (
-                <button
-                  key={city.name}
-                  onClick={() => {
-                    onSelectCity(city.name);
-                    onClose();
-                  }}
-                  className={`p-4 rounded-xl border-2 transition-all duration-200 hover:scale-105 ${
-                    currentCity === city.name
-                      ? 'border-red-500 bg-red-50'
-                      : 'border-gray-200 hover:border-red-300 hover:bg-gray-50'
-                  }`}
-                >
-                  <div className="text-4xl mb-2">{city.icon}</div>
-                  <div className={`font-semibold text-sm mb-1 ${currentCity === city.name ? 'text-red-600' : 'text-gray-900'}`}>
-                    {city.name}
-                  </div>
-                  <div className="text-xs text-gray-500">{city.province}</div>
-                </button>
-              ))}
+              {displayCities.map((city) => {
+                const IconComponent = cityIconMap[city.name] || DefaultCityIcon;
+                return (
+                  <button
+                    key={city.name}
+                    onClick={() => {
+                      onSelectCity(city.name);
+                      onClose();
+                    }}
+                    className={`group p-4 rounded-xl border-2 transition-all duration-200 hover:scale-105 ${
+                      currentCity === city.name
+                        ? 'border-red-500 bg-red-50'
+                        : 'border-gray-200 hover:border-red-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center mb-2">
+                      <div className={`p-3 rounded-xl transform group-hover:scale-110 transition-all duration-200 ${
+                        currentCity === city.name
+                          ? 'bg-red-600'
+                          : 'bg-gray-200 group-hover:bg-red-100'
+                      }`}>
+                        <IconComponent className={`w-8 h-8 ${
+                          currentCity === city.name
+                            ? 'text-white'
+                            : 'text-gray-600 group-hover:text-red-600'
+                        } transition-colors duration-200`} />
+                      </div>
+                    </div>
+                    <div className={`font-semibold text-sm mb-1 ${currentCity === city.name ? 'text-red-600' : 'text-gray-900'}`}>
+                      {city.name}
+                    </div>
+                    <div className="text-xs text-gray-500">{city.province}</div>
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
