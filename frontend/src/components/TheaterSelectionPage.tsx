@@ -53,6 +53,11 @@ export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSe
   const [selectedFormat, setSelectedFormat] = useState<string>('');
 
   useEffect(() => {
+    // Reset filters when movieId or city changes
+    setSelectedDate('');
+    setSelectedLanguage('');
+    setSelectedFormat('');
+    setShowFavoritesOnly(false);
     loadMovie();
   }, [movieId, selectedCity]);
 

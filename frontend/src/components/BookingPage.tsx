@@ -43,7 +43,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
   const [paymentMethod, setPaymentMethod] = useState<string>('');
   const [bookingResponse, setBookingResponse] = useState<any>(null);
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
-  const [showSeatQuantityModal, setShowSeatQuantityModal] = useState(true);
+  const [showSeatQuantityModal, setShowSeatQuantityModal] = useState(false);
   const [selectedSeatQuantity, setSelectedSeatQuantity] = useState(1);
   const [availableShowtimes, setAvailableShowtimes] = useState<any[]>([]);
   const [seatCategories, setSeatCategories] = useState<any[]>([]);
@@ -52,12 +52,10 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
   useEffect(() => {
     const fetchShowtimeInfo = async () => {
       if (!showtimeId) {
-        setError('No showtime selected. Please select a showtime from the movie details page.');
+        setError('No showtime selected. Please select a showtime from the theater selection page.');
         setLoading(false);
-        // Redirect back to movies after a delay
-        setTimeout(() => {
-          onNavigate('movies');
-        }, 3000);
+        // Redirect back to movies immediately (no delay)
+        onNavigate('movies');
         return;
       }
       
@@ -115,6 +113,13 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
 
     fetchShowtimeInfo();
   }, [showtimeId]);
+
+  // Show the seat quantity modal when showtimeInfo is loaded
+  useEffect(() => {
+    if (showtimeInfo && showtimeId && currentStep === 'seats' && !error) {
+      setShowSeatQuantityModal(true);
+    }
+  }, [showtimeInfo, showtimeId, currentStep, error]);
 
   // Fetch other showtimes for the same theater/movie
   const fetchOtherShowtimes = async (currentShowtime: any) => {
@@ -772,7 +777,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
                   <button
                     onClick={() => {
                       setShowSeatQuantityModal(false);
-                      onNavigate('movie-detail', showtimeInfo.movie?.id);
+                      onNavigate('theater-selection', showtimeInfo.movie?.id);
                     }}
                     className="flex items-center gap-2 px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
                     aria-label="Back to theaters"
@@ -1564,7 +1569,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
                 {/* Action Buttons */}
                 <div className="space-y-4 animate-page-fade-in" style={{ animationDelay: '0.4s' }}>
                   <button 
-                    onClick={() => onNavigate('movie-detail', showtimeInfo?.movie?.id)}
+                    onClick={() => onNavigate('theater-selection', showtimeInfo?.movie?.id)}
                     className="w-full bg-gradient-to-r from-purple-500 to-purple-600 text-white py-4 px-6 rounded-xl font-bold text-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-300 hover:scale-105 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
                   >
                     <Film className="w-5 h-5" />
