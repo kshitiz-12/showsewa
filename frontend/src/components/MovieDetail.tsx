@@ -35,6 +35,8 @@ interface Showtime {
   availableSeats: number;
   screen: {
     id: string;
+    screenType?: string;
+    screenNumber?: number;
     theater: {
       id: string;
       name: string;
