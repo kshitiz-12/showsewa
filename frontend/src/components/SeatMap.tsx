@@ -28,6 +28,8 @@ interface SeatMapProps {
   showtimeId: string;
   onSeatSelection: (seats: Seat[], totalPrice: number) => void;
   showtimeInfo?: any;
+  availableShowtimes?: any[];
+  onNavigate?: (page: string, id?: string) => void;
 }
 
 const SeatMap: React.FC<SeatMapProps> = ({ showtimeId, onSeatSelection, showtimeInfo }) => {
@@ -399,21 +401,37 @@ const SeatMap: React.FC<SeatMapProps> = ({ showtimeId, onSeatSelection, showtime
           </button>
         </div>
 
-        {/* Showtime Selection Bar */}
-        <div className="flex gap-3 mt-4">
-          {['05:50 PM', '09:45 PM', '10:00 PM'].map((time) => (
-            <button
-              key={time}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                time === (showtimeInfo?.showTime || '09:45 PM')
-                  ? 'bg-orange-500 text-white'
-                  : 'bg-white border-2 border-orange-500 text-orange-500 hover:bg-orange-50'
-              }`}
-            >
-              {time}
-            </button>
-          ))}
-        </div>
+        {/* Showtime Selection Bar - BookMyShow Style */}
+        {availableShowtimes && availableShowtimes.length > 0 && (
+          <div className="flex gap-3 mt-4 overflow-x-auto pb-2">
+            {availableShowtimes.map((st: any) => {
+              const isSelected = st.id === showtimeId;
+              const isFastFilling = st.availableSeats > 0 && st.availableSeats <= 10;
+              return (
+                <button
+                  key={st.id}
+                  onClick={() => {
+                    if (onNavigate) {
+                      onNavigate('booking-page', st.id);
+                    }
+                  }}
+                  className={`flex-shrink-0 px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
+                    isSelected
+                      ? 'bg-red-600 text-white shadow-md'
+                      : isFastFilling
+                      ? 'bg-white border-2 border-yellow-500 text-orange-600 hover:bg-yellow-50'
+                      : 'bg-white border-2 border-green-500 text-orange-600 hover:bg-green-50'
+                  }`}
+                >
+                  {st.showTime}
+                  {st.screen?.screenType && st.screen.screenType !== '2D' && (
+                    <span className="ml-1 text-xs">{st.screen.screenType}</span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Seating Layout - BookMyShow Style */}

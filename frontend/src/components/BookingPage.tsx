@@ -114,6 +114,13 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
     fetchShowtimeInfo();
   }, [showtimeId]);
 
+  // Fetch available showtimes when showtimeInfo is loaded
+  useEffect(() => {
+    if (showtimeInfo) {
+      fetchOtherShowtimes(showtimeInfo);
+    }
+  }, [showtimeInfo]);
+
   // Show the seat quantity modal when showtimeInfo is loaded and we're on seats step
   useEffect(() => {
     if (showtimeInfo && showtimeId && currentStep === 'seats' && !error && !loading) {
@@ -132,12 +139,13 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
       if (response.ok) {
         const data = await response.json();
         if (data.success && data.data.movie.showtimes) {
-          // Filter showtimes for the same theater and date
+          // Filter showtimes for the same theater and date (include all, including current)
           const sameTheaterShowtimes = data.data.movie.showtimes.filter((st: any) => 
             st.screen.theater.id === currentShowtime.screen.theater.id &&
-            st.showDate === currentShowtime.showDate &&
-            st.id !== showtimeId
+            st.showDate === currentShowtime.showDate
           );
+          // Sort by showTime
+          sameTheaterShowtimes.sort((a: any, b: any) => a.showTime.localeCompare(b.showTime));
           setAvailableShowtimes(sameTheaterShowtimes);
         }
       }
@@ -883,6 +891,8 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
               showtimeId={showtimeId}
               onSeatSelection={handleSeatSelection}
               showtimeInfo={showtimeInfo}
+              availableShowtimes={availableShowtimes}
+              onNavigate={onNavigate}
             />
             
             {selectedSeats.length > 0 && (

@@ -110,18 +110,34 @@ export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSe
   }
 
   function filterShowtimes() {
+    // Always start with all showtimes - don't filter if empty
+    if (showtimes.length === 0) {
+      setFilteredShowtimes([]);
+      return;
+    }
+
     let filtered = [...showtimes]; // Start with all showtimes
 
-    // Filter by selected date (only if a date is selected)
+    // Filter by selected date (only if a date is selected and it's not empty)
     if (selectedDate) {
-      filtered = filtered.filter(showtime => showtime.showDate === selectedDate);
+      // Normalize dates for comparison (compare date strings, not full datetime)
+      filtered = filtered.filter(showtime => {
+        const showtimeDate = new Date(showtime.showDate).toISOString().split('T')[0];
+        const selectedDateStr = new Date(selectedDate).toISOString().split('T')[0];
+        return showtimeDate === selectedDateStr;
+      });
     }
 
     // Filter by language (only if a language is selected)
     if (selectedLanguage) {
-      filtered = filtered.filter(showtime => 
-        movie?.language.some(lang => lang.toLowerCase() === selectedLanguage.toLowerCase())
-      );
+      filtered = filtered.filter(showtime => {
+        // Check both movie language and showtime language
+        const movieHasLang = movie?.language?.some((lang: string) => 
+          lang.toLowerCase() === selectedLanguage.toLowerCase()
+        );
+        const showtimeHasLang = showtime.language?.toLowerCase() === selectedLanguage.toLowerCase();
+        return movieHasLang || showtimeHasLang;
+      });
     }
 
     // Filter by format (only if a format is selected)
@@ -138,6 +154,7 @@ export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSe
       );
     }
 
+    // Always set filtered showtimes, even if empty (so we can show the message)
     setFilteredShowtimes(filtered);
   }
 
@@ -232,11 +249,13 @@ export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSe
         </div>
 
         {/* Date Selector - BookMyShow Style */}
-        <div className="mb-6">
-          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-            {availableDates.map((date) => {
-              const dateObj = new Date(date);
-              const isSelected = date === selectedDate;
+        {availableDates.length > 0 && (
+          <div className="mb-6">
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+              {availableDates.map((date) => {
+                const dateObj = new Date(date);
+                const selectedDateStr = selectedDate ? new Date(selectedDate).toISOString().split('T')[0] : '';
+                const isSelected = date === selectedDateStr;
               return (
                 <button
                   key={date}
@@ -254,6 +273,7 @@ export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSe
             })}
           </div>
         </div>
+        )}
 
         {/* Filters - BookMyShow Style */}
         <div className="flex flex-wrap items-center gap-3 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
@@ -306,18 +326,36 @@ export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSe
         </div>
 
         {/* Theaters with Showtimes - BookMyShow Style */}
-        {filteredShowtimes.length === 0 ? (
+        {showtimes.length === 0 ? (
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6 text-center">
             <Calendar className="w-12 h-12 text-blue-500 mx-auto mb-3" />
             <p className="text-blue-700 dark:text-blue-300 font-medium mb-2">
-              {showFavoritesOnly ? 'No showtimes in favorite theaters' : 'No showtimes available'}
+              No showtimes available
             </p>
             <p className="text-blue-600 dark:text-blue-400 text-sm">
-              {showFavoritesOnly 
-                ? 'Try turning off the favorites filter or add more theaters to your favorites.'
-                : 'Check back later for showtimes or contact the theater for more information.'
-              }
+              Check back later for showtimes or contact the theater for more information.
             </p>
+          </div>
+        ) : filteredShowtimes.length === 0 ? (
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6 text-center">
+            <Calendar className="w-12 h-12 text-yellow-500 mx-auto mb-3" />
+            <p className="text-yellow-700 dark:text-yellow-300 font-medium mb-2">
+              No showtimes match your filters
+            </p>
+            <p className="text-yellow-600 dark:text-yellow-400 text-sm mb-4">
+              Try adjusting your filters to see more showtimes.
+            </p>
+            <button
+              onClick={() => {
+                setSelectedDate('');
+                setSelectedLanguage('');
+                setSelectedFormat('');
+                setShowFavoritesOnly(false);
+              }}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Clear All Filters
+            </button>
           </div>
         ) : (
           <div className="space-y-4">
