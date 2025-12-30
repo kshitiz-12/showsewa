@@ -17,6 +17,9 @@ interface Movie {
   titleNe: string;
   posterUrl: string;
   language: string[];
+  duration?: number;
+  rating?: string;
+  genre?: string[];
 }
 
 interface Showtime {
@@ -240,19 +243,23 @@ export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSe
             )}
           </h1>
           {/* Movie Attributes - BookMyShow Style */}
-          <div className="flex flex-wrap items-center gap-3 mb-4">
-            <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm">
-              Movie runtime: {Math.floor(movie.duration / 60)}h {movie.duration % 60}m
-            </span>
-            <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm">
-              {movie.rating}
-            </span>
-            {movie.genre.slice(0, 2).map((genre) => (
-              <span key={genre} className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm">
-                {genre}
+          {movie.duration && (
+            <div className="flex flex-wrap items-center gap-3 mb-4">
+              <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm">
+                Movie runtime: {Math.floor(movie.duration / 60)}h {movie.duration % 60}m
               </span>
-            ))}
-          </div>
+              {movie.rating && (
+                <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm">
+                  {movie.rating}
+                </span>
+              )}
+              {movie.genre && movie.genre.slice(0, 2).map((genre) => (
+                <span key={genre} className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm">
+                  {genre}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Date Selector - BookMyShow Style */}
@@ -415,7 +422,7 @@ export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSe
                               const isSoldOut = showtime.availableSeats === 0;
                               
                               // Format label for display (like "GOLD", "ATMOS", "PXL", "LASER")
-                              const formatLabel = showtime.screen?.screenType || showtime.format || '2D';
+                              const formatLabel = showtime.screen?.screenType || '2D';
                               const languageLabel = showtime.language || movie?.language?.[0] || '';
                               
                               return (

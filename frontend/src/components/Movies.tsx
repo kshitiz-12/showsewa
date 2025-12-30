@@ -4,6 +4,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useCity } from '../contexts/CityContext';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { useAuth } from '../contexts/AuthContext';
+import { API_BASE_URL } from '../config/api';
 
 interface Movie {
   id: string;
