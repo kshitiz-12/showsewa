@@ -64,6 +64,18 @@ export function EventDetail({ eventId, onNavigate }: EventDetailProps) {
   const [showLearnMoreModal, setShowLearnMoreModal] = useState(false);
   const [loadingInterest, setLoadingInterest] = useState(false);
 
+  // Lock body scroll when modals are open
+  useEffect(() => {
+    if (showTermsModal || showLearnMoreModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [showTermsModal, showLearnMoreModal]);
+
   useEffect(() => {
     loadEvent();
   }, [eventId]);
@@ -573,14 +585,30 @@ export function EventDetail({ eventId, onNavigate }: EventDetailProps) {
       </div>
 
       {/* Terms & Conditions Modal */}
-      {showTermsModal && event && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col">
-            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+      {showTermsModal && event && createPortal(
+        <div 
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+          style={{ 
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            overflow: 'auto'
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowTermsModal(false);
+            }
+          }}
+        >
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col my-auto">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Terms & Conditions</h2>
               <button
                 onClick={() => setShowTermsModal(false)}
                 className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                aria-label="Close"
               >
                 <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               </button>
@@ -604,20 +632,22 @@ export function EventDetail({ eventId, onNavigate }: EventDetailProps) {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Learn More Modal (M-Ticket) */}
       {showLearnMoreModal && createPortal(
         <div 
-          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in"
+          className="fixed top-0 left-0 right-0 bottom-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in"
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
           onClick={(e) => {
             if (e.target === e.currentTarget) {
               setShowLearnMoreModal(false);
             }
           }}
         >
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col animate-scale-in">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col animate-scale-in" style={{ margin: 'auto' }}>
             <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">M-Ticket Guide</h2>
               <button

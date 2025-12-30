@@ -65,7 +65,7 @@ export function About() {
           {/* Main Title */}
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-white mb-8 leading-tight tracking-tight">
             <span className="block transform hover:scale-105 transition-transform duration-500 inline-block">
-              {t('about.title')}
+            {t('about.title')}
             </span>
           </h1>
 
@@ -74,7 +74,7 @@ export function About() {
             <p className="text-2xl md:text-3xl font-light text-red-100 max-w-4xl mx-auto leading-relaxed tracking-wide">
               Tapai ko Show, Hamro Sewa
             </p>
-          </div>
+            </div>
 
           {/* Feature Pills */}
           <div className="flex flex-wrap justify-center gap-4 mb-16">
@@ -96,7 +96,7 @@ export function About() {
                     <span className="font-semibold text-base tracking-wide">
                       {item.text}
                     </span>
-                  </div>
+            </div>
                 </div>
               );
             })}
@@ -122,12 +122,12 @@ export function About() {
           >
             <div className="inline-block px-4 py-2 bg-red-100 dark:bg-red-900/30 rounded-full mb-4">
               <span className="text-red-600 dark:text-red-400 font-bold text-xs uppercase tracking-wider">Why Choose Us</span>
-            </div>
+              </div>
             <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-4">
               Excellence Defined
             </h2>
             <div className="w-20 h-1 bg-gradient-to-r from-transparent via-red-600 to-transparent mx-auto"></div>
-          </div>
+            </div>
 
           {/* Feature Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
@@ -160,19 +160,19 @@ export function About() {
                       </div>
                       <div className="absolute -top-1 -right-1 w-6 h-6 bg-yellow-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse flex items-center justify-center">
                         <CheckCircle2 className="w-4 h-4 text-yellow-900" />
-                      </div>
-                    </div>
+              </div>
+            </div>
 
                     <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors duration-300">
                       {item.title}
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                       {item.text}
-                    </p>
+              </p>
 
                     {/* Decorative Line */}
                     <div className="mt-6 w-12 h-0.5 bg-gradient-to-r from-red-500 to-transparent transform group-hover:scale-x-150 transition-transform duration-500 origin-left"></div>
-                  </div>
+            </div>
                 </div>
               );
             })}
@@ -180,7 +180,7 @@ export function About() {
           
           {/* Vision & Mission - Side by Side */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-20">
-            {/* Vision Section */}
+          {/* Vision Section */}
             <div
               id="vision-section"
               ref={setRef('vision-section')}
@@ -197,15 +197,15 @@ export function About() {
                   <div className="flex items-center gap-4 mb-6">
                     <div className="w-16 h-16 bg-gradient-to-br from-red-600 to-red-700 rounded-xl flex items-center justify-center shadow-lg transform group-hover:rotate-12 group-hover:scale-110 transition-all duration-500">
                       <Target className="w-8 h-8 text-white" />
-                    </div>
+              </div>
                     <h2 className="text-3xl font-black text-gray-900 dark:text-white">
-                      {t('about.vision_title')}
-                    </h2>
-                  </div>
+                {t('about.vision_title')}
+              </h2>
+            </div>
                   <div className="w-16 h-0.5 bg-gradient-to-r from-red-600 to-transparent mb-6"></div>
                   <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-                    {t('about.vision_text')}
-                  </p>
+              {t('about.vision_text')}
+            </p>
                 </div>
               </div>
             </div>
@@ -289,8 +289,8 @@ export function About() {
                 <div className="w-12 h-0.5 bg-gradient-to-r from-red-600 via-red-600 to-transparent"></div>
               </div>
               <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-4">
-                {t('about.founders_title')}
-              </h2>
+                  {t('about.founders_title')}
+                </h2>
               <p className="text-lg text-gray-600 dark:text-gray-400 font-light">
                 The passionate minds behind ShowSewa
               </p>
@@ -337,7 +337,7 @@ export function About() {
                       
                       <div className="relative z-10 flex flex-col items-center text-center">
                         {/* Avatar */}
-                        <div className="relative mb-6">
+                    <div className="relative mb-6">
                           {/* Outer Glow Ring */}
                           <div className="absolute inset-0 bg-gradient-to-br from-red-500 to-red-700 rounded-full blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500 scale-125"></div>
                           
@@ -345,22 +345,22 @@ export function About() {
                           <div className="relative w-32 h-32 bg-gradient-to-br from-red-500 via-red-600 to-red-700 rounded-full mx-auto flex items-center justify-center shadow-xl transform group-hover:rotate-6 group-hover:scale-110 transition-all duration-500">
                             <span className="text-4xl font-black text-white z-10">{founder.initials}</span>
                             <div className="absolute inset-0 bg-white/20 rounded-full blur-lg group-hover:blur-xl transition-all duration-500"></div>
-                          </div>
+                      </div>
                           
                           {/* Award Badge */}
                           <div className="absolute -bottom-2 -right-2 w-12 h-12 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-full flex items-center justify-center shadow-lg transform group-hover:rotate-12 group-hover:scale-110 transition-all duration-500 border-2 border-white dark:border-gray-800">
                             <Award className="w-6 h-6 text-yellow-900" />
-                          </div>
+                      </div>
                           
                           {/* Floating Particles */}
                           <div className="absolute -top-2 -left-2 w-2 h-2 bg-red-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-ping"></div>
                           <div className="absolute top-1/2 -right-3 w-1.5 h-1.5 bg-yellow-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 animate-ping" style={{ animationDelay: '0.3s' }}></div>
-                        </div>
+                    </div>
 
                         {/* Name */}
                         <h3 className="text-3xl font-black text-gray-900 dark:text-white mb-3 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors duration-300">
                           {founder.name}
-                        </h3>
+                    </h3>
                         
                         {/* Role */}
                         <div className="mb-4">
@@ -368,9 +368,9 @@ export function About() {
                             <p className="text-red-100 font-bold text-sm">
                               {founder.role}
                             </p>
-                          </div>
-                        </div>
-                        
+                </div>
+              </div>
+
                         {/* Divider */}
                         <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-red-500 to-transparent mb-6 transform group-hover:scale-x-150 transition-transform duration-500"></div>
                         
@@ -379,12 +379,12 @@ export function About() {
                           {founder.about}
                         </p>
                       </div>
+                      </div>
                     </div>
-                  </div>
                 );
               })}
-            </div>
-          </div>
+                    </div>
+                  </div>
 
           {/* Launch Date - Premium CTA */}
           <div
@@ -400,7 +400,7 @@ export function About() {
                 <div className="absolute top-0 left-0 w-48 h-48 bg-red-500/50 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl animate-pulse"></div>
                 <div className="absolute bottom-0 right-0 w-56 h-56 bg-yellow-400/30 rounded-full translate-x-1/2 translate-y-1/2 blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-red-400/20 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
-              </div>
+                </div>
               
               <div className="relative z-10">
                 {/* Icon */}
@@ -409,9 +409,9 @@ export function About() {
                     <div className="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-60 animate-pulse"></div>
                     <div className="relative bg-yellow-400 rounded-full p-4 shadow-xl">
                       <Calendar className="w-10 h-10 text-red-700" />
-                    </div>
-                  </div>
-                </div>
+              </div>
+            </div>
+          </div>
 
                 {/* Title */}
                 <h2 className="text-4xl md:text-5xl font-black text-white mb-6 transform group-hover:scale-105 transition-transform duration-300">
@@ -440,8 +440,8 @@ export function About() {
                         <div className="relative bg-white/20 backdrop-blur-xl rounded-full px-6 py-3 text-white font-semibold text-base border-2 border-white/40 transform hover:scale-110 hover:bg-white/30 transition-all duration-500 shadow-lg flex items-center gap-2">
                           <IconComponent className="w-4 h-4 transform group-hover/item:rotate-12 transition-transform duration-500" />
                           {item.label}
-                        </div>
-                      </div>
+                  </div>
+                  </div>
                     );
                   })}
                 </div>
@@ -475,28 +475,28 @@ export function About() {
 
               {/* Title */}
               <h2 className="text-6xl md:text-7xl font-black text-white mb-10 transform group-hover:scale-105 transition-transform duration-300">
-                Join the ShowSewa Revolution
-              </h2>
+              Join the ShowSewa Revolution
+            </h2>
 
               {/* Description */}
               <p className="text-3xl text-red-100 mb-16 max-w-4xl mx-auto leading-relaxed font-light">
-                Experience the easiest way to book movies and events in Nepal
-              </p>
+              Experience the easiest way to book movies and events in Nepal
+            </p>
 
               {/* Buttons */}
               <div className="flex flex-wrap justify-center gap-6">
                 <button className="group/btn relative overflow-hidden bg-white text-red-600 font-black px-12 py-6 rounded-2xl transform hover:scale-110 hover:-translate-y-2 transition-all duration-300 shadow-2xl hover:shadow-white/30 text-xl">
                   <span className="relative z-10 flex items-center gap-3">
-                    Start Booking
+                Start Booking
                     <ArrowRight className="w-6 h-6 transform group-hover/btn:translate-x-2 transition-transform duration-300" />
                   </span>
                   <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-red-700 opacity-0 group-hover/btn:opacity-10 transition-opacity duration-300"></div>
-                </button>
+              </button>
                 
                 <button className="group/btn relative overflow-hidden bg-transparent border-4 border-white text-white font-black px-12 py-6 rounded-2xl transform hover:scale-110 hover:-translate-y-2 transition-all duration-300 text-xl backdrop-blur-sm hover:bg-white hover:text-red-600">
                   <span className="relative z-10">Learn More</span>
                   <div className="absolute inset-0 bg-white opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
-                </button>
+              </button>
               </div>
             </div>
           </div>
