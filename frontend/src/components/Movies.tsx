@@ -70,7 +70,7 @@ export function Movies({ onNavigate }: MoviesProps) {
     setError(null);
     try {
       // Build URL - only add city filter if city is selected and not empty
-      let url = 'http://localhost:5000/api/movies';
+      let url = `${API_BASE_URL}/api/movies`;
       if (selectedCity && selectedCity.trim()) {
         url += `?city=${encodeURIComponent(selectedCity)}`;
       }
@@ -92,7 +92,7 @@ export function Movies({ onNavigate }: MoviesProps) {
           // If city filter returned no results and a city is selected, try fallback to all movies
           if (fetchedMovies.length === 0 && selectedCity && selectedCity.trim()) {
             console.log('No movies found for city, trying fallback to all movies...');
-            const fallbackResponse = await fetch('http://localhost:5000/api/movies');
+            const fallbackResponse = await fetch(`${API_BASE_URL}/api/movies`);
             if (fallbackResponse.ok) {
               const fallbackData = await fallbackResponse.json();
               if (fallbackData.success) {
@@ -428,7 +428,7 @@ export function Movies({ onNavigate }: MoviesProps) {
                           if (!isAuthenticated) {
                             // Store redirect destination - will navigate after checking showtimes
                             try {
-                              const response = await fetch(`http://localhost:5000/api/movies/${movie.id}`);
+                              const response = await fetch(`${API_BASE_URL}/api/movies/${movie.id}`);
                               const data = await response.json();
                               if (data.success && data.data.movie.showtimes && data.data.movie.showtimes.length > 0) {
                                 const firstShowtime = data.data.movie.showtimes[0];
@@ -442,23 +442,8 @@ export function Movies({ onNavigate }: MoviesProps) {
                             onNavigate('login');
                             return;
                           }
-                          try {
-                            // Fetch showtimes for this specific movie
-                            const response = await fetch(`http://localhost:5000/api/movies/${movie.id}`);
-                            const data = await response.json();
-                            if (data.success && data.data.movie.showtimes && data.data.movie.showtimes.length > 0) {
-                              // Use the first available showtime for this movie
-                              const firstShowtime = data.data.movie.showtimes[0];
-                              onNavigate('booking-page', firstShowtime.id);
-                            } else {
-                              // If no showtimes found, navigate to movie detail page instead
-                              onNavigate('movie-detail', movie.id);
-                            }
-                          } catch (error) {
-                            console.error('Error fetching movie showtimes:', error);
-                            // Fallback to movie detail page
-                            onNavigate('movie-detail', movie.id);
-                          }
+                          // Navigate to theater selection page for this movie
+                          onNavigate('theater-selection', movie.id);
                         }}
                         className="w-full bg-red-600 text-white py-1.5 sm:py-2 rounded-lg hover:bg-red-700 transition-all duration-300 font-semibold text-xs sm:text-sm transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl"
                       >

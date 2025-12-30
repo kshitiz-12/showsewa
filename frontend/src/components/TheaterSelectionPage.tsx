@@ -168,17 +168,27 @@ export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSe
   // Get available formats
   const availableFormats = [...new Set(showtimes.map(s => s.screen?.screenType || '2D'))].sort((a, b) => a.localeCompare(b));
 
-  // Group showtimes by date, then by theater
+  // Group showtimes by date, then by theater - BookMyShow Style
+  // Normalize dates for grouping
   const groupedShowtimes = filteredShowtimes.reduce((acc, showtime) => {
-    const date = showtime.showDate;
+    const dateStr = new Date(showtime.showDate).toISOString().split('T')[0];
     const theaterName = showtime.screen.theater.name;
+    const theaterId = showtime.screen.theater.id;
     
-    if (!acc[date]) acc[date] = {};
-    if (!acc[date][theaterName]) acc[date][theaterName] = [];
+    // Use theaterId as key to handle theaters with same name
+    const theaterKey = `${theaterId}_${theaterName}`;
     
-    acc[date][theaterName].push(showtime);
+    if (!acc[dateStr]) acc[dateStr] = {};
+    if (!acc[dateStr][theaterKey]) {
+      acc[dateStr][theaterKey] = {
+        theater: showtime.screen.theater,
+        showtimes: []
+      };
+    }
+    
+    acc[dateStr][theaterKey].showtimes.push(showtime);
     return acc;
-  }, {} as Record<string, Record<string, Showtime[]>>);
+  }, {} as Record<string, Record<string, { theater: any, showtimes: Showtime[] }>>);
 
   if (loading) {
     return (
@@ -220,32 +230,28 @@ export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSe
         </button>
 
         {/* Movie Header - BookMyShow Style */}
-        <div className="mb-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-          <div className="flex items-center gap-6">
-            <img
-              src={movie.posterUrl}
-              alt={language === 'en' ? movie.title : movie.titleNe}
-              className="w-24 h-36 rounded-lg object-cover shadow-md"
-              loading="eager"
-              decoding="async"
-              fetchPriority="high"
-            />
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                {language === 'en' ? movie.title : movie.titleNe}
-                {movie.language && movie.language.length > 0 && (
-                  <span className="text-xl font-normal text-gray-600 dark:text-gray-400 ml-2">
-                    - ({movie.language[0]})
-                  </span>
-                )}
-              </h1>
-              <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                <span className="flex items-center gap-1">
-                  <MapPin className="w-4 h-4" />
-                  {selectedCity}
-                </span>
-              </div>
-            </div>
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            {language === 'en' ? movie.title : movie.titleNe}
+            {movie.language && movie.language.length > 0 && (
+              <span className="text-xl font-normal text-gray-600 dark:text-gray-400 ml-2">
+                - ({movie.language[0]})
+              </span>
+            )}
+          </h1>
+          {/* Movie Attributes - BookMyShow Style */}
+          <div className="flex flex-wrap items-center gap-3 mb-4">
+            <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm">
+              Movie runtime: {Math.floor(movie.duration / 60)}h {movie.duration % 60}m
+            </span>
+            <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm">
+              {movie.rating}
+            </span>
+            {movie.genre.slice(0, 2).map((genre) => (
+              <span key={genre} className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm">
+                {genre}
+              </span>
+            ))}
           </div>
         </div>
 
@@ -370,8 +376,14 @@ export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSe
                       style={{ animationDelay: `${(dateIndex * 0.1) + (theaterIndex * 0.05)}s` }}
                     >
                       {/* Theater Header - BookMyShow Style */}
-                      <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700 p-4">
-                        <div className="flex items-start justify-between">
+                      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                        <div className="flex items-start gap-3">
+                          {/* Theater Logo Placeholder - BookMyShow Style */}
+                          <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center flex-shrink-0">
+                            <span className="text-gray-600 dark:text-gray-400 font-bold text-xs">
+                              {theaterName.charAt(0)}
+                            </span>
+                          </div>
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
                               <h4 className="text-lg font-bold text-gray-900 dark:text-white">{theaterName}</h4>
@@ -379,21 +391,13 @@ export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSe
                                 <Heart className="w-5 h-5 fill-red-600 text-red-600" />
                               )}
                             </div>
-                            <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400 mb-2">
-                              <span className="flex items-center gap-1">
-                                <MapPin className="w-4 h-4" />
-                                {showtimes[0]?.screen.theater.city}
+                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                              <span>{showtimes[0]?.screen.theater.area || showtimes[0]?.screen.theater.city}</span>
+                              <span className="text-gray-400">•</span>
+                              <span className="flex items-center gap-1 text-xs cursor-pointer hover:text-red-600">
+                                <span className="w-4 h-4 rounded-full border border-gray-400 flex items-center justify-center text-gray-400">i</span>
                               </span>
-                              {showtimes[0]?.screen.theater.amenities && showtimes[0].screen.theater.amenities.length > 0 && (
-                                <span className="flex items-center gap-1">
-                                  <Ticket className="w-4 h-4" />
-                                  {showtimes[0].screen.theater.amenities.slice(0, 2).join(', ')}
-                                </span>
-                              )}
                             </div>
-                          </div>
-                          <div className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-3 py-1 rounded-full text-sm font-medium">
-                            {showtimes.length} showtime{showtimes.length > 1 ? 's' : ''}
                           </div>
                         </div>
                       </div>
@@ -404,6 +408,10 @@ export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSe
                           {showtimes.map((showtime) => {
                             const isFastFilling = showtime.availableSeats > 0 && showtime.availableSeats <= 10;
                             const isSoldOut = showtime.availableSeats === 0;
+                            
+                            // Format label for display (like "GOLD", "ATMOS", "PXL", "LASER")
+                            const formatLabel = showtime.screen?.screenType || showtime.format || '2D';
+                            const languageLabel = showtime.language || movie?.language?.[0] || '';
                             
                             return (
                               <button
@@ -417,22 +425,33 @@ export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSe
                                   onNavigate('booking-page', showtime.id);
                                 }}
                                 disabled={isSoldOut}
-                                className={`px-6 py-3 rounded-lg border-2 font-semibold text-base transition-all duration-200 ${
+                                className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-200 ${
                                   isSoldOut
-                                    ? 'border-gray-300 text-gray-400 bg-gray-50 cursor-not-allowed'
+                                    ? 'border-2 border-gray-300 text-gray-400 bg-gray-100 cursor-not-allowed'
                                     : isFastFilling
-                                    ? 'border-yellow-500 text-orange-600 bg-white hover:bg-yellow-50 hover:shadow-md active:scale-95'
-                                    : 'border-green-500 text-orange-600 bg-white hover:bg-green-50 hover:shadow-md active:scale-95'
+                                    ? 'bg-yellow-400 text-gray-900 hover:bg-yellow-500 hover:shadow-md active:scale-95'
+                                    : 'bg-green-500 text-white hover:bg-green-600 hover:shadow-md active:scale-95'
                                 }`}
                               >
-                                {showtime.showTime}
+                                <div className="flex flex-col items-start">
+                                  <span>{showtime.showTime}</span>
+                                  {languageLabel && <span className="text-xs mt-0.5">{languageLabel}</span>}
+                                  {formatLabel && formatLabel !== '2D' && (
+                                    <span className="text-xs mt-0.5 font-bold">{formatLabel}</span>
+                                  )}
+                                </div>
                               </button>
                             );
                           })}
                         </div>
+                        {/* Cancellation Available - BookMyShow Style */}
+                        <div className="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                          Cancellation available
+                        </div>
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             ))}

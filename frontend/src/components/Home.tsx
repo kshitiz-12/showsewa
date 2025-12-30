@@ -335,7 +335,10 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
                     trailerUrl: movie.trailerUrl,
                     type: 'movie' as const
                   }))}
-                  onItemClick={(item) => onNavigate('movie-detail', item.id)}
+                  onItemClick={(item) => {
+                    // For movies, go to theater selection page
+                    onNavigate('theater-selection', item.id);
+                  }}
                   autoPlayInterval={5000}
                   variant="section"
                 />
