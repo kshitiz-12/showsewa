@@ -369,87 +369,92 @@ export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSe
             {Object.entries(groupedShowtimes).map(([date, theaters], dateIndex) => (
               <div key={date} className="animate-page-fade-in" style={{ animationDelay: `${dateIndex * 0.1}s` }}>
                 <div className="grid grid-cols-1 gap-4">
-                  {Object.entries(theaters).map(([theaterName, showtimes], theaterIndex) => (
-                    <div
-                      key={theaterName}
-                      className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden hover:border-red-300 dark:hover:border-red-600 transition-all duration-300"
-                      style={{ animationDelay: `${(dateIndex * 0.1) + (theaterIndex * 0.05)}s` }}
-                    >
-                      {/* Theater Header - BookMyShow Style */}
-                      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                        <div className="flex items-start gap-3">
-                          {/* Theater Logo Placeholder - BookMyShow Style */}
-                          <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center flex-shrink-0">
-                            <span className="text-gray-600 dark:text-gray-400 font-bold text-xs">
-                              {theaterName.charAt(0)}
-                            </span>
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h4 className="text-lg font-bold text-gray-900 dark:text-white">{theaterName}</h4>
-                              {favoriteTheaterIds.has(showtimes[0]?.screen.theater.id) && (
-                                <Heart className="w-5 h-5 fill-red-600 text-red-600" />
-                              )}
-                            </div>
-                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                              <span>{showtimes[0]?.screen.theater.area || showtimes[0]?.screen.theater.city}</span>
-                              <span className="text-gray-400">•</span>
-                              <span className="flex items-center gap-1 text-xs cursor-pointer hover:text-red-600">
-                                <span className="w-4 h-4 rounded-full border border-gray-400 flex items-center justify-center text-gray-400">i</span>
+                  {Object.entries(theaters).map(([theaterKey, theaterData], theaterIndex) => {
+                    const theater = theaterData.theater;
+                    const showtimes = theaterData.showtimes;
+                    const theaterName = theater.name;
+                    
+                    return (
+                      <div
+                        key={theaterKey}
+                        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden hover:border-red-300 dark:hover:border-red-600 transition-all duration-300"
+                        style={{ animationDelay: `${(dateIndex * 0.1) + (theaterIndex * 0.05)}s` }}
+                      >
+                        {/* Theater Header - BookMyShow Style */}
+                        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                          <div className="flex items-start gap-3">
+                            {/* Theater Logo Placeholder - BookMyShow Style */}
+                            <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center flex-shrink-0">
+                              <span className="text-gray-600 dark:text-gray-400 font-bold text-xs">
+                                {theaterName.charAt(0)}
                               </span>
                             </div>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h4 className="text-lg font-bold text-gray-900 dark:text-white">{theaterName}</h4>
+                                {favoriteTheaterIds.has(theater.id) && (
+                                  <Heart className="w-5 h-5 fill-red-600 text-red-600" />
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                <span>{theater.area || theater.city}</span>
+                                <span className="text-gray-400">•</span>
+                                <span className="flex items-center gap-1 text-xs cursor-pointer hover:text-red-600">
+                                  <span className="w-4 h-4 rounded-full border border-gray-400 flex items-center justify-center text-gray-400">i</span>
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Showtimes Grid - BookMyShow Style */}
+                        <div className="p-4">
+                          <div className="flex flex-wrap gap-3">
+                            {showtimes.map((showtime) => {
+                              const isFastFilling = showtime.availableSeats > 0 && showtime.availableSeats <= 10;
+                              const isSoldOut = showtime.availableSeats === 0;
+                              
+                              // Format label for display (like "GOLD", "ATMOS", "PXL", "LASER")
+                              const formatLabel = showtime.screen?.screenType || showtime.format || '2D';
+                              const languageLabel = showtime.language || movie?.language?.[0] || '';
+                              
+                              return (
+                                <button
+                                  key={showtime.id}
+                                  onClick={() => {
+                                    if (!isAuthenticated) {
+                                      localStorage.setItem('redirectAfterLogin', JSON.stringify({ page: 'booking-page', id: showtime.id }));
+                                      onNavigate('login');
+                                      return;
+                                    }
+                                    onNavigate('booking-page', showtime.id);
+                                  }}
+                                  disabled={isSoldOut}
+                                  className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-200 ${
+                                    isSoldOut
+                                      ? 'border-2 border-gray-300 text-gray-400 bg-gray-100 cursor-not-allowed'
+                                      : isFastFilling
+                                      ? 'bg-yellow-400 text-gray-900 hover:bg-yellow-500 hover:shadow-md active:scale-95'
+                                      : 'bg-green-500 text-white hover:bg-green-600 hover:shadow-md active:scale-95'
+                                  }`}
+                                >
+                                  <div className="flex flex-col items-start">
+                                    <span>{showtime.showTime}</span>
+                                    {languageLabel && <span className="text-xs mt-0.5">{languageLabel}</span>}
+                                    {formatLabel && formatLabel !== '2D' && (
+                                      <span className="text-xs mt-0.5 font-bold">{formatLabel}</span>
+                                    )}
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </div>
+                          {/* Cancellation Available - BookMyShow Style */}
+                          <div className="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                            Cancellation available
                           </div>
                         </div>
                       </div>
-                      
-                      {/* Showtimes Grid - BookMyShow Style */}
-                      <div className="p-4">
-                        <div className="flex flex-wrap gap-3">
-                          {showtimes.map((showtime) => {
-                            const isFastFilling = showtime.availableSeats > 0 && showtime.availableSeats <= 10;
-                            const isSoldOut = showtime.availableSeats === 0;
-                            
-                            // Format label for display (like "GOLD", "ATMOS", "PXL", "LASER")
-                            const formatLabel = showtime.screen?.screenType || showtime.format || '2D';
-                            const languageLabel = showtime.language || movie?.language?.[0] || '';
-                            
-                            return (
-                              <button
-                                key={showtime.id}
-                                onClick={() => {
-                                  if (!isAuthenticated) {
-                                    localStorage.setItem('redirectAfterLogin', JSON.stringify({ page: 'booking-page', id: showtime.id }));
-                                    onNavigate('login');
-                                    return;
-                                  }
-                                  onNavigate('booking-page', showtime.id);
-                                }}
-                                disabled={isSoldOut}
-                                className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-200 ${
-                                  isSoldOut
-                                    ? 'border-2 border-gray-300 text-gray-400 bg-gray-100 cursor-not-allowed'
-                                    : isFastFilling
-                                    ? 'bg-yellow-400 text-gray-900 hover:bg-yellow-500 hover:shadow-md active:scale-95'
-                                    : 'bg-green-500 text-white hover:bg-green-600 hover:shadow-md active:scale-95'
-                                }`}
-                              >
-                                <div className="flex flex-col items-start">
-                                  <span>{showtime.showTime}</span>
-                                  {languageLabel && <span className="text-xs mt-0.5">{languageLabel}</span>}
-                                  {formatLabel && formatLabel !== '2D' && (
-                                    <span className="text-xs mt-0.5 font-bold">{formatLabel}</span>
-                                  )}
-                                </div>
-                              </button>
-                            );
-                          })}
-                        </div>
-                        {/* Cancellation Available - BookMyShow Style */}
-                        <div className="mt-3 text-sm text-gray-600 dark:text-gray-400">
-                          Cancellation available
-                        </div>
-                      </div>
-                    </div>
                     );
                   })}
                 </div>
