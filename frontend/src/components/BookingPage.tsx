@@ -741,6 +741,48 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
         {showSeatQuantityModal && showtimeInfo && currentStep === 'seats' && !error && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full p-6">
+              {/* Movie and Theater Info at Top */}
+              <div className="mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex-1">
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                      {showtimeInfo.movie?.title || 'Movie Title'}
+                      {showtimeInfo.movie?.language && showtimeInfo.movie.language.length > 0 && (
+                        <span className="text-lg font-normal text-gray-600 dark:text-gray-400 ml-2">
+                          - ({showtimeInfo.movie.language[0]})
+                        </span>
+                      )}
+                    </h1>
+                    <div className="flex flex-wrap items-center gap-2 text-gray-600 dark:text-gray-400 text-sm">
+                      <span className="font-semibold text-gray-900 dark:text-white">
+                        {showtimeInfo.screen?.theater?.name || 'Theater'}
+                      </span>
+                      <span className="text-gray-400">|</span>
+                      <span>{showtimeInfo.screen?.theater?.city || 'Location'}</span>
+                      <span className="text-gray-400">||</span>
+                      <span>
+                        {new Date(showtimeInfo.showDate).toLocaleDateString('en-US', { 
+                          month: 'short', 
+                          day: 'numeric' 
+                        })} {showtimeInfo.showTime}
+                      </span>
+                    </div>
+                  </div>
+                  {/* Back to Theaters Button */}
+                  <button
+                    onClick={() => {
+                      setShowSeatQuantityModal(false);
+                      onNavigate('movie-detail', showtimeInfo.movie?.id);
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                    aria-label="Back to theaters"
+                  >
+                    <ArrowLeft className="w-5 h-5" />
+                    <span className="text-sm font-medium">Change</span>
+                  </button>
+                </div>
+              </div>
+              
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">How many seats?</h2>
               
               {/* Ticket Quantity Selector */}

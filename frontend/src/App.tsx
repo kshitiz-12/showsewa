@@ -10,6 +10,7 @@ import { Movies } from './components/Movies';
 import { EventDetail } from './components/EventDetail';
 import { EventCheckout, EventBookingSuccess } from './components/EventCheckout';
 import { MovieDetail } from './components/MovieDetail';
+import { TheaterSelectionPage } from './components/TheaterSelectionPage';
 import BookingPage from './components/BookingPage';
 import { About } from './components/About';
 import { Contact } from './components/Contact';
@@ -36,6 +37,7 @@ const parseUrl = () => {
   
   switch (segments[0]) {
     case 'movies':
+      if (segments[1] && segments[2] === 'theaters') return { page: 'theater-selection', id: segments[1] };
       if (segments[1]) return { page: 'movie-detail', id: segments[1] };
       return { page: 'movies', id: undefined };
     case 'events':
@@ -82,6 +84,8 @@ const buildUrl = (page: string, id?: string) => {
       return '/movies';
     case 'movie-detail':
       return `/movies/${id}`;
+    case 'theater-selection':
+      return `/movies/${id}/theaters`;
     case 'events':
       return '/events';
     case 'event-detail':
@@ -186,6 +190,12 @@ function App() {
       case 'movie-detail':
         return selectedItemId ? (
           <MovieDetail movieId={selectedItemId} onNavigate={handleNavigate} />
+        ) : (
+          <Movies onNavigate={handleNavigate} />
+        );
+      case 'theater-selection':
+        return selectedItemId ? (
+          <TheaterSelectionPage movieId={selectedItemId} onNavigate={handleNavigate} />
         ) : (
           <Movies onNavigate={handleNavigate} />
         );
