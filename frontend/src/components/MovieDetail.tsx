@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Clock, Film, ArrowLeft, Play, Image as ImageIcon, Star, Ticket } from 'lucide-react';
+import { Clock, Film, ArrowLeft, Play, Image as ImageIcon, Star, Ticket, Calendar } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useCity } from '../contexts/CityContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -23,7 +23,7 @@ interface Movie {
   director?: string;
   cast: string[];
   imdbRating?: number;
-  showtimes?: Showtime[];
+  showtimes?: any[]; // Showtimes are handled in TheaterSelectionPage
 }
 
 
