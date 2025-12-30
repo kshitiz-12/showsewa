@@ -25,6 +25,7 @@ interface Showtime {
   showTime: string;
   price: number;
   availableSeats: number;
+  language?: string;
   screen: {
     id: string;
     screenType?: string;

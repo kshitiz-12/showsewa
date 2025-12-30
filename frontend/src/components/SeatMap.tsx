@@ -32,7 +32,8 @@ interface SeatMapProps {
   onNavigate?: (page: string, id?: string) => void;
 }
 
-const SeatMap: React.FC<SeatMapProps> = ({ showtimeId, onSeatSelection, showtimeInfo }) => {
+const SeatMap: React.FC<SeatMapProps> = (props) => {
+  const { showtimeId, onSeatSelection, showtimeInfo, availableShowtimes = [], onNavigate } = props;
   const { user } = useAuth();
   const [seats, setSeats] = useState<Seat[]>([]);
   const [categories, setCategories] = useState<SeatCategory[]>([]);
@@ -48,7 +49,7 @@ const SeatMap: React.FC<SeatMapProps> = ({ showtimeId, onSeatSelection, showtime
         setError(null);
 
         console.log('Fetching seats for showtime:', showtimeId);
-        const response = await fetch(`http://localhost:5000/api/seats/showtime/${showtimeId}`);
+        const response = await fetch(`${API_BASE_URL}/api/seats/showtime/${showtimeId}`);
         
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
@@ -233,7 +234,7 @@ const SeatMap: React.FC<SeatMapProps> = ({ showtimeId, onSeatSelection, showtime
       const userId = user?.id || 'demo-user-id';
       const token = localStorage.getItem('token');
       
-      const response = await fetch('http://localhost:5000/api/seats/release', {
+      const response = await fetch(`${API_BASE_URL}/api/seats/release`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
