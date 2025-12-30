@@ -84,6 +84,19 @@ export const translations = {
       download_soon: 'Coming Soon',
       copyright: '© 2024 ShowSewa. All rights reserved.',
     },
+    event_checkout: {
+      about_venue: 'About the Venue',
+      event_details: 'Event Details',
+      event_pricing: 'Event Pricing Information',
+      order_summary: 'Order Summary',
+      tickets: 'Tickets',
+      price_per_ticket: 'Price per Ticket',
+      total: 'Total',
+      proceed_to_pay: 'Proceed to Pay',
+      payment: 'Payment',
+      pay_now: 'Pay Now',
+      processing_payment: 'Processing Payment...',
+    },
   },
   ne: {
     nav: {

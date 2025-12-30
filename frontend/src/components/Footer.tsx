@@ -38,7 +38,7 @@ export function Footer({ onNavigate }: FooterProps) {
               </span>
             </div>
             <p className="text-gray-300 mb-3 sm:mb-4 max-w-md text-xs sm:text-sm">
-              {t('footer.tagline')}
+              Tapai Ko Show Hamro Sewa
             </p>
             
             {/* Social Media */}
@@ -73,7 +73,7 @@ export function Footer({ onNavigate }: FooterProps) {
             <div className="space-y-2 sm:space-y-3">
               <div className="flex items-center gap-2 sm:gap-3 text-gray-300">
                 <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />
-                <span className="text-xs sm:text-sm">+977 98-00000000</span>
+                <span className="text-xs sm:text-sm">+977 980 560 4118</span>
               </div>
               <div className="flex items-center gap-2 sm:gap-3 text-gray-300">
                 <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />

@@ -9,6 +9,8 @@ import {
   Tag,
   Heart,
   ChevronRight,
+  ChevronUp,
+  ChevronDown,
   Smartphone,
   Ticket,
   ChevronLeft,
@@ -297,30 +299,30 @@ export function EventDetail({ eventId, onNavigate }: EventDetailProps) {
 
           {/* Interest Section - BookMyShow Style */}
           <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mb-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 rounded-xl border border-red-200 dark:border-red-800">
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-full">
-                  <ThumbsUp className="w-4 h-4 text-green-600 dark:text-green-400" />
+                <div className="flex items-center justify-center w-10 h-10 bg-red-100 dark:bg-red-900/40 rounded-full">
+                  <ThumbsUp className="w-5 h-5 text-red-600 dark:text-red-400" />
                 </div>
                 <div>
-                  <div className="text-sm sm:text-base font-medium text-gray-900 dark:text-white">
-                    {interestedCount} are interested
+                  <div className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
+                    {interestedCount} {language === 'en' ? 'people are interested' : 'व्यक्तिहरू रुचि राख्छन्'}
                   </div>
                   <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                    Mark interested to know more about this event.
+                    {language === 'en' ? 'Join them to stay updated about this event' : 'तिनीहरूसँग जोडिनुहोस् र यस कार्यक्रमको बारेमा अपडेट रहनुहोस्'}
                   </div>
                 </div>
               </div>
               <button
                 onClick={handleInterested}
                 disabled={loadingInterest}
-                className={`px-4 sm:px-6 py-2 rounded-lg border-2 font-medium transition-colors text-sm sm:text-base whitespace-nowrap ${
+                className={`px-6 sm:px-8 py-3 rounded-xl font-semibold transition-all text-sm sm:text-base whitespace-nowrap shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 ${
                   isInterested
-                    ? 'bg-green-500 border-green-500 text-white'
-                    : 'bg-transparent border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20'
-                } disabled:opacity-50 disabled:cursor-not-allowed`}
+                    ? 'bg-gradient-to-r from-green-500 to-green-600 border-2 border-green-600 text-white'
+                    : 'bg-gradient-to-r from-red-600 to-red-700 border-2 border-red-700 text-white hover:from-red-700 hover:to-red-800'
+                } disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100`}
               >
-                {loadingInterest ? 'Updating...' : (isInterested ? "I'm Interested ✓" : "Interested?")}
+                {loadingInterest ? (language === 'en' ? 'Updating...' : 'अपडेट हुँदै...') : (isInterested ? (language === 'en' ? "I'm Interested ✓" : "म रुचि राख्छु ✓") : (language === 'en' ? "Mark as Interested" : "रुचि राख्नुहोस्"))}
               </button>
             </div>
           </div>
@@ -423,21 +425,22 @@ export function EventDetail({ eventId, onNavigate }: EventDetailProps) {
 
           {/* About The Event Section */}
           <div className="mb-6">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4">About The Event</h2>
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-4">{language === 'en' ? 'Event Details' : 'कार्यक्रम विवरण'}</h2>
             
             {/* Price and Availability Row */}
-            <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
               <div>
+                <div className="text-sm sm:text-base font-semibold text-gray-600 dark:text-gray-400 mb-1">{language === 'en' ? 'Event Pricing Information' : 'कार्यक्रम मूल्य निर्धारण'}</div>
                 <div className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
                   NPR {event.priceMin?.toLocaleString() || 0}
                 </div>
                 {event.priceMax > event.priceMin && (
                   <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    up to NPR {event.priceMax.toLocaleString()}
+                    {language === 'en' ? 'up to' : 'सम्म'} NPR {event.priceMax.toLocaleString()}
                   </div>
                 )}
                 <div className="text-sm sm:text-base text-green-600 dark:text-green-400 font-medium mt-1">
-                  {event.availableSeats && event.availableSeats > 0 ? 'Available' : 'Sold Out'}
+                  {event.availableSeats && event.availableSeats > 0 ? (language === 'en' ? 'Available' : 'उपलब्ध') : (language === 'en' ? 'Sold Out' : 'बिक्री भयो')}
                 </div>
               </div>
               <button
@@ -464,9 +467,19 @@ export function EventDetail({ eventId, onNavigate }: EventDetailProps) {
             {readMoreVisible && (
               <button
                 onClick={() => setShowFullDescription(!showFullDescription)}
-                className="text-red-600 dark:text-red-400 font-medium mt-2 hover:underline text-sm sm:text-base"
+                className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-lg transition-all duration-200 hover:shadow-md text-sm sm:text-base"
               >
-                {showFullDescription ? 'Read Less' : 'Read More'}
+                {showFullDescription ? (
+                  <>
+                    <span>{language === 'en' ? 'Show Less' : 'कम देखाउनुहोस्'}</span>
+                    <ChevronUp className="w-4 h-4" />
+                  </>
+                ) : (
+                  <>
+                    <span>{language === 'en' ? 'Read More' : 'थप पढ्नुहोस्'}</span>
+                    <ChevronDown className="w-4 h-4" />
+                  </>
+                )}
               </button>
             )}
           </div>

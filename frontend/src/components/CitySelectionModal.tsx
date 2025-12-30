@@ -108,7 +108,20 @@ export function CitySelectionModal({ isOpen, onClose, onSelectCity, currentCity 
         </div>
 
         {/* Cities Grid */}
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-250px)]">
+        <div className="p-6 overflow-y-auto max-h-[calc(90vh-250px)]" 
+             onWheel={(e) => {
+               const target = e.currentTarget;
+               const isScrollingDown = e.deltaY > 0;
+               const isAtTop = target.scrollTop === 0;
+               const isAtBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 1;
+               
+               // Prevent background scroll when at boundaries
+               if ((isScrollingDown && isAtBottom) || (!isScrollingDown && isAtTop)) {
+                 e.preventDefault();
+                 e.stopPropagation();
+               }
+             }}
+             style={{ overscrollBehavior: 'contain' }}>
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             {showAllCities ? 'All Cities' : 'Popular Cities'}
           </h3>
@@ -126,11 +139,22 @@ export function CitySelectionModal({ isOpen, onClose, onSelectCity, currentCity 
                   onSelectCity(''); // Empty string means show all cities
                   onClose();
                 }}
-                className={`group p-4 rounded-xl border-2 transition-all duration-200 hover:scale-105 ${
+                className={`group p-4 rounded-xl border-2 transition-all duration-200 hover:scale-105 relative ${
                   !currentCity || currentCity === ''
                     ? 'border-red-500 bg-red-50'
                     : 'border-gray-200 hover:border-red-300 hover:bg-gray-50'
                 }`}
+                onMouseEnter={(e) => {
+                  const tooltip = document.createElement('div');
+                  tooltip.textContent = 'All Cities';
+                  tooltip.className = 'absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-900 text-white text-xs rounded-lg whitespace-nowrap z-50 pointer-events-none';
+                  tooltip.id = 'city-tooltip';
+                  e.currentTarget.appendChild(tooltip);
+                }}
+                onMouseLeave={(e) => {
+                  const tooltip = document.getElementById('city-tooltip');
+                  if (tooltip) tooltip.remove();
+                }}
               >
                 <div className="flex items-center justify-center mb-2">
                   <div className={`p-3 rounded-xl transform group-hover:scale-110 transition-all duration-200 ${
@@ -138,7 +162,7 @@ export function CitySelectionModal({ isOpen, onClose, onSelectCity, currentCity 
                       ? 'bg-red-600'
                       : 'bg-gray-200 group-hover:bg-red-100'
                   }`}>
-                    <Building2 className={`w-8 h-8 ${
+                    <DefaultCityIcon className={`w-8 h-8 ${
                       !currentCity || currentCity === ''
                         ? 'text-white'
                         : 'text-gray-600 group-hover:text-red-600'
@@ -160,11 +184,22 @@ export function CitySelectionModal({ isOpen, onClose, onSelectCity, currentCity 
                       onSelectCity(city.name);
                       onClose();
                     }}
-                    className={`group p-4 rounded-xl border-2 transition-all duration-200 hover:scale-105 ${
+                    className={`group p-4 rounded-xl border-2 transition-all duration-200 hover:scale-105 relative ${
                       currentCity === city.name
                         ? 'border-red-500 bg-red-50'
                         : 'border-gray-200 hover:border-red-300 hover:bg-gray-50'
                     }`}
+                    onMouseEnter={(e) => {
+                      const tooltip = document.createElement('div');
+                      tooltip.textContent = city.name;
+                      tooltip.className = 'absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-900 text-white text-xs rounded-lg whitespace-nowrap z-50 pointer-events-none';
+                      tooltip.id = `city-tooltip-${city.name}`;
+                      e.currentTarget.appendChild(tooltip);
+                    }}
+                    onMouseLeave={(e) => {
+                      const tooltip = document.getElementById(`city-tooltip-${city.name}`);
+                      if (tooltip) tooltip.remove();
+                    }}
                   >
                     <div className="flex items-center justify-center mb-2">
                       <div className={`p-3 rounded-xl transform group-hover:scale-110 transition-all duration-200 ${

@@ -173,7 +173,22 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors overflow-x-hidden">
       {/* Hero Section */}
-      <section className="relative py-12 sm:py-16 lg:py-24 bg-gradient-to-br from-red-900 via-red-800 to-red-700 overflow-hidden shadow-xl">
+      <section className="relative py-12 sm:py-16 lg:py-24 overflow-hidden shadow-xl">
+        {/* Dynamic Background Image from Trending Movies */}
+        {trendingMovies.length > 0 && (
+          <div className="absolute inset-0">
+            <img 
+              src={trendingMovies[0].posterUrl} 
+              alt={trendingMovies[0].title}
+              className="w-full h-full object-cover transition-opacity duration-1000"
+              style={{ opacity: 0.3 }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-br from-red-900 via-red-800 to-red-700"></div>
+          </div>
+        )}
+        {trendingMovies.length === 0 && (
+          <div className="absolute inset-0 bg-gradient-to-br from-red-900 via-red-800 to-red-700"></div>
+        )}
         <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/20"></div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -452,7 +467,8 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
                         <img
                           src={event.imageUrl}
                           alt={language === 'en' ? event.title : event.titleNe}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                          style={{ minHeight: '100%', minWidth: '100%' }}
                           loading="lazy"
                           decoding="async"
                           onError={(e) => {

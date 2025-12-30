@@ -74,8 +74,14 @@ export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSe
   // Set default selected date to first available date
   useEffect(() => {
     if (showtimes.length > 0 && !selectedDate) {
-      const dates = [...new Set(showtimes.map(s => s.showDate))].sort((a, b) => a.localeCompare(b));
+      // Normalize dates to YYYY-MM-DD format for consistency
+      const dates = [...new Set(showtimes.map(s => {
+        // showDate is a string, normalize it to YYYY-MM-DD
+        const dateStr = new Date(s.showDate).toISOString().split('T')[0];
+        return dateStr;
+      }))].sort((a, b) => a.localeCompare(b));
       if (dates.length > 0) {
+        console.log('Auto-selecting first available date:', dates[0]);
         setSelectedDate(dates[0]);
       }
     }
@@ -85,24 +91,32 @@ export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSe
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/movies/${movieId}?city=${selectedCity}`);
+      // Build URL - only add city filter if city is selected and not empty
+      let url = `${API_BASE_URL}/api/movies/${movieId}`;
+      if (selectedCity && selectedCity.trim()) {
+        url += `?city=${encodeURIComponent(selectedCity)}`;
+      }
+
+      console.log('Fetching movie showtimes from:', url, 'for city:', selectedCity);
+      const response = await fetch(url);
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
           setMovie(data.data.movie);
-          // Filter showtimes by selected city
+          // Backend already filters by city, so use all returned showtimes
           if (data.data.movie.showtimes && Array.isArray(data.data.movie.showtimes)) {
-            const cityShowtimes = data.data.movie.showtimes.filter((showtime: Showtime) => 
-              showtime.screen?.theater?.city?.toLowerCase() === selectedCity.toLowerCase()
-            );
-            setShowtimes(cityShowtimes);
+            console.log(`Found ${data.data.movie.showtimes.length} showtimes for movie ${data.data.movie.title}`);
+            setShowtimes(data.data.movie.showtimes);
           } else {
+            console.log('No showtimes array in response');
             setShowtimes([]);
           }
         } else {
           setError('Failed to load movie details');
         }
       } else {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Failed to load movie:', response.status, errorData);
         setError('Failed to load movie details');
       }
     } catch (error) {
@@ -121,15 +135,21 @@ export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSe
     }
 
     let filtered = [...showtimes]; // Start with all showtimes
+    console.log(`Filtering ${showtimes.length} showtimes. Selected date: ${selectedDate}, language: ${selectedLanguage}, format: ${selectedFormat}`);
 
     // Filter by selected date (only if a date is selected and it's not empty)
     if (selectedDate) {
-      // Normalize dates for comparison (compare date strings, not full datetime)
+      // Normalize dates for comparison - both are strings, normalize to YYYY-MM-DD
       filtered = filtered.filter(showtime => {
-        const showtimeDate = new Date(showtime.showDate).toISOString().split('T')[0];
+        // Extract date part from showtime.showDate (string)
+        const showtimeDateStr = new Date(showtime.showDate).toISOString().split('T')[0];
+        
+        // Extract date part from selectedDate (string)
         const selectedDateStr = new Date(selectedDate).toISOString().split('T')[0];
-        return showtimeDate === selectedDateStr;
+        
+        return showtimeDateStr === selectedDateStr;
       });
+      console.log(`After date filter: ${filtered.length} showtimes`);
     }
 
     // Filter by language (only if a language is selected)
@@ -162,8 +182,12 @@ export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSe
     setFilteredShowtimes(filtered);
   }
 
-  // Get available dates for date selector
-  const availableDates = [...new Set(showtimes.map(s => s.showDate))].sort((a, b) => a.localeCompare(b));
+  // Get available dates for date selector - normalize to YYYY-MM-DD format
+  const availableDates = [...new Set(showtimes.map(s => {
+    // showDate is a string, normalize it to YYYY-MM-DD
+    const dateStr = new Date(s.showDate).toISOString().split('T')[0];
+    return dateStr;
+  }))].sort((a, b) => a.localeCompare(b));
   
   // Get available languages
   const availableLanguages = movie ? [...new Set(movie.language)] : [];
@@ -268,6 +292,7 @@ export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSe
             <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
               {availableDates.map((date) => {
                 const dateObj = new Date(date);
+                // selectedDate is a string, normalize it to YYYY-MM-DD for comparison
                 const selectedDateStr = selectedDate ? new Date(selectedDate).toISOString().split('T')[0] : '';
                 const isSelected = date === selectedDateStr;
               return (

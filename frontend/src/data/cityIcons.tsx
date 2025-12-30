@@ -4,84 +4,23 @@ import {
   Car, Sun
 } from 'lucide-react';
 
-export { MapPin as DefaultCityIcon } from 'lucide-react';
+// Map of Nepal Icon Component
+const NepalMapIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2C8 2 5 4 5 7C5 9 6 11 8 12C6 13 5 15 5 17C5 20 8 22 12 22C16 22 19 20 19 17C19 15 18 13 16 12C18 11 19 9 19 7C19 4 16 2 12 2Z" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+    <path d="M12 7L10 10L12 13L14 10L12 7Z" fill="currentColor"/>
+  </svg>
+);
 
-// Mapping of city names to appropriate landmark icons
-export const cityIconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  // Province 1 - Koshi
-  'Biratnagar': Factory,
-  'Dharan': Mountain,
-  'Itahari': TreePine,
-  'Inaruwa': Waves,
-  'Damak': Building2,
-  'Biratchowk': MapPin,
-  'Urlabari': Sun,
-  'Mechinagar': Car,
-  'Gaighat': Waves,
-  
-  // Province 2 - Madhesh
-  'Janakpur': Landmark,
-  'Birgunj': Factory,
-  'Kalaiya': TreePine,
-  'Gaur': Building2,
-  'Rajbiraj': Landmark,
-  'Jaleshwar': Landmark,
-  'Malangwa': TreePine,
-  'Siraha': Building2,
-  'Lahan': MapPin,
-  'Malanchwok': TreePine,
-  
-  // Province 3 - Bagmati
-  'Kathmandu': Landmark,
-  'Lalitpur': Castle,
-  'Bhaktapur': Landmark,
-  'Hetauda': Building2,
-  'Thimi': Camera,
-  'Banepa': Building2,
-  'Kirtipur': Landmark,
-  'Sankhu': Landmark,
-  'Dakshinkali': Church,
-  'Madhyapur': Building2,
-  'Dudhauli': Waves,
-  'Tribhuwan Highway': Car,
-  
-  // Province 4 - Gandaki
-  'Pokhara': Mountain,
-  'Baglung': Mountain,
-  'Beni': Waves,
-  'Kushma': Mountain,
-  'Gorkha': Castle,
-  'Damauli': TreePine,
-  'Dulegauda': Mountain,
-  
-  // Province 5 - Lumbini
-  'Butwal': Building2,
-  'Bhairahawa': Sun,
-  'Siddharthanagar': Landmark,
-  'Gulariya': Building2,
-  'Tamghas': Mountain,
-  'Tansen': Landmark,
-  'Musikot': TreePine,
-  
-  // Province 6 - Karnali
-  'Birendranagar': Mountain,
-  'Manma': Mountain,
-  'Jumla': Mountain,
-  'Dunai': Waves,
-  
-  // Province 7 - Sudurpashchim
-  'Nepalgunj': Building2,
-  'Dhangadhi': TreePine,
-  'Mahendranagar': Building2,
-  'Tikapur': TreePine,
-  'Bhimdatta': Waves,
-  'Attariya': Car,
-  
-  // Tourist Cities
-  'Chitwan': TreePine,
-  'Lumbini': Landmark,
-  'Bandipur': Building2,
-  'Ghandruk': Mountain,
-  'Mustang': Mountain,
-  'Annapurna Base Camp': Tent,
-};
+export { NepalMapIcon as DefaultCityIcon };
+
+// Map of Nepal Icon Component - used for all cities
+const NepalMapIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2C8 2 5 4 5 7C5 9 6 11 8 12C6 13 5 15 5 17C5 20 8 22 12 22C16 22 19 20 19 17C19 15 18 13 16 12C18 11 19 9 19 7C19 4 16 2 12 2Z" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+    <path d="M12 7L10 10L12 13L14 10L12 7Z" fill="currentColor"/>
+  </svg>
+);
+
+// All cities use the Map of Nepal icon
+export const cityIconMap: Record<string, React.ComponentType<{ className?: string }>> = {};

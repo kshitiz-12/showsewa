@@ -27,7 +27,7 @@ interface EventInfo {
 }
 
 export function EventCheckout({ eventId, onNavigate }: EventCheckoutProps) {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const [event, setEvent] = useState<EventInfo | null>(null);
   const [qty, setQty] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -147,18 +147,18 @@ function Stepper({step}:{step:'summary'|'payment'|'done'}) {
               </div>
               {/* SUMMARY CARD + PAYMENT ACTION */}
               <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-700 p-8 flex flex-col justify-center min-h-[400px]">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-5">Order Summary</h2>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-5">{t('event_checkout.order_summary')}</h2>
                 <div className="flex items-center justify-between text-lg mb-3">
-                  <span className="text-gray-700 dark:text-gray-400">Tickets</span>
+                  <span className="text-gray-700 dark:text-gray-400">{t('event_checkout.tickets')}</span>
                   <span className="font-bold text-gray-900 dark:text-white">{qty}</span>
                 </div>
                 <div className="flex items-center justify-between text-lg mb-3">
-                  <span className="text-gray-700 dark:text-gray-400">Price per Ticket</span>
+                  <span className="text-gray-700 dark:text-gray-400">{t('event_checkout.price_per_ticket')}</span>
                   <span className="font-semibold text-gray-900 dark:text-white">NPR {price}</span>
                 </div>
                 <div className="border-t my-3" />
                 <div className="flex items-center justify-between text-gray-900 dark:text-white font-extrabold text-2xl mb-6">
-                  <span>Total</span>
+                  <span>{t('event_checkout.total')}</span>
                   <span>NPR {total}</span>
                 </div>
                 {/* Only show proceed/pay on summary */}
@@ -167,7 +167,7 @@ function Stepper({step}:{step:'summary'|'payment'|'done'}) {
                     className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-4 rounded-xl hover:from-red-700 hover:to-red-800 transition-all duration-300 font-bold shadow-lg text-lg mt-4 lift hover:scale-105"
                     onClick={() => setStep('payment')}
                   >
-                    Proceed to Pay
+                    {t('event_checkout.proceed_to_pay')}
                   </button>
                 )}
                 {/* Payment Step: placeholder for payment screen */}
@@ -175,15 +175,15 @@ function Stepper({step}:{step:'summary'|'payment'|'done'}) {
                   <>
                     <div className="mb-5 py-8 flex flex-col items-center">
                       <CreditCard className="w-12 h-12 text-red-600 mb-4 animate-bounce" />
-                      <div className="font-bold text-xl mb-2">Payment</div>
-                      <div className="text-gray-700 dark:text-gray-300 text-lg mb-4">(Mock UI) Pay now to confirm your tickets.</div>
+                      <div className="font-bold text-xl mb-2">{t('event_checkout.payment')}</div>
+                      <div className="text-gray-700 dark:text-gray-300 text-lg mb-4">{language === 'en' ? '(Mock UI) Pay now to confirm your tickets.' : '(मोक UI) आफ्नो टिकटहरू पुष्टि गर्न अहिले तिर्नुहोस्।'}</div>
                     </div>
                     <button
                       className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-4 rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-300 font-bold shadow-lg text-lg mt-4 lift hover:scale-105 disabled:opacity-60"
                       onClick={handlePayment}
                       disabled={paying}
                     >
-                      {paying ? 'Processing Payment...' : 'Pay Now'}
+                      {paying ? t('event_checkout.processing_payment') : t('event_checkout.pay_now')}
                     </button>
                   </>
                 )}

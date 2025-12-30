@@ -414,7 +414,8 @@ export function Movies({ onNavigate }: MoviesProps) {
                   <img
                     src={movie.posterUrl}
                     alt={language === 'en' ? movie.title : movie.titleNe}
-                    className="w-full aspect-[2/3] object-cover transition-transform duration-500 group-hover:scale-110"
+                    className="w-full aspect-[2/3] object-cover object-center transition-transform duration-500 group-hover:scale-110"
+                    style={{ minHeight: '100%', minWidth: '100%' }}
                     loading="lazy"
                     decoding="async"
                   />

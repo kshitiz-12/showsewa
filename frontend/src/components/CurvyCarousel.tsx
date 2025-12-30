@@ -139,43 +139,37 @@ export const CurvyCarousel: React.FC<CurvyCarouselProps> = ({
 
   return (
     <div className={containerClasses}>
-      {/* Background Images with Parallax Effect */}
-      <div className="absolute inset-0">
-        {/* Previous Image */}
-        <div 
-          className="absolute inset-0 opacity-30 scale-110 blur-sm transition-all duration-1000 ease-out"
-          style={{
-            backgroundImage: `url(${visibleItems.prev.image})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            transform: 'translateX(-10px)'
-          }}
-        />
-        
-        {/* Current Image */}
-        <div 
-          className="absolute inset-0 transition-all duration-1000 ease-out"
-          style={{
-            backgroundImage: `url(${visibleItems.current.image})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          }}
-        />
-        
-        {/* Next Image */}
-        <div 
-          className="absolute inset-0 opacity-30 scale-110 blur-sm transition-all duration-1000 ease-out"
-          style={{
-            backgroundImage: `url(${visibleItems.next.image})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            transform: 'translateX(10px)'
-          }}
-        />
+      {/* Background Images with Slide Animation */}
+      <div className="absolute inset-0 overflow-hidden">
+        {items.map((item, index) => {
+          // Calculate position for slide animation
+          let translateX = 0;
+          if (index < currentIndex) {
+            translateX = -100; // Slide left (off screen)
+          } else if (index > currentIndex) {
+            translateX = 100; // Slide right (off screen)
+          } else {
+            translateX = 0; // Current slide (center)
+          }
+          
+          return (
+            <div
+              key={item.id}
+              className="absolute inset-0 transition-transform duration-700 ease-in-out"
+              style={{
+                backgroundImage: `url(${item.image})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                transform: `translateX(${translateX}%)`,
+                zIndex: index === currentIndex ? 1 : 0
+              }}
+            />
+          );
+        })}
       </div>
 
       {/* Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10" />
 
       {/* Content */}
       <div className="relative z-10 h-full flex items-center">

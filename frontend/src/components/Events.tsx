@@ -205,7 +205,8 @@ export function Events({ onNavigate }: EventsProps) {
                     <img
                       src={event.imageUrl}
                       alt={language === 'en' ? event.title : event.titleNe}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-500"
+                      style={{ minHeight: '100%', minWidth: '100%' }}
                       loading="lazy"
                       decoding="async"
                       onError={(e) => {
@@ -215,7 +216,7 @@ export function Events({ onNavigate }: EventsProps) {
                       }}
                     />
                   ) : null}
-                  <div className="hidden absolute inset-0 flex items-center justify-center">
+                  <div className="hidden absolute inset-0 flex items-center justify-center bg-gray-200 dark:bg-gray-700">
                     <Music className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400" />
                   </div>
                   {/* Category Badge */}
