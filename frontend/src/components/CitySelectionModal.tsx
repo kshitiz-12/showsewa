@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { Search, MapPin, X, Landmark, Building2 } from 'lucide-react';
 import { popularCities, nepalCities, getProvinces } from '../data/nepalCities';
 import { cityIconMap, DefaultCityIcon } from '../data/cityIcons';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface CitySelectionModalProps {
   isOpen: boolean;
@@ -14,6 +15,7 @@ interface CitySelectionModalProps {
 const allCities = nepalCities;
 
 export function CitySelectionModal({ isOpen, onClose, onSelectCity, currentCity }: CitySelectionModalProps) {
+  const { language, t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [showAllCities, setShowAllCities] = useState(false);
   const [selectedProvince, setSelectedProvince] = useState<string>('');
@@ -78,7 +80,7 @@ export function CitySelectionModal({ isOpen, onClose, onSelectCity, currentCity 
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Search for your city or province"
+              placeholder={t('common.search_city_province')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
@@ -91,7 +93,7 @@ export function CitySelectionModal({ isOpen, onClose, onSelectCity, currentCity 
               onChange={(e) => setSelectedProvince(e.target.value)}
               className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white"
             >
-              <option value="">All Provinces</option>
+              <option value="">{t('common.all_provinces')}</option>
               {provinces.map(province => (
                 <option key={province} value={province}>{province}</option>
               ))}
@@ -123,13 +125,13 @@ export function CitySelectionModal({ isOpen, onClose, onSelectCity, currentCity 
              }}
              style={{ overscrollBehavior: 'contain' }}>
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            {showAllCities ? 'All Cities' : 'Popular Cities'}
+            {showAllCities ? t('common.all_cities') : t('common.popular_cities')}
           </h3>
 
           {displayCities.length === 0 ? (
             <div className="text-center py-12">
               <Landmark className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500">No cities found</p>
+              <p className="text-gray-500">{t('common.no_cities_found')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -170,9 +172,9 @@ export function CitySelectionModal({ isOpen, onClose, onSelectCity, currentCity 
                   </div>
                 </div>
                 <div className={`font-semibold text-sm mb-1 ${!currentCity || currentCity === '' ? 'text-red-600' : 'text-gray-900'}`}>
-                  All Cities
+                  {t('common.all_cities')}
                 </div>
-                <div className="text-xs text-gray-500">Show all</div>
+                <div className="text-xs text-gray-500">{t('common.show_all')}</div>
               </button>
               
               {displayCities.map((city) => {
@@ -232,7 +234,7 @@ export function CitySelectionModal({ isOpen, onClose, onSelectCity, currentCity 
               onClick={() => setShowAllCities(true)}
               className="w-full text-red-600 hover:text-red-700 font-medium text-center"
             >
-              View All Cities
+              {t('common.view_all_cities')}
             </button>
           </div>
         )}

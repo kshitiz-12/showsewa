@@ -42,7 +42,7 @@ interface Showtime {
 }
 
 export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSelectionPageProps>) {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const { selectedCity } = useCity();
   const { favoriteTheaterIds } = useFavorites();
   const { isAuthenticated } = useAuth();
@@ -232,12 +232,12 @@ export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSe
     return (
       <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center animate-page-fade-in">
-          <div className="text-red-600 text-xl mb-4">⚠️ {error || 'Movie not found'}</div>
+          <div className="text-red-600 text-xl mb-4">⚠️ {error || t('common.movie_not_found')}</div>
           <button
             onClick={() => onNavigate('movies')}
             className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
           >
-            Back to Movies
+            {t('common.back_to_movies')}
           </button>
         </div>
       </div>
@@ -270,7 +270,7 @@ export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSe
           {movie.duration && (
             <div className="flex flex-wrap items-center gap-3 mb-4">
               <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm">
-                Movie runtime: {Math.floor(movie.duration / 60)}h {movie.duration % 60}m
+                {t('common.movie_runtime')}: {Math.floor(movie.duration / 60)}h {movie.duration % 60}m
               </span>
               {movie.rating && (
                 <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm">
@@ -340,7 +340,7 @@ export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSe
                 onChange={(e) => setSelectedFormat(e.target.value)}
                 className="appearance-none bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 pr-8 text-sm font-medium text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500"
               >
-                <option value="">All Formats</option>
+                <option value="">{t('common.all_formats')}</option>
                 {availableFormats.map((format) => (
                   <option key={format} value={format}>{format}</option>
                 ))}
@@ -359,7 +359,7 @@ export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSe
               }`}
             >
               <Heart className={`w-4 h-4 ${showFavoritesOnly ? 'fill-red-600 text-red-600' : 'text-gray-400'}`} />
-              <span className="font-medium text-sm">My Favorites</span>
+              <span className="font-medium text-sm">{t('common.my_favorites')}</span>
             </button>
           )}
         </div>
@@ -483,7 +483,7 @@ export function TheaterSelectionPage({ movieId, onNavigate }: Readonly<TheaterSe
                           </div>
                           {/* Cancellation Available - BookMyShow Style */}
                           <div className="mt-3 text-sm text-gray-600 dark:text-gray-400">
-                            Cancellation available
+                            {t('common.cancellation_available')}
                           </div>
                         </div>
                       </div>

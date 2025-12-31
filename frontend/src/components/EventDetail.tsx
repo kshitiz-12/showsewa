@@ -285,7 +285,7 @@ export function EventDetail({ eventId, onNavigate }: EventDetailProps) {
           <div className="w-full">
             <div className="mb-4">
               <p className="text-xs sm:text-sm text-gray-300 mb-2 uppercase tracking-wider">
-                FEATURING ALL THE BEST AND UPCOMING TALENTS
+                {t('common.featuring_talents')}
               </p>
               <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-white leading-tight">
                 {eventTitle.toUpperCase()}
@@ -380,7 +380,7 @@ export function EventDetail({ eventId, onNavigate }: EventDetailProps) {
                 <Users className="w-5 h-5 text-gray-600 dark:text-gray-400 flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
                   <div className="text-sm sm:text-base text-gray-900 dark:text-white font-medium">
-                    Age Limit - {event.ageRestriction}
+                    {t('common.age_limit')} - {event.ageRestriction}
                   </div>
                 </div>
               </div>
@@ -391,7 +391,7 @@ export function EventDetail({ eventId, onNavigate }: EventDetailProps) {
               <Languages className="w-5 h-5 text-gray-600 dark:text-gray-400 flex-shrink-0 mt-0.5" />
               <div className="flex-1">
                 <div className="text-sm sm:text-base text-gray-900 dark:text-white font-medium">
-                  {language === 'en' ? 'English' : 'नेपाली'}, English
+                  {language === 'en' ? t('common.english') : t('common.nepali')}, {t('common.english')}
                 </div>
               </div>
             </div>
@@ -449,7 +449,7 @@ export function EventDetail({ eventId, onNavigate }: EventDetailProps) {
                 </div>
                 {event.priceMax > event.priceMin && (
                   <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    {language === 'en' ? 'up to' : 'सम्म'} NPR {event.priceMax.toLocaleString()}
+                    {t('common.up_to')} NPR {event.priceMax.toLocaleString()}
                   </div>
                 )}
                 <div className="text-sm sm:text-base text-green-600 dark:text-green-400 font-medium mt-1">
@@ -469,7 +469,7 @@ export function EventDetail({ eventId, onNavigate }: EventDetailProps) {
                 disabled={!event.availableSeats || event.availableSeats === 0}
                 className="bg-red-600 text-white px-6 sm:px-8 py-3 rounded-lg hover:bg-red-700 transition-colors font-semibold text-base sm:text-lg disabled:bg-gray-400 disabled:cursor-not-allowed whitespace-nowrap"
               >
-                Book Now
+                {t('common.book_now')}
               </button>
             </div>
 
@@ -499,14 +499,14 @@ export function EventDetail({ eventId, onNavigate }: EventDetailProps) {
 
           {/* M-Ticket Section */}
           <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 mb-6">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">M-Ticket</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">M-{language === 'en' ? 'Ticket' : 'टिकट'}</h3>
             <div className="flex items-start gap-4">
               <div className="bg-white dark:bg-gray-800 p-3 rounded-lg">
                 <Smartphone className="w-6 h-6 text-red-600" />
               </div>
               <div className="flex-1">
                 <p className="text-gray-700 dark:text-gray-300 text-sm sm:text-base mb-2">
-                  Contactless Ticketing & Fast-track Entry with M-ticket.
+                  {language === 'en' ? 'Contactless Ticketing & Fast-track Entry with M-ticket.' : 'M-टिकट संग सम्पर्क रहित टिकिटिङ र छिटो प्रवेश।'}
                 </p>
                 <button 
                   onClick={() => setShowLearnMoreModal(true)}
@@ -548,8 +548,8 @@ export function EventDetail({ eventId, onNavigate }: EventDetailProps) {
           {/* You May Also Like */}
           {relatedEvents.length > 0 && (
             <div className="mb-6">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2">You May Also Like</h2>
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-4">Events around you, book now</p>
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2">{t('common.you_may_also_like')}</h2>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-4">{t('common.events_around_you')}</p>
               <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4">
                 {relatedEvents.map((relatedEvent) => (
                   <div
@@ -649,7 +649,7 @@ export function EventDetail({ eventId, onNavigate }: EventDetailProps) {
         >
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col animate-scale-in" style={{ margin: 'auto' }}>
             <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">M-Ticket Guide</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('common.m_ticket_guide')}</h2>
               <button
                 onClick={() => setShowLearnMoreModal(false)}
                 className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
@@ -665,8 +665,8 @@ export function EventDetail({ eventId, onNavigate }: EventDetailProps) {
                     <Smartphone className="w-6 h-6 text-red-600" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-lg mb-2">Contactless Ticketing</h3>
-                    <p>Your ticket will be delivered to your email and can be accessed on your mobile device. No need to print!</p>
+                    <h3 className="font-bold text-lg mb-2">{t('common.contactless_ticketing')}</h3>
+                    <p>{t('common.contactless_ticketing_desc')}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
@@ -674,17 +674,17 @@ export function EventDetail({ eventId, onNavigate }: EventDetailProps) {
                     <Ticket className="w-6 h-6 text-green-600" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-lg mb-2">Fast-track Entry</h3>
-                    <p>Show your M-ticket QR code at the venue for quick and seamless entry. Faster than traditional paper tickets!</p>
+                    <h3 className="font-bold text-lg mb-2">{t('common.fast_track_entry')}</h3>
+                    <p>{t('common.fast_track_entry_desc')}</p>
                   </div>
                 </div>
                 <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg">
-                  <h3 className="font-bold text-lg mb-2">How it works:</h3>
+                  <h3 className="font-bold text-lg mb-2">{t('common.how_it_works')}</h3>
                   <ol className="list-decimal list-inside space-y-2">
-                    <li>Book your tickets and receive them via email</li>
-                    <li>Open the email on your mobile device</li>
-                    <li>Show the QR code at the venue entrance</li>
-                    <li>Enjoy contactless entry!</li>
+                    <li>{t('common.how_it_works_step1')}</li>
+                    <li>{t('common.how_it_works_step2')}</li>
+                    <li>{t('common.how_it_works_step3')}</li>
+                    <li>{t('common.how_it_works_step4')}</li>
                   </ol>
                 </div>
               </div>

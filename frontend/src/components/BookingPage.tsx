@@ -4,6 +4,7 @@ import SeatMap from './SeatMap';
 import { useAuth } from '../contexts/AuthContext';
 import { TicketCard } from './TicketCard';
 import { useCity } from '../contexts/CityContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { API_BASE_URL } from '../config/api';
 import jsPDF from 'jspdf';
 
@@ -25,6 +26,7 @@ interface SelectedSeat {
 }
 
 const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => {
+  const { language, t } = useLanguage();
   const { user, isAuthenticated } = useAuth();
   const { selectedCity } = useCity();
   const [selectedSeats, setSelectedSeats] = useState<SelectedSeat[]>([]);
@@ -680,7 +682,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
                 onClick={() => onNavigate('movies')}
                 className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
               >
-                Back to Movies
+                {t('common.back_to_movies')}
               </button>
             </div>
           ) : showtimeInfo ? (
@@ -916,7 +918,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-6 animate-page-fade-in">
                 <h3 className="text-xl font-semibold mb-4 flex items-center gap-2 text-gray-800 dark:text-white">
                   <Film className="w-5 h-5 text-blue-600" />
-                  Movie & Show Details
+                  {language === 'en' ? 'Movie & Show Details' : 'चलचित्र र शो विवरण'}
                 </h3>
                 {showtimeInfo && (
                   <div className="flex gap-4">
@@ -999,11 +1001,11 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
                 
                 <div className="space-y-4">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Tickets ({selectedSeats.length})</span>
+                    <span className="text-gray-600">{t('event_checkout.tickets')} ({selectedSeats.length})</span>
                     <span className="font-medium text-gray-900">NPR {totalPrice.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Convenience Fee</span>
+                    <span className="text-gray-600">{language === 'en' ? 'Convenience Fee' : 'सुविधा शुल्क'}</span>
                     <span className="font-medium text-gray-900">NPR {convenienceFee.toLocaleString()}</span>
                   </div>
                   <hr className="border-gray-300" />
@@ -1622,7 +1624,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
                     className="w-full bg-gradient-to-r from-gray-500 to-gray-600 text-white py-4 px-6 rounded-xl font-bold text-lg hover:from-gray-600 hover:to-gray-700 transition-all duration-300 hover:scale-105 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
                   >
                     <ArrowLeft className="w-5 h-5" />
-                    <span>Back to Home</span>
+                    <span>{t('common.back_to_home')}</span>
                   </button>
                 </div>
               </div>

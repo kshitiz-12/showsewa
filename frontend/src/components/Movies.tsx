@@ -352,7 +352,7 @@ export function Movies({ onNavigate }: MoviesProps) {
           <div className="flex justify-center items-center py-12 sm:py-16 lg:py-20">
             <div className="flex flex-col items-center space-y-3 sm:space-y-4">
               <div className="w-10 h-10 sm:w-12 sm:h-12 border-4 border-red-200 border-t-red-600 rounded-full animate-spin"></div>
-              <div className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Loading movies...</div>
+              <div className="text-sm sm:text-base text-gray-600 dark:text-gray-400">{t('common.loading_movies')}</div>
             </div>
           </div>
         ) : error ? (
@@ -362,7 +362,7 @@ export function Movies({ onNavigate }: MoviesProps) {
               onClick={loadMovies}
               className="px-5 py-2 sm:px-6 sm:py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm sm:text-base"
             >
-              Retry
+              {t('common.retry')}
             </button>
           </div>
         ) : filteredMovies.length === 0 ? (

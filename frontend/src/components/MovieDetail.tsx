@@ -33,7 +33,7 @@ interface MovieDetailProps {
 }
 
 export function MovieDetail({ movieId, onNavigate }: Readonly<MovieDetailProps>) {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const { selectedCity } = useCity();
   const { isAuthenticated } = useAuth();
   const [movie, setMovie] = useState<Movie | null>(null);
@@ -93,7 +93,7 @@ export function MovieDetail({ movieId, onNavigate }: Readonly<MovieDetailProps>)
       <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
         <div className="flex flex-col items-center space-y-4 animate-page-fade-in">
           <div className="w-12 h-12 border-4 border-red-200 border-t-red-600 rounded-full animate-spin"></div>
-          <div className="text-gray-600 dark:text-gray-400 text-lg font-medium">Loading movie details...</div>
+          <div className="text-gray-600 dark:text-gray-400 text-lg font-medium">{t('common.loading_movie_details')}</div>
         </div>
       </div>
     );
@@ -103,12 +103,12 @@ export function MovieDetail({ movieId, onNavigate }: Readonly<MovieDetailProps>)
     return (
       <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center animate-page-fade-in">
-          <div className="text-red-600 text-xl mb-4">⚠️ {error || 'Movie not found'}</div>
+          <div className="text-red-600 text-xl mb-4">⚠️ {error || t('common.movie_not_found')}</div>
           <button
             onClick={() => onNavigate('movies')}
             className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
           >
-            Back to Movies
+            {t('common.back_to_movies')}
           </button>
         </div>
       </div>
@@ -238,13 +238,13 @@ export function MovieDetail({ movieId, onNavigate }: Readonly<MovieDetailProps>)
               }}
               className="w-full sm:w-auto px-12 py-4 bg-red-600 text-white rounded-lg font-bold text-lg hover:bg-red-700 transition-all duration-300 shadow-lg hover:shadow-xl mb-8"
             >
-              Book tickets
+              {t('common.book_tickets')}
             </button>
 
             {/* About the movie Section */}
             <div className="mt-8">
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-                About the movie
+                {t('common.about_the_movie')}
               </h2>
               <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-lg">
                 {language === 'en' ? movie.description : movie.descriptionNe}
@@ -308,7 +308,7 @@ export function MovieDetail({ movieId, onNavigate }: Readonly<MovieDetailProps>)
             </button>
             <img
               src={selectedImage}
-              alt="Gallery view"
+              alt={t('common.gallery_view')}
               className="max-w-full max-h-full object-contain rounded-lg"
               loading="eager"
               decoding="async"

@@ -172,11 +172,11 @@ export function Events({ onNavigate }: EventsProps) {
               <Filter className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-red-600 dark:text-red-400" />
             </div>
             <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              No Events Found
+              {t('events.no_events')}
             </h3>
             <p className="text-sm sm:text-base lg:text-lg text-gray-600 dark:text-gray-400 mb-4 sm:mb-6">
               {searchQuery || selectedCategory !== 'all' 
-                ? 'Try adjusting your filters to see more results'
+                ? t('common.try_adjusting_filters')
                 : 'Check back soon for upcoming events!'}
             </p>
             {(searchQuery || selectedCategory !== 'all') && (

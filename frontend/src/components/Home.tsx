@@ -37,7 +37,7 @@ interface HomeProps {
 }
 
 export function Home({ onNavigate }: Readonly<HomeProps>) {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const { selectedCity } = useCity();
   const [featuredEvents, setFeaturedEvents] = useState<Event[]>([]);
   const [incomingEvents, setIncomingEvents] = useState<Event[]>([]);
@@ -198,13 +198,13 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
               <div className="space-y-3 sm:space-y-4">
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
                   <span className="bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent animate-gradient">
-                    Book Your Entertainment
+                    {t('home.hero_title').split(' ').slice(0, 3).join(' ')}
                   </span>
                   <br />
-                  <span className="text-white animate-slide-in-left">Experience</span>
+                  <span className="text-white animate-slide-in-left">{t('home.hero_title').split(' ').slice(3).join(' ')}</span>
                 </h1>
                 <p className="text-base sm:text-lg lg:text-xl text-gray-200 max-w-2xl animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-                  Discover and book tickets for concerts, movies, sports, and events across Nepal
+                  {t('home.hero_subtitle')}
                 </p>
               </div>
 
@@ -230,15 +230,15 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
               <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-xs sm:text-sm text-gray-300">
                 <div className="flex items-center gap-2">
                   <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400" />
-                  <span>4.9/5 Rating</span>
+                  <span>4.9/5 {t('common.rating')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Users className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />
-                  <span>50K+ Users</span>
+                  <span>50K+ {t('common.users')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Award className="w-3 h-3 sm:w-4 sm:h-4 text-green-400" />
-                  <span>Trusted Platform</span>
+                  <span>{t('common.trusted_platform')}</span>
                 </div>
               </div>
             </div>
@@ -292,7 +292,7 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
                         </div>
                       ))
                     ) : (
-                      <p className="text-gray-300 text-sm">No trending movies available</p>
+                      <p className="text-gray-300 text-sm">{t('common.no_trending_movies')}</p>
                     )}
                   </div>
                 )}
@@ -307,10 +307,10 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16 animate-fade-in-up">
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4 bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-              Featured Content
+              {t('home.featured_content')}
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-              Discover the most popular movies and events happening around you
+              {t('home.featured_content_subtitle')}
             </p>
           </div>
 
@@ -511,8 +511,8 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
             ) : (
               <div className="text-center py-12">
                 <Clock className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No Incoming Events</h4>
-                <p className="text-gray-600 dark:text-gray-400 mb-6">Check back later for upcoming events</p>
+                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('home.no_incoming_events')}</h4>
+                <p className="text-gray-600 dark:text-gray-400 mb-6">{t('home.check_back_later')}</p>
                 <button
                   onClick={() => onNavigate('events')}
                   className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-2 rounded-lg font-semibold hover:from-red-600 hover:to-red-700 transition-all duration-300"
