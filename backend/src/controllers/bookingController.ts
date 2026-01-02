@@ -16,8 +16,10 @@ interface AuthRequest extends Request {
 }
 
 interface BookingRequest {
-  showtimeId: string;
-  seatNumbers: string[];
+  showtimeId?: string;
+  eventId?: string;
+  seatNumbers?: string[];
+  quantity?: number; // For event bookings
   customerName: string;
   customerEmail: string;
   customerPhone: string;
@@ -73,7 +75,9 @@ export const createBooking = async (req: Request, res: Response) => {
     
     const {
       showtimeId,
+      eventId,
       seatNumbers,
+      quantity,
       customerName,
       customerEmail,
       customerPhone,
@@ -98,20 +102,42 @@ export const createBooking = async (req: Request, res: Response) => {
       userId = req.body.userId;
     }
 
+    // Determine booking type
+    const isEventBooking = !!eventId && !showtimeId;
+    const isMovieBooking = !!showtimeId && !eventId;
+
     // Validate request
     console.log('🔍 Validation check:', {
       showtimeId: !!showtimeId,
+      eventId: !!eventId,
       seatNumbers: seatNumbers?.length || 0,
+      quantity: quantity || 0,
       customerName: !!customerName,
       customerEmail: !!customerEmail,
       customerPhone: !!customerPhone
     });
 
-    if (!showtimeId || !seatNumbers?.length) {
-      console.error('❌ Validation failed: Missing showtimeId or seatNumbers');
+    if (!isEventBooking && !isMovieBooking) {
+      console.error('❌ Validation failed: Must provide either showtimeId or eventId');
       return res.status(400).json({
         success: false,
-        message: 'Showtime ID and seat numbers are required'
+        message: 'Either showtime ID (for movies) or event ID (for events) is required'
+      });
+    }
+
+    if (isMovieBooking && (!seatNumbers?.length)) {
+      console.error('❌ Validation failed: Missing seatNumbers for movie booking');
+      return res.status(400).json({
+        success: false,
+        message: 'Seat numbers are required for movie bookings'
+      });
+    }
+
+    if (isEventBooking && (!quantity || quantity < 1)) {
+      console.error('❌ Validation failed: Missing or invalid quantity for event booking');
+      return res.status(400).json({
+        success: false,
+        message: 'Quantity (at least 1) is required for event bookings'
       });
     }
 
@@ -123,86 +149,112 @@ export const createBooking = async (req: Request, res: Response) => {
       });
     }
 
-    // Get showtime details
-    const showtime = await prisma.showtime.findUnique({
-      where: { id: showtimeId },
-      include: {
-        screen: {
-          include: {
-            theater: true
-          }
-        },
-        movie: true
-      }
-    });
+    // Get event or showtime details
+    let event: any = null;
+    let showtime: any = null;
 
-    if (!showtime) {
-      return res.status(404).json({
-        success: false,
-        message: 'Showtime not found'
+    if (isEventBooking && eventId) {
+      event = await prisma.event.findUnique({
+        where: { id: eventId }
       });
-    }
 
-    // Find the selected seats for this screen
-    const selectedSeats = await prisma.seat.findMany({
-      where: {
-        screenId: showtime.screenId,
-        seatNumber: { in: seatNumbers }
-      },
-      include: {
-        category: true
-      }
-    });
-
-    if (selectedSeats.length !== seatNumbers.length) {
-      return res.status(400).json({
-        success: false,
-        message: 'Some seats not found'
-      });
-    }
-
-    // Check if seats are available (not booked or held)
-    const existingBookings = await prisma.booking.findMany({
-      where: {
-        showtimeId: showtimeId,
-        bookingStatus: 'CONFIRMED',
-        seats: {
-          hasSome: seatNumbers
-        }
-      }
-    });
-
-    if (existingBookings.length > 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'Some seats are already booked'
-      });
-    }
-
-    // Check if seats are currently held
-    const activeHolds = await prisma.seatHold.findMany({
-      where: {
-        seatId: {
-          in: selectedSeats.map((seat: any) => seat.id)
-        },
-        expiresAt: {
-          gt: new Date()
-        }
-      }
-    });
-
-    if (activeHolds.length > 0) {
-      // If holds exist but not for the current user, reject
-      if (userId && !activeHolds.every(hold => hold.userId === userId)) {
-        return res.status(400).json({
+      if (!event) {
+        return res.status(404).json({
           success: false,
-          message: 'Some seats are currently held by another user'
+          message: 'Event not found'
+        });
+      }
+    } else if (isMovieBooking && showtimeId) {
+      showtime = await prisma.showtime.findUnique({
+        where: { id: showtimeId },
+        include: {
+          screen: {
+            include: {
+              theater: true
+            }
+          },
+          movie: true
+        }
+      });
+
+      if (!showtime) {
+        return res.status(404).json({
+          success: false,
+          message: 'Showtime not found'
         });
       }
     }
 
-    // Calculate total amount
-    const totalAmount = selectedSeats.reduce((sum: number, seat: any) => sum + seat.price, 0);
+    // For movie bookings, validate seats
+    let selectedSeats: any[] = [];
+    let totalAmount = 0;
+
+    if (isMovieBooking && showtime && seatNumbers) {
+      // Find the selected seats for this screen
+      selectedSeats = await prisma.seat.findMany({
+        where: {
+          screenId: showtime.screenId,
+          seatNumber: { in: seatNumbers }
+        },
+        include: {
+          category: true
+        }
+      });
+
+      if (selectedSeats.length !== seatNumbers.length) {
+        return res.status(400).json({
+          success: false,
+          message: 'Some seats not found'
+        });
+      }
+
+      // Check if seats are available (not booked or held)
+      const existingBookings = await prisma.booking.findMany({
+        where: {
+          showtimeId: showtimeId,
+          bookingStatus: 'CONFIRMED',
+          seats: {
+            hasSome: seatNumbers
+          }
+        }
+      });
+
+      if (existingBookings.length > 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'Some seats are already booked'
+        });
+      }
+
+      // Check if seats are currently held
+      const activeHolds = await prisma.seatHold.findMany({
+        where: {
+          seatId: {
+            in: selectedSeats.map((seat: any) => seat.id)
+          },
+          expiresAt: {
+            gt: new Date()
+          }
+        }
+      });
+
+      if (activeHolds.length > 0) {
+        // If holds exist but not for the current user, reject
+        if (userId && !activeHolds.every(hold => hold.userId === userId)) {
+          return res.status(400).json({
+            success: false,
+            message: 'Some seats are currently held by another user'
+          });
+        }
+      }
+
+      // Calculate total amount from seats
+      totalAmount = selectedSeats.reduce((sum: number, seat: any) => sum + seat.price, 0);
+    } else if (isEventBooking && event) {
+      // For event bookings, calculate from event price
+      const ticketPrice = event.priceMin || 0;
+      totalAmount = ticketPrice * (quantity || 1);
+    }
 
     // Generate booking reference
     const bookingReference = `SS${Date.now()}${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
@@ -215,61 +267,73 @@ export const createBooking = async (req: Request, res: Response) => {
     // Create booking using transaction
     const booking = await prisma.$transaction(async (tx) => {
       // Create the booking
+      const bookingData: any = {
+        bookingType: isEventBooking ? 'EVENT' : 'MOVIE',
+        userId: userId || 'system',
+        customerName,
+        customerEmail,
+        customerPhone,
+        ticketPrice: isEventBooking ? (event?.priceMin || 0) : totalAmount,
+        totalAmount,
+        paymentMethod,
+        paymentStatus: initialPaymentStatus,
+        bookingStatus: initialBookingStatus,
+        bookingReference,
+        ...(userId ? { bookingSource: 'SHOWSEWA' as any } : { bookingSource: 'POS_SYSTEM' as any })
+      };
+
+      if (isEventBooking && eventId) {
+        bookingData.eventId = eventId;
+        bookingData.seats = [];
+        bookingData.seatCount = quantity || 1;
+      } else if (isMovieBooking && showtimeId) {
+        bookingData.showtimeId = showtimeId;
+        bookingData.seats = seatNumbers || [];
+        bookingData.seatCount = (seatNumbers || []).length;
+      }
+
       const newBooking = await tx.booking.create({
-        data: {
-          bookingType: 'MOVIE',
-          showtimeId: showtimeId,
-          userId: userId || 'system',
-          customerName,
-          customerEmail,
-          customerPhone,
-          seats: seatNumbers,
-          seatCount: seatNumbers.length,
-          ticketPrice: totalAmount,
-          totalAmount,
-          paymentMethod,
-          paymentStatus: initialPaymentStatus,
-          bookingStatus: initialBookingStatus,
-          bookingReference,
-          ...(userId ? { bookingSource: 'SHOWSEWA' as any } : { bookingSource: 'POS_SYSTEM' as any })
-        }
+        data: bookingData
       });
 
-      // Clear any existing holds for these seats
-      await tx.seatHold.deleteMany({
-        where: {
-          seatId: {
-            in: selectedSeats.map((seat: any) => seat.id)
-          }
-        }
-      });
-
-      // Only update seats and showtime if payment is completed (CASH)
-      // For online payments, seats will be updated after payment verification
-      if (!isOnlinePayment) {
-        // Update seat status to BOOKED
-        await tx.seat.updateMany({
+      // For movie bookings, handle seat holds and updates
+      if (isMovieBooking) {
+        // Clear any existing holds for these seats
+        await tx.seatHold.deleteMany({
           where: {
-            id: {
+            seatId: {
               in: selectedSeats.map((seat: any) => seat.id)
             }
-          },
-          data: {
-            status: 'BOOKED',
-            bookingId: newBooking.id,
-            updatedAt: new Date()
           }
         });
 
-        // Update showtime available seats count
-        await tx.showtime.update({
-          where: { id: showtimeId },
-          data: {
-            availableSeats: {
-              decrement: seatNumbers.length
+        // Only update seats and showtime if payment is completed (CASH) and it's a movie booking
+        // For online payments, seats will be updated after payment verification
+        if (!isOnlinePayment && isMovieBooking && showtimeId && seatNumbers && selectedSeats.length > 0) {
+          // Update seat status to BOOKED
+          await tx.seat.updateMany({
+            where: {
+              id: {
+                in: selectedSeats.map((seat: any) => seat.id)
+              }
+            },
+            data: {
+              status: 'BOOKED',
+              bookingId: newBooking.id,
+              updatedAt: new Date()
             }
-          }
-        });
+          });
+
+          // Update showtime available seats count
+          await tx.showtime.update({
+            where: { id: showtimeId },
+            data: {
+              availableSeats: {
+                decrement: seatNumbers.length
+              }
+            }
+          });
+        }
       }
 
       return { booking: newBooking, seats: selectedSeats };
@@ -295,7 +359,8 @@ export const createBooking = async (req: Request, res: Response) => {
               }
             }
           }
-        }
+        },
+        event: true
       }
     });
 
@@ -340,19 +405,26 @@ export const createBooking = async (req: Request, res: Response) => {
           console.error('Failed to generate QR code:', qrError);
         });
 
-        emailService.sendBookingConfirmation({
-          bookingReference: bookingWithDetails.bookingReference,
-          customerName: bookingWithDetails.customerName,
-          customerEmail: bookingWithDetails.customerEmail,
-          movieTitle: bookingWithDetails.showtime?.movie.title || 'Unknown Movie',
-          theaterName: bookingWithDetails.showtime?.screen.theater.name || 'Unknown Theater',
-          showDate: bookingWithDetails.showtime?.showDate.toLocaleDateString() || '',
-          showTime: bookingWithDetails.showtime?.showTime || '',
-          seats: bookingWithDetails.seats,
-          totalAmount: bookingWithDetails.totalAmount
-        }).catch((emailError) => {
-          console.error('Failed to send booking confirmation email:', emailError);
-        });
+        // Send booking confirmation email
+        if (bookingWithDetails.showtime) {
+          // Movie booking email
+          emailService.sendBookingConfirmation({
+            bookingReference: bookingWithDetails.bookingReference,
+            customerName: bookingWithDetails.customerName,
+            customerEmail: bookingWithDetails.customerEmail,
+            movieTitle: bookingWithDetails.showtime?.movie.title || 'Unknown Movie',
+            theaterName: bookingWithDetails.showtime?.screen.theater.name || 'Unknown Theater',
+            showDate: bookingWithDetails.showtime?.showDate.toLocaleDateString() || '',
+            showTime: bookingWithDetails.showtime?.showTime || '',
+            seats: bookingWithDetails.seats,
+            totalAmount: bookingWithDetails.totalAmount
+          }).catch((emailError) => {
+            console.error('Failed to send booking confirmation email:', emailError);
+          });
+        } else if (bookingWithDetails.event) {
+          // Event booking email (TODO: implement event booking email template)
+          console.log('Event booking confirmation email should be sent for:', bookingWithDetails.bookingReference);
+        }
 
         // Award loyalty points for completed booking (async, don't wait)
         if (userId && userId !== 'system') {
@@ -564,6 +636,7 @@ export const getUserBookings = async (req: AuthRequest, res: Response) => {
           include: {
             movie: {
               select: {
+                id: true,
                 title: true,
                 posterUrl: true
               }
@@ -579,23 +652,60 @@ export const getUserBookings = async (req: AuthRequest, res: Response) => {
               }
             }
           }
+        },
+        event: {
+          select: {
+            id: true,
+            title: true,
+            titleNe: true,
+            imageUrl: true,
+            venue: true,
+            venueNe: true,
+            eventDate: true
+          }
         }
       }
     });
 
     // Transform the data to match frontend expectations
-    const transformedBookings = bookings.map(booking => ({
-      id: booking.id,
-      bookingReference: booking.bookingReference,
-      movieTitle: booking.showtime?.movie?.title || 'Unknown Movie',
-      theaterName: booking.showtime?.screen?.theater?.name || 'Unknown Theater',
-      showDate: booking.showtime?.showDate || new Date(),
-      showTime: booking.showtime?.showTime || 'Unknown Time',
-      seats: booking.seats || [],
-      totalAmount: booking.totalAmount,
-      status: booking.bookingStatus,
-      createdAt: booking.createdAt
-    }));
+    const transformedBookings = bookings.map(booking => {
+      if (booking.bookingType === 'EVENT' && booking.event) {
+        // Event booking
+        return {
+          id: booking.id,
+          bookingReference: booking.bookingReference,
+          bookingType: 'EVENT',
+          eventId: booking.event.id,
+          eventTitle: booking.event.title,
+          eventTitleNe: booking.event.titleNe,
+          eventImageUrl: booking.event.imageUrl,
+          venue: booking.event.venue,
+          venueNe: booking.event.venueNe,
+          eventDate: booking.event.eventDate,
+          quantity: booking.seatCount,
+          totalAmount: booking.totalAmount,
+          status: booking.bookingStatus,
+          createdAt: booking.createdAt
+        };
+      } else {
+        // Movie booking
+        return {
+          id: booking.id,
+          bookingReference: booking.bookingReference,
+          bookingType: 'MOVIE',
+          movieTitle: booking.showtime?.movie?.title || 'Unknown Movie',
+          moviePosterUrl: booking.showtime?.movie?.posterUrl,
+          movieId: booking.showtime?.movie?.id,
+          theaterName: booking.showtime?.screen?.theater?.name || 'Unknown Theater',
+          showDate: booking.showtime?.showDate || new Date(),
+          showTime: booking.showtime?.showTime || 'Unknown Time',
+          seats: booking.seats || [],
+          totalAmount: booking.totalAmount,
+          status: booking.bookingStatus,
+          createdAt: booking.createdAt
+        };
+      }
+    });
 
     return res.json({
       success: true,
