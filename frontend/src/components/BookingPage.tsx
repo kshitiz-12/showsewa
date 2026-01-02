@@ -611,7 +611,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
               <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform duration-300" />
               <span className="font-medium">Back</span>
             </button>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Book Your Seats</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('booking.select_seats')}</h1>
             <div className="w-24"></div>
           </div>
           
@@ -782,10 +782,10 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
                     </h1>
                     <div className="flex flex-wrap items-center gap-2 text-gray-600 dark:text-gray-400 text-sm">
                       <span className="font-semibold text-gray-900 dark:text-white">
-                        {showtimeInfo.screen?.theater?.name || 'Theater'}
+                        {showtimeInfo.screen?.theater?.name || t('common.theater')}
                       </span>
                       <span className="text-gray-400">|</span>
-                      <span>{showtimeInfo.screen?.theater?.city || 'Location'}</span>
+                      <span>{showtimeInfo.screen?.theater?.city || t('common.location')}</span>
                       <span className="text-gray-400">|</span>
                       <span>
                         {new Date(showtimeInfo.showDate).toLocaleDateString('en-US', { 
@@ -801,7 +801,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
               </div>
               
               <div className="p-6">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">How many seats?</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('common.how_many_seats')}</h2>
                 
                 {/* Ticket Quantity Selector - BookMyShow Style (Circular) */}
                 <div className="mb-8">
@@ -829,17 +829,17 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
                       {seatCategories.map((category: any) => {
                         const totalAvailable = showtimeInfo?.availableSeats || 0;
                         
-                        const getAvailability = (): 'SOLD OUT' | 'ALMOST FULL' | 'AVAILABLE' => {
-                          if (totalAvailable === 0) return 'SOLD OUT';
-                          if (totalAvailable <= 10) return 'ALMOST FULL';
-                          return 'AVAILABLE';
+                        const getAvailability = (): string => {
+                          if (totalAvailable === 0) return t('common.sold_out_caps');
+                          if (totalAvailable <= 10) return t('common.almost_full');
+                          return t('common.available_caps');
                         };
                         
                         const availability = getAvailability();
                         
                         const getAvailabilityColor = () => {
-                          if (availability === 'SOLD OUT') return 'text-red-600 dark:text-red-400';
-                          if (availability === 'ALMOST FULL') return 'text-yellow-600 dark:text-yellow-400';
+                          if (availability === t('common.sold_out_caps')) return 'text-red-600 dark:text-red-400';
+                          if (availability === t('common.almost_full')) return 'text-yellow-600 dark:text-yellow-400';
                           return 'text-green-600 dark:text-green-400';
                         };
                         
@@ -879,7 +879,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
                   }}
                   className="w-full bg-red-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-red-700 transition-colors shadow-lg"
                 >
-                  Select Seats
+                  {t('common.select_seats')}
                 </button>
               </div>
             </div>
@@ -962,7 +962,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
                         </div>
                         <div className="flex items-center gap-2">
                           <Users className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                          <span className="text-gray-700 dark:text-gray-300">Screen {showtimeInfo.screen?.screenNumber}</span>
+                          <span className="text-gray-700 dark:text-gray-300">{t('common.screen')} {showtimeInfo.screen?.screenNumber}</span>
                         </div>
                       </div>
                     </div>
@@ -996,7 +996,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-6 sticky top-6 animate-page-slide-in-right">
                 <h3 className="text-xl font-semibold mb-4 flex items-center gap-2 text-gray-800 dark:text-white">
                   <Check className="w-5 h-5 text-blue-600" />
-                  Booking Summary
+                  {t('common.booking_summary')}
                 </h3>
                 
                 <div className="space-y-4">
@@ -1044,10 +1044,10 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
                   <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
                     <CreditCard className="w-5 h-5 text-white" />
                   </div>
-                  Payment & Booking Details
+                  {t('common.payment_booking_details')}
                 </h2>
                 <div className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                  Step 3 of 4
+                  {t('common.step_of').replace('{current}', '3').replace('{total}', '4')}
                 </div>
               </div>
               
@@ -1063,13 +1063,13 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
                   <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center">
                     <Users className="w-4 h-4 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-800 dark:text-white">Your Information</h3>
+                  <h3 className="text-xl font-bold text-gray-800 dark:text-white">{t('common.your_information')}</h3>
                 </div>
                 
                 <div className="space-y-6">
                   <div className="group">
                     <label htmlFor="customerName" className="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors">
-                      Full Name *
+                      {t('common.full_name')} *
                     </label>
                     <div className="relative">
                       <input
@@ -1078,7 +1078,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
                         value={customerInfo.name}
                         onChange={(e) => setCustomerInfo({...customerInfo, name: e.target.value})}
                         className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500"
-                        placeholder="Enter your full name"
+                        placeholder={t('common.enter_full_name')}
                       />
                       <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                         <Users className="w-5 h-5 text-gray-400" />
@@ -1088,7 +1088,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
                   
                   <div className="group">
                     <label htmlFor="customerEmail" className="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors">
-                      Email Address *
+                      {t('common.email_address')} *
                     </label>
                     <div className="relative">
                       <input
@@ -1097,7 +1097,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
                         value={customerInfo.email}
                         onChange={(e) => setCustomerInfo({...customerInfo, email: e.target.value})}
                         className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500"
-                        placeholder="Enter your email address"
+                        placeholder={t('common.enter_email_address')}
                       />
                       <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                         <div className="w-5 h-5 text-gray-400">@</div>
@@ -1132,7 +1132,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
                 <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
                   <Ticket className="w-4 h-4 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-800 dark:text-white">Booking Summary</h3>
+                <h3 className="text-xl font-bold text-gray-800 dark:text-white">{t('common.booking_summary')}</h3>
               </div>
               
               {/* Movie Info Card */}
@@ -1179,7 +1179,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
               <div className="mb-6">
                 <h4 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
                   <Users className="w-4 h-4" />
-                  Selected Seats ({selectedSeats.length})
+                  {t('common.selected_seats')} ({selectedSeats.length})
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {selectedSeats.map((seat, index) => (
@@ -1208,7 +1208,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
                   </div>
                   <hr className="border-gray-300 dark:border-gray-600" />
                   <div className="flex justify-between items-center">
-                    <span className="text-lg font-bold text-gray-800 dark:text-white">Total Amount</span>
+                    <span className="text-lg font-bold text-gray-800 dark:text-white">{t('booking.total_amount')}</span>
                     <span className="text-xl font-bold text-green-600 dark:text-green-400">NPR {finalTotal.toLocaleString()}</span>
                   </div>
                 </div>
@@ -1243,8 +1243,8 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
                       </div>
                       <div className="flex-1">
                         <div className="font-bold text-gray-900 dark:text-white text-lg">eSewa</div>
-                        <div className="text-sm text-gray-600 dark:text-gray-300">Digital wallet payment</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">Instant payment • Secure</div>
+                        <div className="text-sm text-gray-600 dark:text-gray-300">{t('common.digital_wallet_payment')}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('common.instant_payment_secure')}</div>
                       </div>
                       {paymentMethod === 'ESEWA' && (
                         <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
@@ -1309,8 +1309,8 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
                       </div>
                       <div className="flex-1">
                         <div className="font-bold text-gray-900 dark:text-white text-lg">Cash Payment</div>
-                        <div className="text-sm text-gray-600 dark:text-gray-300">Pay at the theater counter</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">No online payment • Traditional</div>
+                        <div className="text-sm text-gray-600 dark:text-gray-300">{t('common.pay_at_theater')}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('common.no_online_payment_traditional')}</div>
                       </div>
                       {paymentMethod === 'CASH' && (
                         <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
@@ -1462,7 +1462,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onNavigate, showtimeId }) => 
                               </div>
                               <div>
                                 <div className="font-semibold text-gray-800">{showtimeInfo.screen?.theater?.name}</div>
-                                <div className="text-gray-500 text-xs">Theater</div>
+                                <div className="text-gray-500 text-xs">{t('common.theater')}</div>
                               </div>
                             </div>
                             

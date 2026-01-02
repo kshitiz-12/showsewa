@@ -6,17 +6,29 @@ import jsPDF from 'jspdf';
 interface Booking {
   id: string;
   bookingReference: string;
-  movieTitle: string;
+  bookingType?: 'MOVIE' | 'EVENT';
+  // Movie booking fields
+  movieTitle?: string;
   moviePosterUrl?: string;
-  theaterName: string;
-  showDate: string;
-  showTime: string;
-  seats: string[];
+  theaterName?: string;
+  showDate?: string;
+  showTime?: string;
+  seats?: string[];
+  screenType?: string;
+  movieId?: string;
+  // Event booking fields
+  eventId?: string;
+  eventTitle?: string;
+  eventTitleNe?: string;
+  eventImageUrl?: string;
+  venue?: string;
+  venueNe?: string;
+  eventDate?: string;
+  quantity?: number;
+  // Common fields
   totalAmount: number;
   status: string;
   createdAt: string;
-  screenType?: string;
-  movieId?: string;
 }
 
 interface UserBookingsProps {
@@ -86,7 +98,7 @@ export function UserBookings({ onNavigate }: Readonly<UserBookingsProps>) {
       // Fetch QR payload from backend and build QR image
       let qrDataUrl: string | null = null;
       try {
-        const qrRes = await fetch(`http://localhost:5000/api/qr/generate/${booking.id}`);
+        const qrRes = await fetch(`${API_BASE_URL}/api/qr/generate/${booking.id}`);
         const qrJson = await qrRes.json();
         const qrString: string | undefined = qrJson?.data?.qrString;
         if (qrString) {
@@ -110,10 +122,13 @@ export function UserBookings({ onNavigate }: Readonly<UserBookingsProps>) {
       doc.roundedRect(12, 14, 186, 38, 4, 4, 'F');
       doc.setDrawColor(235, 235, 235);
       doc.roundedRect(12, 14, 186, 38, 4, 4);
+      const isEvent = booking.bookingType === 'EVENT' || booking.eventId;
+      const posterUrl = isEvent ? booking.eventImageUrl : booking.moviePosterUrl;
+      const title = isEvent ? booking.eventTitle : booking.movieTitle;
       // Poster thumb
-      if (booking.moviePosterUrl) {
+      if (posterUrl) {
         try {
-          const posterDataUrl = await toDataURL(booking.moviePosterUrl);
+          const posterDataUrl = await toDataURL(posterUrl);
           doc.addImage(posterDataUrl, 'JPEG', 16, 18, 24, 30, undefined, 'FAST');
         } catch {}
       }
@@ -121,12 +136,17 @@ export function UserBookings({ onNavigate }: Readonly<UserBookingsProps>) {
       doc.setTextColor(0, 0, 0);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(16);
-      doc.text(booking.movieTitle, 44, 26);
+      doc.text(title || 'Booking', 44, 26);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(90, 90, 90);
       doc.setFontSize(11);
-      doc.text(`${booking.screenType || '2D'} • ${new Date(booking.showDate).toLocaleDateString()} • ${booking.showTime}`, 44, 33);
-      doc.text(booking.theaterName, 44, 40);
+      if (isEvent) {
+        doc.text(`${booking.eventDate ? new Date(booking.eventDate).toLocaleDateString() : 'N/A'}`, 44, 33);
+        doc.text(booking.venue || 'Venue', 44, 40);
+      } else {
+        doc.text(`${booking.screenType || '2D'} • ${booking.showDate ? new Date(booking.showDate).toLocaleDateString() : 'N/A'} • ${booking.showTime || 'N/A'}`, 44, 33);
+        doc.text(booking.theaterName || 'Theater', 44, 40);
+      }
       
       let yPosition = 60;
       
@@ -155,7 +175,7 @@ export function UserBookings({ onNavigate }: Readonly<UserBookingsProps>) {
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(0, 0, 0);
       doc.setFontSize(18);
-      doc.text(`${booking.seats.length} Ticket(s)`, 80, yPosition + 30);
+      doc.text(`${isEvent ? (booking.quantity || 1) : ((booking.seats && booking.seats.length > 0) ? booking.seats.length : 0)} Ticket(s)`, 80, yPosition + 30);
       doc.setFontSize(12);
       doc.setTextColor(80, 80, 80);
       doc.text(`Screen / Audi`, 80, yPosition + 44);
@@ -167,13 +187,13 @@ export function UserBookings({ onNavigate }: Readonly<UserBookingsProps>) {
       doc.setDrawColor(240, 240, 240);
       doc.line(22, yPosition + 70, 190, yPosition + 70);
       
-      // Seats line
+      // Seats/Tickets line
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(90, 90, 90);
-      doc.text('Seats', 22, yPosition + 84);
+      doc.text(isEvent ? 'Tickets' : 'Seats', 22, yPosition + 84);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(0, 0, 0);
-      const seatsText = booking.seats.join(', ');
+      const seatsText = isEvent ? `${booking.quantity || 1} ticket(s)` : ((booking.seats && booking.seats.length > 0) ? booking.seats.join(', ') : 'N/A');
       doc.text(seatsText, 22, yPosition + 96);
       // Booking ID
       doc.setFont('helvetica', 'normal');
@@ -197,17 +217,23 @@ export function UserBookings({ onNavigate }: Readonly<UserBookingsProps>) {
       doc.setFontSize(11);
       doc.setFont('helvetica', 'normal');
       
-      for (const seat of booking.seats) {
-        if (yPosition > 250) {
-          doc.addPage();
-          yPosition = 20;
+      if (isEvent) {
+        doc.text(`Quantity: ${booking.quantity || 1} ticket(s)`, 20, yPosition);
+        yPosition += 15;
+      } else {
+        if (booking.seats && booking.seats.length > 0) {
+          for (const seat of booking.seats) {
+            if (yPosition > 250) {
+              doc.addPage();
+              yPosition = 20;
+            }
+            doc.text(`Seat ${seat}`, 20, yPosition);
+            yPosition += 7;
+          }
+          doc.text(`Total Seats: ${booking.seats.length}`, 20, yPosition);
+          yPosition += 15;
         }
-        doc.text(`Seat ${seat}`, 20, yPosition);
-        yPosition += 7;
       }
-      
-      doc.text(`Total Seats: ${booking.seats.length}`, 20, yPosition);
-      yPosition += 15;
       
       // Bottom bar (total)
       yPosition += 118;
@@ -317,114 +343,150 @@ export function UserBookings({ onNavigate }: Readonly<UserBookingsProps>) {
         </div>
       ) : (
         <div className="space-y-6">
-          {bookings.map((booking) => (
-            <div
-              key={booking.id}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
-            >
-              <div className="p-6">
-                <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
-                  <div className="flex gap-4 flex-1">
-                    {/* Movie Poster */}
-                    <div className="w-20 h-28 rounded-lg overflow-hidden bg-gray-200 flex items-center justify-center flex-shrink-0">
-                      {booking.moviePosterUrl ? (
-                        <img 
-                          src={booking.moviePosterUrl} 
-                          alt={booking.movieTitle}
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                          decoding="async"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                            e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                          }}
-                        />
-                      ) : null}
-                      <div className={`w-full h-full flex items-center justify-center ${booking.moviePosterUrl ? 'hidden' : ''}`}>
-                        <Film className="w-8 h-8 text-gray-400" />
-                      </div>
-                    </div>
-                    
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between mb-4">
-                        <div>
-                          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                            {booking.movieTitle}
-                          </h3>
-                          <p className="text-gray-600 dark:text-gray-400">
-                            {booking.theaterName}
-                          </p>
-                        </div>
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(booking.status)}`}>
-                          {booking.status}
-                        </span>
-                      </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                        <Calendar className="w-4 h-4" />
-                        <span>{new Date(booking.showDate).toLocaleDateString()}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                        <Clock className="w-4 h-4" />
-                        <span>{booking.showTime}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                        <MapPin className="w-4 h-4" />
-                        <span>{booking.seats.length} seat(s)</span>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {booking.seats.map((seat) => (
-                        <span
-                          key={seat}
-                          className="px-2 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 text-xs rounded"
-                        >
-                          {seat}
-                        </span>
-                      ))}
-                    </div>
-
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            Booking Reference
-                          </p>
-                          <p className="font-mono text-sm text-gray-900 dark:text-white">
-                            {booking.bookingReference}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm text-gray-500 dark:text-gray-400">Total Amount</p>
-                          <p className="text-xl font-bold text-gray-900 dark:text-white">
-                            रू {booking.totalAmount.toLocaleString()}
-                          </p>
+          {bookings.map((booking) => {
+            const isEvent = booking.bookingType === 'EVENT' || booking.eventId;
+            return (
+              <div
+                key={booking.id}
+                className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
+              >
+                <div className="p-6">
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+                    <div className="flex gap-4 flex-1">
+                      {/* Poster/Image */}
+                      <div className="w-20 h-28 rounded-lg overflow-hidden bg-gray-200 flex items-center justify-center flex-shrink-0">
+                        {isEvent ? (
+                          booking.eventImageUrl ? (
+                            <img 
+                              src={booking.eventImageUrl} 
+                              alt={booking.eventTitle || 'Event'}
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                              decoding="async"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                              }}
+                            />
+                          ) : null
+                        ) : (
+                          booking.moviePosterUrl ? (
+                            <img 
+                              src={booking.moviePosterUrl} 
+                              alt={booking.movieTitle || 'Movie'}
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                              decoding="async"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                              }}
+                            />
+                          ) : null
+                        )}
+                        <div className={`w-full h-full flex items-center justify-center ${(isEvent ? booking.eventImageUrl : booking.moviePosterUrl) ? 'hidden' : ''}`}>
+                          <Film className="w-8 h-8 text-gray-400" />
                         </div>
                       </div>
-                    </div>
-                  </div>
+                      
+                      <div className="flex-1">
+                        <div className="flex items-start justify-between mb-4">
+                          <div>
+                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                              {isEvent ? booking.eventTitle : booking.movieTitle}
+                            </h3>
+                            <p className="text-gray-600 dark:text-gray-400">
+                              {isEvent ? booking.venue : booking.theaterName}
+                            </p>
+                          </div>
+                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(booking.status)}`}>
+                            {booking.status}
+                          </span>
+                        </div>
 
-                  <div className="flex flex-col gap-2 lg:ml-6">
-                    <button 
-                      onClick={() => onNavigate('movie-detail', booking.movieId)}
-                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      <Eye className="w-4 h-4" />
-                      View Details
-                    </button>
-                    <button 
-                      onClick={() => handleDownloadTicket(booking)}
-                      className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-                    >
-                      <Download className="w-4 h-4" />
-                      Download Ticket
-                    </button>
+                        {isEvent ? (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                              <Calendar className="w-4 h-4" />
+                              <span>{booking.eventDate ? new Date(booking.eventDate).toLocaleDateString() : 'N/A'}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                              <Ticket className="w-4 h-4" />
+                              <span>{booking.quantity || 1} ticket(s)</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                                <Calendar className="w-4 h-4" />
+                                <span>{booking.showDate ? new Date(booking.showDate).toLocaleDateString() : 'N/A'}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                                <Clock className="w-4 h-4" />
+                                <span>{booking.showTime || 'N/A'}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                                <MapPin className="w-4 h-4" />
+                                <span>{booking.seats?.length || 0} seat(s)</span>
+                              </div>
+                            </div>
+
+                            {booking.seats && booking.seats.length > 0 && (
+                              <div className="flex flex-wrap gap-2 mb-4">
+                                {booking.seats.map((seat) => (
+                                  <span
+                                    key={seat}
+                                    className="px-2 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 text-xs rounded"
+                                  >
+                                    {seat}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </>
+                        )}
+
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                              Booking Reference
+                            </p>
+                            <p className="font-mono text-sm text-gray-900 dark:text-white">
+                              {booking.bookingReference}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm text-gray-500 dark:text-gray-400">Total Amount</p>
+                            <p className="text-xl font-bold text-gray-900 dark:text-white">
+                              रू {booking.totalAmount.toLocaleString()}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-2 lg:ml-6">
+                      <button 
+                        onClick={() => onNavigate(isEvent ? 'event-detail' : 'movie-detail', isEvent ? booking.eventId : booking.movieId)}
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        <Eye className="w-4 h-4" />
+                        View Details
+                      </button>
+                      <button 
+                        onClick={() => handleDownloadTicket(booking)}
+                        className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                      >
+                        <Download className="w-4 h-4" />
+                        Download Ticket
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

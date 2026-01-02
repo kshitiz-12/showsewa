@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { ArrowLeft, Calendar, MapPin, CheckCircle, CreditCard, Share2, Download } from 'lucide-react';
 import jsPDF from 'jspdf';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
+import { API_BASE_URL } from '../config/api';
 
 interface EventCheckoutProps {
   eventId: string;
@@ -28,6 +30,7 @@ interface EventInfo {
 
 export function EventCheckout({ eventId, onNavigate }: EventCheckoutProps) {
   const { language, t } = useLanguage();
+  const { user } = useAuth();
   const [event, setEvent] = useState<EventInfo | null>(null);
   const [qty, setQty] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -67,19 +70,49 @@ function Stepper({step}:{step:'summary'|'payment'|'done'}) {
   );
 }
 
-  // --- Payment simulation ---
-  function handlePayment() {
+  // --- Payment handler ---
+  async function handlePayment() {
     setPaying(true);
-    setTimeout(() => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Create event booking
+      const bookingResponse = await fetch(`${API_BASE_URL}/api/bookings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({
+          eventId: eventId,
+          quantity: qty,
+          customerName: 'User', // TODO: Get from user profile or form
+          customerEmail: 'user@example.com', // TODO: Get from user profile
+          customerPhone: '9800000000', // TODO: Get from user profile
+          paymentMethod: 'CASH' // For now, default to CASH (mock payment)
+        })
+      });
+
+      const bookingData = await bookingResponse.json();
+      
+      if (bookingData.success) {
+        setPaying(false);
+        setStep('done');
+        // Persist booking info for success page
+        try {
+          const payload = { qty, price, total, ts: Date.now(), eventId, bookingId: bookingData.data.booking.id, bookingReference: bookingData.data.booking.bookingReference };
+          sessionStorage.setItem('eventBookingSuccess', JSON.stringify(payload));
+        } catch {}
+        onNavigate('event-booking-success', eventId);
+      } else {
+        alert(bookingData.message || 'Failed to create booking. Please try again.');
+        setPaying(false);
+      }
+    } catch (error) {
+      console.error('Error creating event booking:', error);
+      alert('Failed to create booking. Please try again.');
       setPaying(false);
-      setStep('done');
-      // Persist minimal booking info for success page
-      try {
-        const payload = { qty, price, total, ts: Date.now(), eventId };
-        sessionStorage.setItem('eventBookingSuccess', JSON.stringify(payload));
-      } catch {}
-      onNavigate('event-booking-success', eventId); // Route to new success page
-    }, 1200);
+    }
   }
 
   return (
@@ -204,7 +237,7 @@ export function EventBookingSuccess({ eventId, onNavigate }: { eventId: string, 
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/events/${eventId}`);
+        const res = await fetch(`${API_BASE_URL}/api/events/${eventId}`);
         const data = await res.json();
         if (data?.success && data.data?.event) setEvent(data.data.event as EventInfo);
       } catch {}

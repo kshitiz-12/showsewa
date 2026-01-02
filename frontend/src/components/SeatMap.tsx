@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Ticket, ArrowLeft, Pencil } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { API_BASE_URL } from '../config/api';
 
 interface Seat {
@@ -34,6 +35,7 @@ interface SeatMapProps {
 
 const SeatMap: React.FC<SeatMapProps> = (props) => {
   const { showtimeId, onSeatSelection, showtimeInfo, availableShowtimes = [], onNavigate } = props;
+  const { language, t } = useLanguage();
   const { user } = useAuth();
   const [seats, setSeats] = useState<Seat[]>([]);
   const [categories, setCategories] = useState<SeatCategory[]>([]);
@@ -474,8 +476,8 @@ const SeatMap: React.FC<SeatMapProps> = (props) => {
                                 : 'bg-white dark:bg-gray-800 border-2 border-green-500 text-gray-900 dark:text-white hover:border-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 cursor-pointer'
                               }
                             `}
-                            aria-label={`${seat.seatNumber} seat, ${seat.isBooked ? 'Sold' : seat.isSelected ? 'Selected' : 'Available'}, Price: NPR ${seat.price}`}
-                            title={`${seat.seatNumber} - NPR ${seat.price}${seat.isBooked ? ' (Sold)' : seat.isSelected ? ' (Selected)' : ' (Available)'}`}
+                            aria-label={`${seat.seatNumber} seat, ${seat.isBooked ? t('common.sold') : seat.isSelected ? t('common.selected') : t('common.available')}, Price: NPR ${seat.price}`}
+                            title={`${seat.seatNumber} - NPR ${seat.price}${seat.isBooked ? ` (${t('common.sold')})` : seat.isSelected ? ` (${t('common.selected')})` : ` (${t('common.available')})`}`}
                           >
                             <span>{seatNumStr}</span>
                           </button>
@@ -493,7 +495,7 @@ const SeatMap: React.FC<SeatMapProps> = (props) => {
       {/* Screen Indicator - BookMyShow Style */}
       <div className="px-4 mb-8">
         <div className="bg-blue-200 dark:bg-blue-800 rounded-lg py-6 text-center">
-          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">SCREEN</p>
+          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('common.screen_caps')}</p>
         </div>
       </div>
 
@@ -525,7 +527,7 @@ const SeatMap: React.FC<SeatMapProps> = (props) => {
           <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center">
             <span className="text-white text-xs">✓</span>
           </div>
-          <span>YES Private Debit Card Offer</span>
+          <span>{t('common.yes_private_debit_offer')}</span>
         </div>
         <div className="text-gray-600 dark:text-gray-400">1/3</div>
       </div>
