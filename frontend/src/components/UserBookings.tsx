@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Ticket, Calendar, Clock, MapPin, Download, Eye, Film } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { API_BASE_URL } from '../config/api';
 import jsPDF from 'jspdf';
 
 interface Booking {
