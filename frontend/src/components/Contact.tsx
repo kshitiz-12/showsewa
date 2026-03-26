@@ -14,7 +14,7 @@ export function Contact() {
     setLoading(true);
 
     setTimeout(() => {
-      alert('Message sent successfully! We will get back to you soon.');
+      alert(t('contact.message_sent_success'));
       setName('');
       setEmail('');
       setMessage('');
@@ -46,23 +46,23 @@ export function Contact() {
             <a
               href="mailto:info@showsewa.com"
               className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 transform hover:scale-110 shadow-lg"
-              aria-label="Email Us"
+              aria-label={t('contact.email_us')}
             >
               <Mail className="w-6 h-6" />
             </a>
             <a
               href="tel:+9779800000000"
               className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 transform hover:scale-110 shadow-lg"
-              aria-label="Call Us"
+              aria-label={t('contact.call_us')}
             >
               <Phone className="w-6 h-6" />
             </a>
             <a
-              href="https://www.google.com/maps/search/?api=1&query=Kathmandu,Nepal"
+              href="https://www.google.com/maps/search/?api=1&query=Biratnagar,Nepal"
               target="_blank"
               rel="noopener noreferrer"
               className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 transform hover:scale-110 shadow-lg"
-              aria-label="Visit Us"
+              aria-label={t('contact.location')}
             >
               <MapPin className="w-6 h-6" />
             </a>
@@ -81,7 +81,7 @@ export function Contact() {
                   <Send className="w-6 h-6 text-white" />
                 </div>
                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-                  Send us a message
+                  {t('contact.send_us_message')}
                 </h2>
               </div>
               
@@ -96,7 +96,7 @@ export function Contact() {
                     onChange={(e) => setName(e.target.value)}
                     required
                     className="w-full px-5 py-4 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-red-100 dark:focus:ring-red-900/30 focus:border-red-500 transition-all duration-200"
-                    placeholder="Your full name"
+                    placeholder={t('contact.placeholder_full_name')}
                   />
                 </div>
 
@@ -110,7 +110,7 @@ export function Contact() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     className="w-full px-5 py-4 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-red-100 dark:focus:ring-red-900/30 focus:border-red-500 transition-all duration-200"
-                    placeholder="your.email@example.com"
+                    placeholder={t('contact.placeholder_email')}
                   />
                 </div>
 
@@ -124,7 +124,7 @@ export function Contact() {
                     required
                     rows={6}
                     className="w-full px-5 py-4 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-red-100 dark:focus:ring-red-900/30 focus:border-red-500 transition-all duration-200 resize-none"
-                    placeholder="Your message here..."
+                    placeholder={t('contact.placeholder_message')}
                   ></textarea>
                 </div>
 
@@ -134,7 +134,7 @@ export function Contact() {
                   className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-4 rounded-xl hover:from-red-700 hover:to-red-800 transition-all duration-300 font-bold disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105"
                 >
                   <Send className="w-5 h-5" />
-                  {loading ? 'Sending...' : t('contact.send')}
+                  {loading ? t('contact.sending') : t('contact.send')}
                 </button>
               </form>
             </div>
@@ -148,7 +148,7 @@ export function Contact() {
                   <Phone className="w-6 h-6 text-white" />
                 </div>
                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-                  Get in touch
+                  {t('contact.get_in_touch')}
                 </h2>
               </div>
               <div className="space-y-6">
@@ -175,7 +175,7 @@ export function Contact() {
                   </div>
                   <div className="flex-1">
                     <h3 className="font-bold text-gray-900 dark:text-white mb-2 text-lg">
-                      Call Us
+                      {t('contact.call_us')}
                     </h3>
                     <a
                       href="tel:+9779800000000"
@@ -192,10 +192,10 @@ export function Contact() {
                   </div>
                   <div className="flex-1">
                     <h3 className="font-bold text-gray-900 dark:text-white mb-2 text-lg">
-                      Location
+                      {t('contact.location')}
                     </h3>
                     <p className="text-gray-600 dark:text-gray-400 text-lg">
-                      Kathmandu, Nepal
+                      Biratnagar, Nepal
                     </p>
                   </div>
                 </div>
@@ -214,21 +214,27 @@ export function Contact() {
               </div>
               <div className="flex gap-4 justify-center">
                 <a
-                  href="#"
+                  href="https://www.facebook.com/showsewa"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center hover:from-red-600 hover:to-red-700 transition-all duration-300 transform hover:scale-110 shadow-lg hover:shadow-xl"
                   aria-label="Facebook"
                 >
                   <Facebook className="w-7 h-7 text-white" />
                 </a>
                 <a
-                  href="#"
+                  href="https://www.instagram.com/showsewa?igsh=bGZ6ZjRxZXUycncx"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center hover:from-red-600 hover:to-red-700 transition-all duration-300 transform hover:scale-110 shadow-lg hover:shadow-xl"
                   aria-label="Instagram"
                 >
                   <Instagram className="w-7 h-7 text-white" />
                 </a>
                 <a
-                  href="#"
+                  href="https://x.com/showsewa"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center hover:from-red-600 hover:to-red-700 transition-all duration-300 transform hover:scale-110 shadow-lg hover:shadow-xl"
                   aria-label="Twitter"
                 >

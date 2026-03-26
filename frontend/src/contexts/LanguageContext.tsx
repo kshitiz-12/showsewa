@@ -23,6 +23,10 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('showsewa-language', newLang);
   };
 
+  const normalizeBrand = (text: string): string => {
+    return text.replaceAll('ShowSewa', 'SHOWसेवा');
+  };
+
   const t = (key: string): string => {
     const keys = key.split('.');
     let value: any = translations[language];
@@ -35,7 +39,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    return typeof value === 'string' ? value : key;
+    return typeof value === 'string' ? normalizeBrand(value) : key;
   };
 
   return (

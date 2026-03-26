@@ -56,10 +56,10 @@ export function PrivacyPolicy({ onNavigate }: PrivacyPolicyProps) {
             </div>
           </div>
           <p className="text-gray-700 dark:text-gray-300 mt-4">
-            At ShowSewa, we value your privacy and are committed to protecting your personal information. This Privacy Policy explains how we collect, use, store, and safeguard your data when you access or use our website and services.
+            At SHOWसेवा, we value your privacy and are committed to protecting your personal information. This Privacy Policy explains how we collect, use, store, and safeguard your data when you access or use our website and services.
           </p>
           <p className="text-gray-700 dark:text-gray-300 mt-2 font-semibold">
-            By using ShowSewa, you agree to the terms outlined in this Privacy Policy.
+            By using SHOWसेवा, you agree to the terms outlined in this Privacy Policy.
           </p>
         </div>
 
@@ -82,7 +82,7 @@ export function PrivacyPolicy({ onNavigate }: PrivacyPolicyProps) {
                 
                 <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mt-6 mb-3">a) Personal Information</h3>
                 <p className="text-gray-700 dark:text-gray-300 mb-4">
-                  When you use ShowSewa, we may collect the following information:
+                  When you use SHOWसेवा, we may collect the following information:
                 </p>
                 <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 ml-4">
                   <li>Full name</li>
@@ -131,7 +131,7 @@ export function PrivacyPolicy({ onNavigate }: PrivacyPolicyProps) {
                   <li>Prevent fraud and misuse of the platform</li>
                 </ul>
                 <p className="text-gray-700 dark:text-gray-300 mt-4 font-semibold">
-                  ShowSewa does not sell, rent, or trade your personal information to third parties.
+                  SHOWसेवा does not sell, rent, or trade your personal information to third parties.
                 </p>
               </div>
             </div>
@@ -153,7 +153,7 @@ export function PrivacyPolicy({ onNavigate }: PrivacyPolicyProps) {
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">3. Payments and Third-Party Services</h2>
                 <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 ml-4">
                   <li>All payments are processed through secure third-party payment gateways.</li>
-                  <li>ShowSewa does not store your card, wallet, or banking details.</li>
+                  <li>SHOWसेवा does not store your card, wallet, or banking details.</li>
                   <li>Third-party services may have their own privacy policies, and users are encouraged to review them.</li>
                 </ul>
               </div>
@@ -204,7 +204,7 @@ export function PrivacyPolicy({ onNavigate }: PrivacyPolicyProps) {
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">5. Data Security</h2>
                 <p className="text-gray-700 dark:text-gray-300 mb-4">
-                  ShowSewa takes reasonable technical and organizational measures to protect user data from:
+                  SHOWसेवा takes reasonable technical and organizational measures to protect user data from:
                 </p>
                 <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 ml-4 mb-4">
                   <li>Unauthorized access</li>
@@ -233,7 +233,7 @@ export function PrivacyPolicy({ onNavigate }: PrivacyPolicyProps) {
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">6. Cookies and Analytics</h2>
                 <p className="text-gray-700 dark:text-gray-300 mb-4">
-                  ShowSewa may use cookies and similar technologies to:
+                  SHOWसेवा may use cookies and similar technologies to:
                 </p>
                 <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 ml-4 mb-4">
                   <li>Improve website functionality</li>
@@ -270,7 +270,7 @@ export function PrivacyPolicy({ onNavigate }: PrivacyPolicyProps) {
                   <li>Withdraw consent for communications</li>
                 </ul>
                 <p className="text-gray-700 dark:text-gray-300">
-                  Requests can be made through the official communication channels provided on the ShowSewa website.
+                  Requests can be made through the official communication channels provided on the SHOWसेवा website.
                 </p>
               </div>
             </div>
@@ -291,7 +291,7 @@ export function PrivacyPolicy({ onNavigate }: PrivacyPolicyProps) {
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">8. Children's Privacy</h2>
                 <p className="text-gray-700 dark:text-gray-300">
-                  ShowSewa is not intended for children under the age of 13. We do not knowingly collect personal information from minors.
+                  SHOWसेवा is not intended for children under the age of 13. We do not knowingly collect personal information from minors.
                 </p>
               </div>
             </div>
@@ -312,7 +312,7 @@ export function PrivacyPolicy({ onNavigate }: PrivacyPolicyProps) {
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">9. Changes to This Privacy Policy</h2>
                 <p className="text-gray-700 dark:text-gray-300">
-                  ShowSewa may update this Privacy Policy from time to time. Any changes will be posted on this page with an updated revision date.
+                  SHOWसेवा may update this Privacy Policy from time to time. Any changes will be posted on this page with an updated revision date.
                 </p>
               </div>
             </div>
@@ -333,7 +333,7 @@ export function PrivacyPolicy({ onNavigate }: PrivacyPolicyProps) {
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">10. Contact Us</h2>
                 <p className="text-gray-700 dark:text-gray-300">
-                  If you have any questions, concerns, or requests related to this Privacy Policy, please contact us through the official contact details available on the ShowSewa website.
+                  If you have any questions, concerns, or requests related to this Privacy Policy, please contact us through the official contact details available on the SHOWसेवा website.
                 </p>
               </div>
             </div>

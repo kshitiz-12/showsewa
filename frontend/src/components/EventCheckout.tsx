@@ -252,11 +252,11 @@ export function EventBookingSuccess({ eventId, onNavigate }: { eventId: string, 
   }, [eventId]);
 
   const handleShare = async () => {
-    const shareText = `Booked ${info?.qty || 1} ticket(s) for ${event?.title || 'Event'} on ${event?.eventDate ? new Date(event.eventDate).toLocaleString() : ''} via ShowSewa.`;
+    const shareText = `Booked ${info?.qty || 1} ticket(s) for ${event?.title || 'Event'} on ${event?.eventDate ? new Date(event.eventDate).toLocaleString() : ''} via SHOWसेवा.`;
     const url = globalThis.location.href;
     try {
       if (navigator.share) {
-        await navigator.share({ title: 'ShowSewa Ticket', text: shareText, url });
+        await navigator.share({ title: 'SHOWसेवा Ticket', text: shareText, url });
       } else {
         await navigator.clipboard.writeText(`${shareText} ${url}`);
         alert('Link copied to clipboard');
@@ -271,7 +271,7 @@ export function EventBookingSuccess({ eventId, onNavigate }: { eventId: string, 
     doc.rect(0, 0, doc.internal.pageSize.getWidth(), 72, 'F');
     doc.setTextColor(255,255,255);
     doc.setFontSize(16);
-    doc.text('ShowSewa • Event Ticket', pad, 44);
+    doc.text('SHOWसेवा • Event Ticket', pad, 44);
     doc.setTextColor(20,20,20);
     doc.setFontSize(14);
     doc.text(event?.title || 'Event', pad, 98, { maxWidth: 280 });
@@ -287,8 +287,8 @@ export function EventBookingSuccess({ eventId, onNavigate }: { eventId: string, 
     doc.setDrawColor(230);
     doc.line(pad, 210, doc.internal.pageSize.getWidth()-pad, 210);
     doc.setFontSize(9);
-    doc.text('Thank you for booking with ShowSewa', pad, 232);
-    doc.save(`ShowSewa-${event?.title || 'Ticket'}.pdf`);
+    doc.text('Thank you for booking with SHOWसेवा', pad, 232);
+    doc.save(`SHOWसेवा-${event?.title || 'Ticket'}.pdf`);
   };
 
   return (

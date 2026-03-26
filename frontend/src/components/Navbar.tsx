@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Ticket, Menu, X, Sun, Moon, User, LogOut, ShoppingBag, BarChart3, Trophy, MapPin, ChevronDown, Heart } from 'lucide-react';
+import { Menu, X, Sun, Moon, User, LogOut, ShoppingBag, BarChart3, Trophy, MapPin, ChevronDown, Heart } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useCity } from '../contexts/CityContext';
@@ -59,17 +59,20 @@ export function Navbar({ onNavigate, currentPage }: Readonly<NavbarProps>) {
     <nav className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-xl sticky top-0 z-50 transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-14 sm:h-16">
-          <div 
-            className="flex items-center gap-1.5 sm:gap-2 cursor-pointer group"
+          <button
+            type="button"
+            className="flex items-center cursor-pointer group p-0 border-0 bg-transparent"
             onClick={() => onNavigate('home')}
+            aria-label="SHOWसेवा home"
           >
-            <div className="bg-red-600 p-1.5 sm:p-2 rounded-lg sm:rounded-xl group-hover:scale-110 transition-transform duration-300 shadow-lg">
-              <Ticket className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-            </div>
-            <span className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white group-hover:text-red-600 transition-colors duration-300">
-              Show<span className="text-red-600">Sewa</span>
-            </span>
-          </div>
+            <img
+              src="/logo.png"
+              alt="SHOWसेवा — Nepal ticketing: mountains, film strip, and play mark with SHOWसेवा wordmark"
+              className="h-10 sm:h-12 md:h-14 w-auto object-contain object-left group-hover:opacity-90 transition-opacity duration-300"
+              width={280}
+              height={56}
+            />
+          </button>
 
           <div className="hidden md:flex items-center gap-4">
             {/* City Selection Button */}

@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Search, MapPin, X, Landmark, Building2 } from 'lucide-react';
+import { Search, MapPin, X, Landmark } from 'lucide-react';
 import { popularCities, nepalCities, getProvinces } from '../data/nepalCities';
-import { cityIconMap, DefaultCityIcon } from '../data/cityIcons';
+import { DefaultCityIcon, getCityIcon } from '../data/cityIcons';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface CitySelectionModalProps {
@@ -15,7 +15,7 @@ interface CitySelectionModalProps {
 const allCities = nepalCities;
 
 export function CitySelectionModal({ isOpen, onClose, onSelectCity, currentCity }: CitySelectionModalProps) {
-  const { language, t } = useLanguage();
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [showAllCities, setShowAllCities] = useState(false);
   const [selectedProvince, setSelectedProvince] = useState<string>('');
@@ -65,7 +65,7 @@ export function CitySelectionModal({ isOpen, onClose, onSelectCity, currentCity 
       <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] my-8 overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900">Select Your City</h2>
+          <h2 className="text-2xl font-bold text-gray-900">{t('common.select_your_city')}</h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -104,7 +104,7 @@ export function CitySelectionModal({ isOpen, onClose, onSelectCity, currentCity 
               className="flex items-center gap-2 px-4 py-3 text-red-600 hover:text-red-700 font-medium bg-red-50 rounded-xl hover:bg-red-100 transition-colors"
             >
               <MapPin className="w-5 h-5" />
-              Detect Location
+              {t('common.detect_location')}
             </button>
           </div>
         </div>
@@ -178,7 +178,7 @@ export function CitySelectionModal({ isOpen, onClose, onSelectCity, currentCity 
               </button>
               
               {displayCities.map((city) => {
-                const IconComponent = cityIconMap[city.name] || DefaultCityIcon;
+                const CityIcon = getCityIcon(city.name, city.province);
                 return (
                   <button
                     key={city.name}
@@ -209,11 +209,13 @@ export function CitySelectionModal({ isOpen, onClose, onSelectCity, currentCity 
                           ? 'bg-red-600'
                           : 'bg-gray-200 group-hover:bg-red-100'
                       }`}>
-                        <IconComponent className={`w-8 h-8 ${
-                          currentCity === city.name
-                            ? 'text-white'
-                            : 'text-gray-600 group-hover:text-red-600'
-                        } transition-colors duration-200`} />
+                        <CityIcon
+                          className={`w-8 h-8 ${
+                            currentCity === city.name
+                              ? 'text-white'
+                              : 'text-gray-600 group-hover:text-red-600'
+                          } transition-colors duration-200`}
+                        />
                       </div>
                     </div>
                     <div className={`font-semibold text-sm mb-1 ${currentCity === city.name ? 'text-red-600' : 'text-gray-900'}`}>

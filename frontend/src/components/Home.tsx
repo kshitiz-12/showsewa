@@ -160,11 +160,11 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
         .insert([{ email, language }]);
 
       if (error) throw error;
-      alert('Thank you for subscribing!');
+      alert(t('home.newsletter_success'));
       setEmail('');
     } catch (error) {
       console.error('Error:', error);
-      alert('Something went wrong. Please try again.');
+      alert(t('home.newsletter_error'));
     }
 
     setLoading(false);
@@ -214,7 +214,7 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
                   className="btn-primary px-6 py-3 sm:px-8 sm:py-4 text-base sm:text-lg font-semibold rounded-lg sm:rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 active:scale-95"
                 >
                   <Film className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:rotate-12" />
-                  Explore Movies
+                  {t('common.explore_movies')}
                   <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:translate-x-1" />
                 </button>
                 <button
@@ -222,7 +222,7 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
                   className="border-2 border-white text-white hover:bg-white hover:text-red-600 px-6 py-3 sm:px-8 sm:py-4 text-base sm:text-lg font-semibold rounded-lg sm:rounded-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 active:scale-95 hover:shadow-2xl flex items-center justify-center gap-2 backdrop-blur-sm"
                 >
                   <Music className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 hover:rotate-12" />
-                  Discover Events
+                  {t('common.discover_events')}
                   <Play className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 hover:scale-110" />
                 </button>
               </div>
@@ -251,8 +251,8 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
                     <TrendingUp className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <p className="text-white font-semibold text-sm sm:text-base">Trending Now</p>
-                    <p className="text-gray-300 text-xs sm:text-sm">Most popular this week</p>
+                    <p className="text-white font-semibold text-sm sm:text-base">{t('common.trending_now')}</p>
+                    <p className="text-gray-300 text-xs sm:text-sm">{t('common.most_popular_week')}</p>
                   </div>
                 </div>
                 
@@ -323,15 +323,15 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
                     <Film className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Trending Movies</h3>
-                    <p className="text-gray-600 dark:text-gray-400">Most popular movies right now</p>
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{t('home.trending_movies')}</h3>
+                    <p className="text-gray-600 dark:text-gray-400">{t('home.trending_movies_subtitle')}</p>
                   </div>
                 </div>
                 <button
                   onClick={() => onNavigate('movies')}
                   className="flex items-center gap-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-semibold transition-all duration-300 hover:gap-3 group"
                 >
-                  View All
+                  {t('home.view_all')}
                   <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </button>
               </div>
@@ -362,13 +362,13 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
                   <div className="w-16 h-16 bg-gradient-to-r from-red-100 to-red-200 dark:from-red-900/30 dark:to-red-800/30 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Film className="w-8 h-8 text-red-600 dark:text-red-400" />
                   </div>
-                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No Trending Movies</h4>
-                  <p className="text-gray-600 dark:text-gray-400 mb-4">Check back soon for trending movies!</p>
+                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('common.no_trending_movies')}</h4>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">{t('home.no_trending_movies_subtitle')}</p>
                   <button
                     onClick={() => onNavigate('movies')}
                     className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-2 rounded-lg font-semibold hover:from-red-600 hover:to-red-700 transition-all duration-300"
                   >
-                    Browse All Movies
+                    {t('home.browse_all_movies')}
                   </button>
                 </div>
               )}
@@ -382,15 +382,15 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
                     <Music className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Featured Events</h3>
-                    <p className="text-gray-600 dark:text-gray-400">Don't miss these amazing events</p>
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{t('home.featured_events')}</h3>
+                    <p className="text-gray-600 dark:text-gray-400">{t('home.featured_events_subtitle')}</p>
                   </div>
                 </div>
                 <button
                   onClick={() => onNavigate('events')}
                   className="flex items-center gap-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-semibold transition-all duration-300 hover:gap-3 group"
                 >
-                  View All
+                  {t('home.view_all')}
                   <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </button>
               </div>
@@ -417,13 +417,13 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
                   <div className="w-16 h-16 bg-gradient-to-r from-red-100 to-red-200 dark:from-red-900/30 dark:to-red-800/30 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Music className="w-8 h-8 text-red-600 dark:text-red-400" />
                   </div>
-                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No Featured Events</h4>
-                  <p className="text-gray-600 dark:text-gray-400 mb-4">Check back soon for featured events!</p>
+                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t('home.no_featured_events')}</h4>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">{t('home.no_featured_events_subtitle')}</p>
                   <button
                     onClick={() => onNavigate('events')}
                     className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-2 rounded-lg font-semibold hover:from-red-600 hover:to-red-700 transition-all duration-300"
                   >
-                    Browse All Events
+                    {t('home.browse_all_events')}
                   </button>
                 </div>
               )}
@@ -442,15 +442,15 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
                   <Clock className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Incoming Events</h3>
-                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Events starting soon</p>
+                  <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t('home.incoming_events')}</h3>
+                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">{t('home.incoming_events_subtitle')}</p>
                 </div>
               </div>
               <button
                 onClick={() => onNavigate('events')}
                 className="bg-gradient-to-r from-red-500 to-red-600 text-white px-5 py-2 sm:px-6 sm:py-2 rounded-lg font-semibold text-sm sm:text-base hover:from-red-600 hover:to-red-700 transition-all duration-300 whitespace-nowrap self-start sm:self-auto"
               >
-                View All Events
+                {t('home.view_all_events')}
               </button>
             </div>
 
@@ -481,7 +481,7 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
                         <Music className="w-12 h-12 text-gray-400" />
                       </div>
                       <div className="badge-red absolute top-3 left-3">
-                        Coming Soon
+                        {t('home.coming_soon')}
                       </div>
                     </div>
                     <div className="p-3 sm:p-4">
@@ -517,7 +517,7 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
                   onClick={() => onNavigate('events')}
                   className="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-2 rounded-lg font-semibold hover:from-red-600 hover:to-red-700 transition-all duration-300"
                 >
-                  Browse All Events
+                  {t('home.browse_all_events')}
                 </button>
               </div>
             )}
@@ -536,13 +536,13 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
             <div className="inline-block px-4 py-2 bg-red-100 dark:bg-red-900/30 rounded-full mb-6">
-              <span className="text-red-600 dark:text-red-400 font-bold text-xs uppercase tracking-wider">Why Choose Us</span>
+              <span className="text-red-600 dark:text-red-400 font-bold text-xs uppercase tracking-wider">{t('home.why_choose_us')}</span>
             </div>
             <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 dark:text-white mb-6 tracking-tight">
-              Why Choose ShowSewa?
+              {t('home.why_choose_showsewa')}
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mb-8">
-              Experience excellence in entertainment booking
+              {t('home.experience_excellence')}
             </p>
             <div className="w-32 h-1.5 bg-gradient-to-r from-transparent via-red-600 to-transparent mx-auto"></div>
           </div>
@@ -551,29 +551,29 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
             {[
               {
                 icon: Zap,
-                title: "Lightning Fast",
-                description: "Book tickets in seconds with our optimized booking system",
+                title: t('home.feature_lightning_fast_title'),
+                description: t('home.feature_lightning_fast_desc'),
                 gradient: "from-yellow-500 to-orange-500",
                 delay: "0s"
               },
               {
                 icon: Heart,
-                title: "Personalized",
-                description: "Get recommendations based on your preferences and history",
+                title: t('home.feature_personalized_title'),
+                description: t('home.feature_personalized_desc'),
                 gradient: "from-red-500 to-pink-500",
                 delay: "0.15s"
               },
               {
                 icon: Award,
-                title: "Premium Quality",
-                description: "Access to the best venues and exclusive events",
+                title: t('home.feature_premium_quality_title'),
+                description: t('home.feature_premium_quality_desc'),
                 gradient: "from-blue-500 to-indigo-600",
                 delay: "0.3s"
               },
               {
                 icon: Users,
-                title: "Trusted Community",
-                description: "Join thousands of entertainment enthusiasts",
+                title: t('home.feature_trusted_community_title'),
+                description: t('home.feature_trusted_community_desc'),
                 gradient: "from-green-500 to-emerald-600",
                 delay: "0.45s"
               }
@@ -624,10 +624,10 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
           <div className="space-y-8">
             <div>
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-                Ready to Book Your Next Adventure?
+                {t('home.final_cta_title')}
               </h2>
               <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                Join thousands of satisfied customers who trust ShowSewa for their entertainment needs
+                {t('home.final_cta_subtitle')}
               </p>
             </div>
 
@@ -637,14 +637,14 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
                 className="bg-gradient-to-r from-red-500 to-red-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-red-600 hover:to-red-700 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               >
                 <Film className="w-5 h-5" />
-                Browse Movies
+                {t('home.browse_movies')}
               </button>
               <button
                 onClick={() => onNavigate('events')}
                 className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-gray-900 transition-all duration-300 flex items-center justify-center gap-2"
               >
                 <Music className="w-5 h-5" />
-                Explore Events
+                {t('common.discover_events')}
               </button>
             </div>
             
@@ -654,21 +654,21 @@ export function Home({ onNavigate }: Readonly<HomeProps>) {
                   <Star className="w-8 h-8 text-white" />
                 </div>
                 <div className="text-2xl font-bold text-white mb-2">4.9/5</div>
-                <div className="text-gray-400">User Rating</div>
+                <div className="text-gray-400">{t('home.user_rating')}</div>
               </div>
               <div className="text-center">
                 <div className="w-16 h-16 bg-gradient-to-r from-green-400 to-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Users className="w-8 h-8 text-white" />
                 </div>
                 <div className="text-2xl font-bold text-white mb-2">50K+</div>
-                <div className="text-gray-400">Happy Users</div>
+                <div className="text-gray-400">{t('home.happy_users')}</div>
               </div>
               <div className="text-center">
                 <div className="w-16 h-16 bg-gradient-to-r from-red-400 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Award className="w-8 h-8 text-white" />
                 </div>
                 <div className="text-2xl font-bold text-white mb-2">100+</div>
-                <div className="text-gray-400">Events</div>
+                <div className="text-gray-400">{t('home.events_label')}</div>
               </div>
             </div>
           </div>

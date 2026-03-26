@@ -289,7 +289,7 @@ export function Login({ onNavigate }: Readonly<LoginProps>) {
               {isLogin ? 'Welcome Back!' : 'Create Account'}
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              {isLogin ? 'Sign in to continue booking' : 'Join ShowSewa today'}
+              {isLogin ? 'Sign in to continue booking' : 'Join SHOWसेवा today'}
             </p>
           </div>
 

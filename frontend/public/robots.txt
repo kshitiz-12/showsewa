@@ -1,4 +1,4 @@
-# robots.txt for ShowSewa
+# robots.txt for SHOWसेवा
 # Allow all search engines to crawl the site
 User-agent: *
 Allow: /

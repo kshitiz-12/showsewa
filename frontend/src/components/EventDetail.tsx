@@ -269,8 +269,8 @@ export function EventDetail({ eventId, onNavigate }: EventDetailProps) {
         <img
           src={event.imageUrl}
           alt={eventTitle}
-          className="w-full h-full object-contain sm:object-cover opacity-60"
-          style={{ objectPosition: 'center' }}
+          className="w-full h-full object-cover"
+          style={{ objectPosition: 'center center' }}
           loading="eager"
           decoding="async"
           fetchPriority="high"
@@ -278,7 +278,7 @@ export function EventDetail({ eventId, onNavigate }: EventDetailProps) {
             (e.target as HTMLImageElement).style.display = 'none';
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-black/20"></div>
         
         {/* Banner Content */}
         <div className="absolute inset-0 flex items-end p-6">

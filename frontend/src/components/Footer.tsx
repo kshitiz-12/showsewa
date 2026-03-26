@@ -1,8 +1,8 @@
-import { Ticket, Facebook, Instagram, Twitter, Mail, Smartphone, MapPin, Phone, Heart } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Mail, Smartphone, MapPin, Phone, Heart } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface FooterProps {
-  onNavigate: (page: string) => void;
+  readonly onNavigate: (page: string) => void;
 }
 
 export function Footer({ onNavigate }: FooterProps) {
@@ -29,13 +29,14 @@ export function Footer({ onNavigate }: FooterProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-4 sm:mb-6">
           {/* Company Info */}
           <div className="lg:col-span-2">
-            <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3 group">
-              <div className="bg-gradient-to-br from-red-600 to-red-700 p-2 sm:p-2.5 rounded-xl shadow-lg transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
-                <Ticket className="w-5 h-5 sm:w-6 sm:h-6 text-white transform group-hover:scale-110 transition-transform duration-300" />
-              </div>
-              <span className="text-xl sm:text-2xl font-extrabold transform group-hover:scale-105 transition-transform duration-300">
-                Show<span className="text-red-500">Sewa</span>
-              </span>
+            <div className="flex items-center mb-2 sm:mb-3 group">
+              <img
+                src="/logo.png"
+                alt="SHOWसेवा — Nepal ticketing: mountains, film strip, and play mark with SHOWसेवा wordmark"
+                className="h-9 sm:h-11 w-auto max-w-[min(100%,280px)] object-contain object-left opacity-95 group-hover:opacity-100 transition-opacity duration-300"
+                width={220}
+                height={44}
+              />
             </div>
             <p className="text-gray-300 mb-3 sm:mb-4 max-w-md text-xs sm:text-sm">
               Tapai Ko Show Hamro Sewa
@@ -44,7 +45,9 @@ export function Footer({ onNavigate }: FooterProps) {
             {/* Social Media */}
             <div className="flex gap-1.5 sm:gap-2 mb-3 sm:mb-4">
               <a
-                href="#"
+                href="https://www.facebook.com/showsewa"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="group relative w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-red-600 to-red-700 rounded-lg flex items-center justify-center hover:from-red-700 hover:to-red-800 transition-all duration-300 transform hover:scale-110 hover:rotate-6 hover:shadow-lg"
                 aria-label="Facebook"
               >
@@ -53,6 +56,8 @@ export function Footer({ onNavigate }: FooterProps) {
               </a>
               <a
                 href="https://www.instagram.com/showsewa?igsh=bGZ6ZjRxZXUycncx"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="group relative w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-red-600 to-red-700 rounded-lg flex items-center justify-center hover:from-red-700 hover:to-red-800 transition-all duration-300 transform hover:scale-110 hover:rotate-6 hover:shadow-lg"
                 aria-label="Instagram"
               >
@@ -60,7 +65,9 @@ export function Footer({ onNavigate }: FooterProps) {
                 <div className="absolute inset-0 bg-white/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </a>
               <a
-                href="#"
+                href="https://x.com/showsewa"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="group relative w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-red-600 to-red-700 rounded-lg flex items-center justify-center hover:from-red-700 hover:to-red-800 transition-all duration-300 transform hover:scale-110 hover:rotate-6 hover:shadow-lg"
                 aria-label="Twitter"
               >
@@ -81,7 +88,7 @@ export function Footer({ onNavigate }: FooterProps) {
               </div>
               <div className="flex items-center gap-2 sm:gap-3 text-gray-300">
                 <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />
-                <span className="text-xs sm:text-sm">Kathmandu, Nepal</span>
+                <span className="text-xs sm:text-sm">Biratnagar, Nepal</span>
               </div>
             </div>
           </div>
@@ -133,7 +140,7 @@ export function Footer({ onNavigate }: FooterProps) {
         <div className="border-t border-gray-800 pt-3 sm:pt-4 mt-3 sm:mt-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-2 sm:gap-3 text-xs text-gray-400">
             <p className="flex items-center gap-1.5">
-              © 2024 ShowSewa. Made with{' '}
+              © 2024 SHOWसेवा. Made with{' '}
               <Heart className="w-3.5 h-3.5 text-red-500 inline-block fill-red-500 animate-pulse" />{' '}
               in Nepal
             </p>

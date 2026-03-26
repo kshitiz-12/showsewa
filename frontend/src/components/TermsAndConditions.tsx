@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { FileText, Scale, AlertCircle, CreditCard, XCircle, Users, CheckCircle2, Info, Ticket, RefreshCw, Shield, Ban, Mail, ListChecks, DollarSign, Image as ImageIcon, FileEdit, ArrowRight } from 'lucide-react';
+import { FileText, Scale, CreditCard, XCircle, Users, CheckCircle2, Ticket, RefreshCw, Shield, Ban, Mail, ListChecks, DollarSign, Image as ImageIcon, FileEdit, ArrowRight, Globe, RotateCcw, ClipboardList } from 'lucide-react';
 
 interface TermsAndConditionsProps {
   readonly onNavigate?: (page: string, id?: string) => void;
@@ -103,7 +103,7 @@ export function TermsAndConditions({ onNavigate }: TermsAndConditionsProps) {
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">1. Acceptance of Terms</h2>
                   <p className="text-gray-700 dark:text-gray-300">
-                    By using ShowSewa, you confirm that you have read, understood, and agreed to these Terms and Conditions.
+                    By using SHOWसेवा, you confirm that you have read, understood, and agreed to these Terms and Conditions.
                   </p>
                 </div>
               </div>
@@ -118,12 +118,12 @@ export function TermsAndConditions({ onNavigate }: TermsAndConditionsProps) {
             >
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center flex-shrink-0 transform group-hover:scale-110 transition-transform duration-300">
-                  <Info className="w-6 h-6 text-red-600 dark:text-red-400" />
+                  <Globe className="w-6 h-6 text-red-600 dark:text-red-400" />
                 </div>
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">2. Platform Description</h2>
                   <p className="text-gray-700 dark:text-gray-300">
-                    ShowSewa is an online platform that helps users discover events and book tickets. ShowSewa does not organize events and is not responsible for event execution.
+                    SHOWसेवा is an online platform that helps users discover events and book tickets. SHOWसेवा does not organize events and is not responsible for event execution.
                   </p>
                 </div>
               </div>
@@ -143,7 +143,7 @@ export function TermsAndConditions({ onNavigate }: TermsAndConditionsProps) {
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">3. Ticket Booking and Entry</h2>
                   <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 ml-4">
-                    <li>Tickets purchased through ShowSewa are valid only for the specified event, date, and time.</li>
+                    <li>Tickets purchased through SHOWसेवा are valid only for the specified event, date, and time.</li>
                     <li>Tickets are non-transferable unless explicitly mentioned by the organizer.</li>
                     <li>Entry to events is subject to the organizer's rules and venue policies.</li>
                   </ul>
@@ -167,20 +167,28 @@ export function TermsAndConditions({ onNavigate }: TermsAndConditionsProps) {
                   <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 ml-4">
                     <li>Ticket prices are set by event organizers.</li>
                     <li>Payments are processed through secure third-party payment gateways.</li>
-                    <li>ShowSewa does not store payment card or wallet information.</li>
+                    <li>SHOWसेवा does not store payment card or wallet information.</li>
                   </ul>
                 </div>
               </div>
             </section>
 
-            <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-              <div className="flex items-start gap-4 mb-4">
-                <AlertCircle className="w-6 h-6 text-red-600 dark:text-red-400 flex-shrink-0 mt-1" />
+            <section
+              id="user-term-5"
+              ref={setRef('user-term-5')}
+              className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 transform transition-all duration-700 ease-out ${
+                isVisible['user-term-5'] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+              }`}
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center flex-shrink-0 transform group-hover:scale-110 transition-transform duration-300">
+                  <RotateCcw className="w-6 h-6 text-red-600 dark:text-red-400" />
+                </div>
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">5. Refunds and Cancellations</h2>
                   <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 ml-4">
                     <li>Refunds depend on the event organizer's refund policy.</li>
-                    <li>ShowSewa is not responsible for refunds unless clearly stated.</li>
+                    <li>SHOWसेवा is not responsible for refunds unless clearly stated.</li>
                     <li>In case of event cancellation or rescheduling, users will be informed when possible.</li>
                   </ul>
                 </div>
@@ -201,7 +209,7 @@ export function TermsAndConditions({ onNavigate }: TermsAndConditionsProps) {
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">6. Event Changes</h2>
                   <p className="text-gray-700 dark:text-gray-300">
-                    Event details such as venue, time, performers, or schedule may change. ShowSewa is not liable for such changes made by organizers.
+                    Event details such as venue, time, performers, or schedule may change. SHOWसेवा is not liable for such changes made by organizers.
                   </p>
                 </div>
               </div>
@@ -246,7 +254,7 @@ export function TermsAndConditions({ onNavigate }: TermsAndConditionsProps) {
                 </div>
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">8. Limitation of Liability</h2>
-                  <p className="text-gray-700 dark:text-gray-300 mb-4">ShowSewa is not responsible for:</p>
+                  <p className="text-gray-700 dark:text-gray-300 mb-4">SHOWसेवा is not responsible for:</p>
                   <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 ml-4">
                     <li>Event quality or execution</li>
                     <li>Personal injury, loss, or damage at events</li>
@@ -270,7 +278,7 @@ export function TermsAndConditions({ onNavigate }: TermsAndConditionsProps) {
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">9. Account Termination</h2>
                   <p className="text-gray-700 dark:text-gray-300">
-                    ShowSewa reserves the right to suspend or terminate user accounts that violate these terms.
+                    SHOWसेवा reserves the right to suspend or terminate user accounts that violate these terms.
                   </p>
                 </div>
               </div>
@@ -295,7 +303,7 @@ export function TermsAndConditions({ onNavigate }: TermsAndConditionsProps) {
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">1. Organizer Eligibility</h2>
                   <p className="text-gray-700 dark:text-gray-300">
-                    By listing events on ShowSewa, organizers confirm they have legal authority to host and sell tickets for the event.
+                    By listing events on SHOWसेवा, organizers confirm they have legal authority to host and sell tickets for the event.
                   </p>
                 </div>
               </div>
@@ -310,7 +318,7 @@ export function TermsAndConditions({ onNavigate }: TermsAndConditionsProps) {
             >
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center flex-shrink-0 transform group-hover:scale-110 transition-transform duration-300">
-                  <Users className="w-6 h-6 text-red-600 dark:text-red-400" />
+                  <ClipboardList className="w-6 h-6 text-red-600 dark:text-red-400" />
                 </div>
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">2. Organizer Responsibilities</h2>
@@ -341,7 +349,7 @@ export function TermsAndConditions({ onNavigate }: TermsAndConditionsProps) {
                   <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 ml-4">
                     <li>All event details must be accurate and updated.</li>
                     <li>Misleading or false information may result in event removal.</li>
-                    <li>ShowSewa reserves the right to review and approve listings.</li>
+                    <li>SHOWसेवा reserves the right to review and approve listings.</li>
                   </ul>
                 </div>
               </div>
@@ -362,16 +370,24 @@ export function TermsAndConditions({ onNavigate }: TermsAndConditionsProps) {
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">4. Ticket Sales and Pricing</h2>
                   <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 ml-4">
                     <li>Organizers set ticket prices and availability.</li>
-                    <li>ShowSewa may charge a service or platform fee.</li>
+                    <li>SHOWसेवा may charge a service or platform fee.</li>
                     <li>Ticket revenue settlements are handled as per agreed timelines.</li>
                   </ul>
                 </div>
               </div>
             </section>
 
-            <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-              <div className="flex items-start gap-4 mb-4">
-                <AlertCircle className="w-6 h-6 text-red-600 dark:text-red-400 flex-shrink-0 mt-1" />
+            <section
+              id="org-term-5"
+              ref={setRef('org-term-5')}
+              className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 transform transition-all duration-700 ease-out ${
+                isVisible['org-term-5'] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+              }`}
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center flex-shrink-0 transform group-hover:scale-110 transition-transform duration-300">
+                  <RotateCcw className="w-6 h-6 text-red-600 dark:text-red-400" />
+                </div>
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">5. Refunds and Cancellations</h2>
                   <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 ml-4">
@@ -397,7 +413,7 @@ export function TermsAndConditions({ onNavigate }: TermsAndConditionsProps) {
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">6. Payments and Settlements</h2>
                   <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 ml-4">
                     <li>Organizer payouts are processed after deducting applicable fees.</li>
-                    <li>ShowSewa is not responsible for delays caused by third-party payment providers.</li>
+                    <li>SHOWसेवा is not responsible for delays caused by third-party payment providers.</li>
                   </ul>
                 </div>
               </div>
@@ -417,7 +433,7 @@ export function TermsAndConditions({ onNavigate }: TermsAndConditionsProps) {
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">7. Content Usage</h2>
                   <p className="text-gray-700 dark:text-gray-300">
-                    Organizers grant ShowSewa the right to use event names, images, posters, and descriptions for promotional and marketing purposes.
+                    Organizers grant SHOWसेवा the right to use event names, images, posters, and descriptions for promotional and marketing purposes.
                   </p>
                 </div>
               </div>
@@ -463,7 +479,7 @@ export function TermsAndConditions({ onNavigate }: TermsAndConditionsProps) {
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">9. Termination of Organizer Account</h2>
                   <p className="text-gray-700 dark:text-gray-300">
-                    ShowSewa reserves the right to suspend or permanently remove organizers who violate platform policies.
+                    SHOWसेवा reserves the right to suspend or permanently remove organizers who violate platform policies.
                   </p>
                 </div>
               </div>
@@ -483,7 +499,7 @@ export function TermsAndConditions({ onNavigate }: TermsAndConditionsProps) {
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">10. Changes to Terms</h2>
                   <p className="text-gray-700 dark:text-gray-300">
-                    ShowSewa may update these Terms and Conditions at any time. Continued use of the platform indicates acceptance of updated terms.
+                    SHOWसेवा may update these Terms and Conditions at any time. Continued use of the platform indicates acceptance of updated terms.
                   </p>
                 </div>
               </div>
@@ -503,7 +519,7 @@ export function TermsAndConditions({ onNavigate }: TermsAndConditionsProps) {
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">11. Contact</h2>
                   <p className="text-gray-700 dark:text-gray-300">
-                    For any questions regarding these Terms and Conditions, please contact ShowSewa through the official communication channels listed on the website.
+                    For any questions regarding these Terms and Conditions, please contact SHOWसेवा through the official communication channels listed on the website.
                   </p>
                 </div>
               </div>

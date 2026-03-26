@@ -202,7 +202,7 @@ function App() {
       case 'booking-page':
         return <BookingPage onNavigate={handleNavigate} showtimeId={selectedItemId} />;
       case 'about':
-        return <About />;
+        return <About onNavigate={handleNavigate} />;
       case 'contact':
         return <Contact />;
       case 'login':
