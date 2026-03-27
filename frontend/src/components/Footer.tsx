@@ -26,9 +26,9 @@ export function Footer({ onNavigate }: FooterProps) {
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-4 sm:mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-4 sm:mb-6">
           {/* Company Info */}
-          <div className="lg:col-span-2">
+          <div className="col-span-2 lg:col-span-2">
             <div className="flex items-center mb-2 sm:mb-3 group">
               <img
                 src="/logo.png"
@@ -94,17 +94,17 @@ export function Footer({ onNavigate }: FooterProps) {
           </div>
 
           {/* Quick Links */}
-          <div>
+          <div className="col-span-1">
             <h3 className="text-sm sm:text-base font-bold mb-2 sm:mb-3 flex items-center gap-2">
               <span className="w-1 h-4 bg-gradient-to-b from-red-600 to-red-700 rounded-full"></span>
               {t('footer.quick_links')}
             </h3>
-            <ul className="space-y-1.5 sm:space-y-2">
+            <ul className="grid grid-cols-2 sm:grid-cols-1 gap-x-2 gap-y-1.5 sm:gap-y-2">
               {quickLinks.map(link => (
                 <li key={link.id}>
                   <button
                     onClick={() => onNavigate(link.id)}
-                    className="text-gray-300 hover:text-red-500 hover:translate-x-2 transition-all duration-300 flex items-center gap-2 group text-xs sm:text-sm"
+                    className="text-gray-300 hover:text-red-500 hover:translate-x-1 sm:hover:translate-x-2 transition-all duration-300 flex items-center gap-1.5 sm:gap-2 group text-xs sm:text-sm"
                   >
                     <span className="w-0 h-0.5 bg-red-500 transition-all duration-300 group-hover:w-3"></span>
                     {link.label}
@@ -115,7 +115,7 @@ export function Footer({ onNavigate }: FooterProps) {
           </div>
 
           {/* Download App */}
-          <div>
+          <div className="col-span-1">
             <h3 className="text-sm sm:text-base font-bold mb-2 sm:mb-3 flex items-center gap-2">
               <span className="w-1 h-4 bg-gradient-to-b from-red-600 to-red-700 rounded-full"></span>
               {t('home.download_app')}

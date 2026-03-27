@@ -42,11 +42,11 @@ export function About({ onNavigate }: AboutProps) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Hero Section - World Class */}
-      <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-red-600 via-red-700 to-red-800 overflow-hidden">
+      <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-red-700 via-red-600 to-red-800 overflow-hidden">
         {/* Animated Background Pattern */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-red-500/30 rounded-full mix-blend-overlay filter blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-red-500/20 rounded-full mix-blend-overlay filter blur-3xl animate-pulse" style={{ animationDelay: '1.5s' }}></div>
+          <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-yellow-400/20 rounded-full mix-blend-overlay filter blur-3xl animate-pulse" style={{ animationDelay: '1.5s' }}></div>
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-red-400/10 rounded-full mix-blend-overlay filter blur-3xl animate-pulse" style={{ animationDelay: '3s' }}></div>
           
           {/* Geometric Pattern Overlay */}
@@ -61,8 +61,8 @@ export function About({ onNavigate }: AboutProps) {
           {/* Floating Icon */}
           <div className="inline-block mb-8 transform hover:scale-110 transition-transform duration-500">
             <div className="relative">
-              <div className="absolute inset-0 bg-red-400 rounded-full blur-3xl opacity-60 animate-pulse"></div>
-              <Sparkles className="w-20 h-20 text-red-300 relative z-10 drop-shadow-2xl animate-float" />
+              <div className="absolute inset-0 bg-yellow-400 rounded-full blur-3xl opacity-60 animate-pulse"></div>
+              <Sparkles className="w-20 h-20 text-yellow-300 relative z-10 drop-shadow-2xl animate-float" />
             </div>
           </div>
 
@@ -137,8 +137,8 @@ export function About({ onNavigate }: AboutProps) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
             {[
               { id: 'mission', icon: Target, title: t('about.mission_title'), text: t('about.mission_text'), gradient: 'from-red-500 to-red-700', delay: '0s' },
-              { id: 'fast-easy', icon: Zap, title: t('about.lightning_fast_title'), text: t('about.lightning_fast_text'), gradient: 'from-red-500 to-red-700', delay: '0.2s' },
-              { id: 'nationwide', icon: Globe, title: t('about.nationwide_reach_title'), text: t('about.nationwide_reach_text'), gradient: 'from-red-500 to-red-700', delay: '0.4s' }
+              { id: 'fast-easy', icon: Zap, title: t('about.lightning_fast_title'), text: t('about.lightning_fast_text'), gradient: 'from-yellow-500 to-orange-500', delay: '0.2s' },
+              { id: 'nationwide', icon: Globe, title: t('about.nationwide_reach_title'), text: t('about.nationwide_reach_text'), gradient: 'from-blue-500 to-indigo-600', delay: '0.4s' }
             ].map((item) => {
               const IconComponent = item.icon;
               const isCardVisible = isVisible[`feature-card-${item.id}`];
@@ -162,8 +162,8 @@ export function About({ onNavigate }: AboutProps) {
                       <div className={`relative w-16 h-16 bg-gradient-to-br ${item.gradient} rounded-xl flex items-center justify-center shadow-xl transform group-hover:rotate-6 group-hover:scale-110 transition-all duration-500`}>
                         <IconComponent className="w-8 h-8 text-white transform group-hover:scale-110 transition-transform duration-300" />
                       </div>
-                      <div className="absolute -top-1 -right-1 w-6 h-6 bg-red-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse flex items-center justify-center">
-                        <CheckCircle2 className="w-4 h-4 text-red-900" />
+                      <div className="absolute -top-1 -right-1 w-6 h-6 bg-yellow-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse flex items-center justify-center">
+                        <CheckCircle2 className="w-4 h-4 text-yellow-900" />
               </div>
             </div>
 
@@ -192,7 +192,7 @@ export function About({ onNavigate }: AboutProps) {
                 isVisible['vision-section'] ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-16'
               }`}
             >
-              <div className="relative h-full bg-gradient-to-br from-red-50 via-white to-red-50/50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 rounded-2xl p-8 border-2 border-red-200 dark:border-red-900/50 shadow-xl overflow-hidden group hover:shadow-red-500/20 transition-shadow duration-500">
+              <div className="relative h-full bg-gradient-to-br from-gray-50 via-white to-gray-50/50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 rounded-2xl p-8 border-2 border-gray-300 dark:border-gray-600 shadow-xl overflow-hidden group hover:shadow-gray-500/20 transition-shadow duration-500">
                 {/* Background Pattern */}
                 <div className="absolute top-0 right-0 w-48 h-48 bg-red-200/30 dark:bg-red-900/20 rounded-full blur-3xl opacity-50 group-hover:opacity-70 transition-opacity duration-500"></div>
                 <div className="absolute bottom-0 left-0 w-36 h-36 bg-red-200/20 dark:bg-red-900/10 rounded-full blur-3xl"></div>
@@ -224,19 +224,19 @@ export function About({ onNavigate }: AboutProps) {
             >
               <div className="relative h-full bg-gradient-to-br from-red-50 via-white to-red-50/50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 rounded-2xl p-8 border-2 border-red-200 dark:border-red-900/50 shadow-xl overflow-hidden group hover:shadow-red-500/20 transition-shadow duration-500">
                 {/* Background Pattern */}
-                <div className="absolute top-0 left-0 w-48 h-48 bg-red-200/30 dark:bg-red-900/20 rounded-full blur-3xl opacity-50 group-hover:opacity-70 transition-opacity duration-500"></div>
+                <div className="absolute top-0 left-0 w-48 h-48 bg-gray-200/30 dark:bg-gray-700/30 rounded-full blur-3xl opacity-50 group-hover:opacity-70 transition-opacity duration-500"></div>
                 <div className="absolute bottom-0 right-0 w-36 h-36 bg-red-200/20 dark:bg-red-900/10 rounded-full blur-3xl"></div>
                 
                 <div className="relative z-10">
                   <div className="flex items-center gap-4 mb-6">
-                    <div className="w-16 h-16 bg-gradient-to-br from-red-600 to-red-700 rounded-xl flex items-center justify-center shadow-lg transform group-hover:rotate-12 group-hover:scale-110 transition-all duration-500">
+                    <div className="w-16 h-16 bg-gradient-to-br from-gray-700 to-gray-900 dark:from-gray-600 dark:to-gray-800 rounded-xl flex items-center justify-center shadow-lg transform group-hover:rotate-12 group-hover:scale-110 transition-all duration-500">
                       <Star className="w-8 h-8 text-white" />
                     </div>
                     <h2 className="text-3xl font-black text-gray-900 dark:text-white">
                       {t('about.mission_title')}
                     </h2>
                   </div>
-                  <div className="w-16 h-0.5 bg-gradient-to-r from-red-600 to-transparent dark:from-red-400 mb-6"></div>
+                  <div className="w-16 h-0.5 bg-gradient-to-r from-gray-700 to-transparent dark:from-gray-400 mb-6"></div>
                   <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
                     {t('about.mission_text')}
                   </p>
@@ -397,7 +397,7 @@ export function About({ onNavigate }: AboutProps) {
               {/* Animated Background */}
               <div className="absolute inset-0">
                 <div className="absolute top-0 left-0 w-48 h-48 bg-red-500/50 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl animate-pulse"></div>
-                <div className="absolute bottom-0 right-0 w-56 h-56 bg-red-400/30 rounded-full translate-x-1/2 translate-y-1/2 blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+                <div className="absolute bottom-0 right-0 w-56 h-56 bg-yellow-400/30 rounded-full translate-x-1/2 translate-y-1/2 blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-red-400/20 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
                 </div>
               
@@ -405,9 +405,9 @@ export function About({ onNavigate }: AboutProps) {
                 {/* Icon */}
                 <div className="inline-block mb-8 transform group-hover:rotate-12 transition-transform duration-500">
                   <div className="relative">
-                    <div className="absolute inset-0 bg-red-400 rounded-full blur-xl opacity-60 animate-pulse"></div>
-                    <div className="relative bg-red-400 rounded-full p-4 shadow-xl">
-                      <Calendar className="w-10 h-10 text-white" />
+                    <div className="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-60 animate-pulse"></div>
+                    <div className="relative bg-yellow-400 rounded-full p-4 shadow-xl">
+                      <Calendar className="w-10 h-10 text-red-700" />
               </div>
             </div>
           </div>
@@ -462,13 +462,13 @@ export function About({ onNavigate }: AboutProps) {
           <div className="relative bg-gradient-to-br from-red-600 via-red-700 to-red-800 rounded-3xl shadow-2xl p-20 overflow-hidden group">
             {/* Animated Background */}
             <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
-            <div className="absolute top-0 right-0 w-96 h-96 bg-red-400/20 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+            <div className="absolute top-0 right-0 w-96 h-96 bg-yellow-400/20 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
             
             <div className="relative z-10 text-center">
               {/* Hearts */}
               <div className="flex items-center justify-center gap-4 mb-12">
                 <Heart className="w-12 h-12 text-white fill-white transform group-hover:scale-125 group-hover:rotate-12 transition-all duration-500" />
-                <TrendingUp className="w-16 h-16 text-red-300 transform group-hover:scale-125 transition-all duration-500" />
+                <TrendingUp className="w-16 h-16 text-yellow-400 transform group-hover:scale-125 transition-all duration-500" />
                 <Heart className="w-12 h-12 text-white fill-white transform group-hover:scale-125 group-hover:-rotate-12 transition-all duration-500" />
               </div>
 

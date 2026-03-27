@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Search, MapPin, X, Landmark } from 'lucide-react';
 import { popularCities, nepalCities, getProvinces } from '../data/nepalCities';
-import { DefaultCityIcon, getCityIcon } from '../data/cityIcons';
+import { DefaultCityIcon } from '../data/cityIcons';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface CitySelectionModalProps {
@@ -164,11 +164,13 @@ export function CitySelectionModal({ isOpen, onClose, onSelectCity, currentCity 
                       ? 'bg-red-600'
                       : 'bg-gray-200 group-hover:bg-red-100'
                   }`}>
-                    <DefaultCityIcon className={`w-8 h-8 ${
-                      !currentCity || currentCity === ''
-                        ? 'text-white'
-                        : 'text-gray-600 group-hover:text-red-600'
-                    } transition-colors duration-200`} />
+                    {!currentCity || currentCity === '' ? (
+                      <span className="inline-flex h-8 w-8 items-center justify-center text-2xl leading-none text-white" aria-hidden="true">
+                        🗺️
+                      </span>
+                    ) : (
+                      <DefaultCityIcon className="w-8 h-8 text-gray-600 group-hover:text-red-600 transition-colors duration-200" />
+                    )}
                   </div>
                 </div>
                 <div className={`font-semibold text-sm mb-1 ${!currentCity || currentCity === '' ? 'text-red-600' : 'text-gray-900'}`}>
@@ -178,7 +180,6 @@ export function CitySelectionModal({ isOpen, onClose, onSelectCity, currentCity 
               </button>
               
               {displayCities.map((city) => {
-                const CityIcon = getCityIcon(city.name, city.province);
                 return (
                   <button
                     key={city.name}
@@ -209,13 +210,14 @@ export function CitySelectionModal({ isOpen, onClose, onSelectCity, currentCity 
                           ? 'bg-red-600'
                           : 'bg-gray-200 group-hover:bg-red-100'
                       }`}>
-                        <CityIcon
-                          className={`w-8 h-8 ${
-                            currentCity === city.name
-                              ? 'text-white'
-                              : 'text-gray-600 group-hover:text-red-600'
-                          } transition-colors duration-200`}
-                        />
+                        <span
+                          className={`inline-flex h-8 w-8 items-center justify-center text-2xl leading-none ${
+                            currentCity === city.name ? 'text-white' : ''
+                          }`}
+                          aria-hidden="true"
+                        >
+                          {city.icon}
+                        </span>
                       </div>
                     </div>
                     <div className={`font-semibold text-sm mb-1 ${currentCity === city.name ? 'text-red-600' : 'text-gray-900'}`}>
